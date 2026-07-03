@@ -59,7 +59,16 @@ je Version:
   Liga, Zeitstempel.
 
 Bewusst nicht in den Daten: die Tier-Rangfolge (wird in der Engine aus der
-Itemstufe berechnet). Ebenfalls draußen: Uniques und Nicht-Item-Domains.
+Itemstufe berechnet). Ebenfalls draußen: Uniques.
+
+Der Browser deckt mehrere Basis-Welten ab: Ausrüstung (`domain item`), Jewels
+(`misc`), Flasks/Charms (`flask`), Waystones (`area`), Tablets (`tablet`) und
+Relics (`sanctum_relic`). Jede Welt ist gegen die anderen isoliert: der
+allgegenwärtige Tag `default` zählt weder als craftbarer noch als Eignungs-Tag.
+Domänenweite Mods (nur `default`) bekommen stattdessen einen unsichtbaren Marker
+(`__dom_<domain>`), der auch an die Basen ihrer Welt gehängt wird. So erscheinen
+Flask-, Jewel-, Waystone-, Tablet- und Relic-Mods nur auf ihren eigenen Basen.
+Siehe ADR 0013.
 
 ## Query-Engine
 

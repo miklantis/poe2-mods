@@ -1,6 +1,15 @@
 {
-  "current": "0.14.0",
+  "current": "0.15.0",
   "entries": [
+    {
+      "version": "0.15.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Neue Item-Kategorien im Browser: Jewels (Ruby, Emerald, Sapphire, Diamond samt der Time-Lost-Varianten), Flasks (Life, Mana) und Charms, Waystones, Tablets sowie Relics.",
+        "Diese Kategorien fehlten bisher komplett, weil ihre Modifier im Spieldaten-Export in eigenen Bereichen liegen, die der Import nicht erfasst hatte. Jede Kategorie hat wie gewohnt ihre Basis-Varianten (z. B. Waystone Tier 1 bis 16, die sieben Relic-Typen, die einzelnen Charms).",
+        "Die Modifier bleiben sauber getrennt: Flask-, Jewel-, Waystone-, Tablet- und Relic-Mods erscheinen nur auf ihren eigenen Basen und nicht mehr versehentlich bei Waffen oder Rüstung."
+      ]
+    },
     {
       "version": "0.14.0",
       "date": "2026-07-03",

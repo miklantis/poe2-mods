@@ -49,6 +49,10 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-03, 0.15.0 – Weitere Basis-Welten aufgenommen: Jewels, Flasks/Charms,
+  Waystones, Tablets, Relics. Import um die Domains misc/flask/area/tablet/
+  sanctum_relic erweitert; Domain-Marker isoliert die Welten gegen den
+  allgegenwärtigen Tag `default`. 30 → 37 Item-Typen. ADR 0013.
 - 2026-07-03 – PLAN verschlankt: Übergang in den Betriebsmodus. Abgeschlossene
   Vorhaben zu einem Überblick verdichtet, Phase-8-Detailblock entfernt (steht in
   ADR 0011 und Commits), Aufbau-Log 0.12.0–Phase 8 ins Archiv verschoben.

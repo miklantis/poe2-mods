@@ -92,6 +92,45 @@ async function fetchJson<T>(url: string): Promise<T> {
   return JSON.parse(await fetchText(url)) as T
 }
 
+/**
+ * Basis-Domains, aus denen der Browser Modifier zeigt. Neben der klassischen
+ * Ausruestung ('item') sind das Jewels ('misc'), Flasks/Charms ('flask'),
+ * Waystones ('area'), Tablets ('tablet') und Relics ('sanctum_relic'). Jede
+ * Domain ist eine eigene Basis-Welt; ein Modifier passt nur auf Basen seiner
+ * eigenen Welt (siehe domainMarker).
+ */
+const ITEM_DOMAIN = 'item'
+const EXTRA_ROLLABLE_DOMAINS = new Set([
+  'flask',
+  'misc',
+  'area',
+  'tablet',
+  'sanctum_relic',
+])
+
+/**
+ * Der Tag 'default' haengt an praktisch jeder Basis und an domaenenweiten
+ * Modifiern. Als Eignungssignal taugt er nicht (er wuerde alles mit allem
+ * verbinden): er zaehlt weder als craftbarer Tag (Item-Typ-Auswahl) noch fuer
+ * die Eignung. Domaenenweite Mods (nur 'default') bekommen stattdessen den
+ * Marker ihrer Welt, damit sie auf allen Basen ihrer Welt – und nur dort –
+ * erscheinen.
+ */
+const GENERIC_TAG = 'default'
+
+/** Welt (Basis-Domain) einer Mod-Domain. Desecrated rollt auf Ausruestung. */
+function worldOf(domain: string): string {
+  return domain === 'desecrated' ? ITEM_DOMAIN : domain
+}
+/** Unsichtbarer Marker je Basis-Welt (nie in der Oberflaeche sichtbar). */
+function domainMarker(domain: string): string {
+  return `__dom_${domain}`
+}
+/** Domain gehoert zu einer der gezeigten Basis-Welten. */
+function isAcceptedDomain(domain: string): boolean {
+  return domain === ITEM_DOMAIN || EXTRA_ROLLABLE_DOMAINS.has(domain)
+}
+
 /** Herkunft aus domain + generation_type ableiten; null = nicht relevant. */
 function originOf(m: RawMod): Origin | null {
   if (m.domain === 'desecrated') {
@@ -100,12 +139,16 @@ function originOf(m: RawMod): Origin | null {
     }
     return null
   }
-  if (m.domain !== 'item') return null
+  if (!isAcceptedDomain(m.domain)) return null
   if (m.generation_type === 'prefix' || m.generation_type === 'suffix') {
     return 'rollable'
   }
   if (m.generation_type === 'corrupted') return 'corrupted'
-  if (m.generation_type === 'essence') return 'essence'
+  // Essence bleibt bewusst auf die Ausruestungs-Domain beschraenkt (CoE deckt
+  // Essence separat ab; andere Domains haben ohnehin keine Essence-Mods).
+  if (m.generation_type === 'essence' && m.domain === ITEM_DOMAIN) {
+    return 'essence'
+  }
   return null
 }
 
@@ -155,6 +198,7 @@ async function main(): Promise<void> {
     id: string
     slot: Slot | null
     origin: Origin
+    world: string
     tags: Set<string>
     filterTags: Set<string>
     rows: { row: RawMod; id: string }[]
@@ -176,6 +220,7 @@ async function main(): Promise<void> {
         id: key,
         slot,
         origin,
+        world: worldOf(v.domain),
         tags: new Set(),
         filterTags: new Set(),
         rows: [],
@@ -186,7 +231,9 @@ async function main(): Promise<void> {
     for (const t of v.implicit_tags ?? []) fam.filterTags.add(t)
     fam.rows.push({ row: v, id })
     if (origin === 'rollable') {
-      for (const w of positive) craftableTags.add(w.tag)
+      for (const w of positive) {
+        if (w.tag !== GENERIC_TAG) craftableTags.add(w.tag)
+      }
     }
   }
 
@@ -204,12 +251,19 @@ async function main(): Promise<void> {
       }))
       .sort((a, b) => a.ilvl - b.ilvl || a.id.localeCompare(b.id))
     const top = tiers[tiers.length - 1]
+    // Eignungs-Tags: den generischen 'default' durch den Marker der Welt
+    // ersetzen, damit domaenenweite Mods nur auf ihren eigenen Basen greifen.
+    const eligTags = new Set(fam.tags)
+    if (eligTags.has(GENERIC_TAG)) {
+      eligTags.delete(GENERIC_TAG)
+      eligTags.add(domainMarker(fam.world))
+    }
     mods.push({
       id: fam.id,
       text: top.text,
       slot: fam.slot,
       origin: fam.origin,
-      tags: Array.from(fam.tags).sort(),
+      tags: Array.from(eligTags).sort(),
       filterTags: Array.from(fam.filterTags).sort(),
       tiers,
     })
@@ -222,7 +276,12 @@ async function main(): Promise<void> {
   const idOfRaw = new Map<RawBaseItem, string>()
   for (const [id, v] of Object.entries(baseItemsRaw)) {
     if (v.release_state !== 'released') continue
-    baseItemsAll.push({ id, name: v.name, itemClass: v.item_class, tags: v.tags })
+    baseItemsAll.push({
+      id,
+      name: v.name,
+      itemClass: v.item_class,
+      tags: [...v.tags, domainMarker(v.domain)],
+    })
     idOfRaw.set(v, id)
     const list = basesByClass.get(v.item_class) ?? []
     list.push(v)
@@ -237,8 +296,8 @@ async function main(): Promise<void> {
   for (const [classId, bases] of basesByClass) {
     const c = itemClasses[classId]
     if (!c || !c.name) continue
-    const craftableBases = bases.filter((b) =>
-      b.tags.some((t) => craftableTags.has(t)),
+    const craftableBases = bases.filter(
+      (b) => isAcceptedDomain(b.domain) && b.tags.some((t) => craftableTags.has(t)),
     )
     if (craftableBases.length === 0) continue
 
