@@ -67,7 +67,7 @@ export function ModTable({
                         strokeWidth={2}
                         aria-hidden
                       />
-                      <span className="text-[12.5px] font-semibold text-heading">
+                      <span className="text-[14px] font-semibold text-body">
                         {family}
                       </span>
                       {showProbability && (

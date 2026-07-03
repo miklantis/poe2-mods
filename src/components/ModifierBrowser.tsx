@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 import type { ItemType, Mod } from '@/data/schema.coe'
 import type { BrowserSearch } from '@/routes/$type'
 import { useMods, useBaseMods, useEssences } from '@/hooks/useGameData'
@@ -129,9 +128,6 @@ export function ModifierBrowser({
     return s
   }, [allKeys, expandedKeys])
 
-  const allCollapsed =
-    allKeys.length === 0 || !allKeys.some((k) => expandedKeys.has(k))
-
   const toggleKey = (key: string) =>
     setExpandedKeys((prev) => {
       const next = new Set(prev)
@@ -139,9 +135,6 @@ export function ModifierBrowser({
       else next.add(key)
       return next
     })
-
-  const toggleAll = () =>
-    setExpandedKeys(allCollapsed ? new Set(allKeys) : new Set())
 
   const toggleTag = (tag: ColorTag) => {
     const active = new Set(search.tags)
@@ -171,8 +164,6 @@ export function ModifierBrowser({
     )
   }
 
-  const CollapseIcon = allCollapsed ? ChevronsUpDown : ChevronsDownUp
-
   return (
     <div className="mt-6">
       {variants.length > 1 && (
@@ -200,22 +191,10 @@ export function ModifierBrowser({
         onItemLevel={(ilvl) => patchSearch({ ilvl })}
       />
 
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <p className="text-[12px] text-dim">
-          Chance nur im rollbaren Pool (geschätzte Spawn-Gewichte, Craft of
-          Exile). Desecrated, Essence und Corrupted werden gezielt gesetzt.
-        </p>
-        <button
-          type="button"
-          onClick={toggleAll}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2.5 py-1.5 text-[12.5px] font-semibold text-secondary-text transition-colors hover:text-body"
-        >
-          <CollapseIcon className="size-3.5" strokeWidth={2} aria-hidden />
-          <span className="hidden sm:inline">
-            {allCollapsed ? 'Alle ausklappen' : 'Alle einklappen'}
-          </span>
-        </button>
-      </div>
+      <p className="mb-6 text-[12px] text-dim">
+        Chance nur im rollbaren Pool (geschätzte Spawn-Gewichte, Craft of
+        Exile). Desecrated, Essence und Corrupted werden gezielt gesetzt.
+      </p>
 
       {/* Rollbar */}
       <section>

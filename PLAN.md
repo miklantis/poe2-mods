@@ -186,6 +186,13 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.12.2 – Phase 5 (Design-Feinschliff): Textgrößen vereinheitlicht
+  (Familienkopf in ModTable 12.5→14px, weiß statt heading), alle Modifier-Texte
+  weiß. Theme insgesamt heller und kontrastärmer: `--background`, Surface-,
+  Border- und shadcn-Basis-Tokens angehoben, graue Text-Token (secondary/muted/
+  dim) heller. Globaler „Alle ein-/ausklappen"-Button samt Logik
+  (toggleAll/allCollapsed/CollapseIcon) entfernt; Einzel-Toggle bleibt.
+  Typecheck, 57 Tests, Build grün.
 - 2026-07-03, 0.12.1 – Phase 5 (Design-Feinschliff): Typ-Tags aus den Tabellen
   entfernt (Filter-Pills oben unverändert, `displayTags` bleibt für die
   Filterung), Modifier-Text 13→14px. Übergeordnete Herkunfts-Überschriften

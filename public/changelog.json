@@ -1,6 +1,16 @@
 {
-  "current": "0.12.1",
+  "current": "0.12.2",
   "entries": [
+    {
+      "version": "0.12.2",
+      "date": "2026-07-03",
+      "changes": [
+        "Einheitliche Textgröße in allen Tabellen: der Modifier-Name (Familienkopf) ist jetzt so groß wie die aufgeklappten Zeilen und die Essence-Zeilen.",
+        "Modifier-Texte durchgehend in Weiß statt teils bräunlich, für ein ruhigeres Bild.",
+        "Hintergrund und Flächen etwas heller, graue Beschriftungen heller gesetzt – insgesamt weniger harter Kontrast.",
+        "Button „Alle ein-/ausklappen“ entfernt; Gruppen lassen sich weiterhin einzeln über den Pfeil auf- und zuklappen."
+      ]
+    },
     {
       "version": "0.12.1",
       "date": "2026-07-03",

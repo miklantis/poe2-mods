@@ -15,23 +15,23 @@
 :root {
   --radius: 0.8125rem;
 
-  --background: #0a0c0f;
+  --background: #14171d;
   --foreground: #e6e8ec;
-  --card: #0f1217;
+  --card: #1a1e25;
   --card-foreground: #e6e8ec;
-  --popover: #101318;
+  --popover: #1d212a;
   --popover-foreground: #e6e8ec;
   --primary: #e8b45a;
   --primary-foreground: #0a0c0f;
-  --secondary: #101318;
+  --secondary: #1d212a;
   --secondary-foreground: #e6e8ec;
-  --muted: #12151a;
-  --muted-foreground: #8b93a1;
-  --accent: #161a20;
+  --muted: #22262e;
+  --muted-foreground: #b4bcc9;
+  --accent: #262b34;
   --accent-foreground: #f3ead6;
   --destructive: #e05a6f;
-  --border: #23272f;
-  --input: #23272f;
+  --border: #2c313b;
+  --input: #2c313b;
   --ring: #e8b45a;
 }
 
@@ -65,21 +65,21 @@
   --color-ring: var(--ring);
 
   /* Surface-Abstufungen */
-  --color-surface: #0f1217;
-  --color-surface-raised: #101318;
-  --color-surface-header: #12151a;
-  --color-surface-group: #0c0f13;
+  --color-surface: #1a1e25;
+  --color-surface-raised: #1d212a;
+  --color-surface-header: #22262e;
+  --color-surface-group: #16191f;
 
   /* Border-Abstufungen */
-  --color-border-card: #20242c;
-  --color-border-subtle: #1a1e25;
+  --color-border-card: #2b3039;
+  --color-border-subtle: #262b34;
 
   /* Text-Abstufungen */
   --color-heading: #f3ead6;
   --color-body: #e6e8ec;
-  --color-secondary-text: #8b93a1;
-  --color-muted-text: #6b7280;
-  --color-dim: #565d68;
+  --color-secondary-text: #b4bcc9;
+  --color-muted-text: #a4acb9;
+  --color-dim: #8a92a0;
 
   /* Praefix-/Suffix-Akzent */
   --color-prefix: #6ea8ff;
