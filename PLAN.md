@@ -2,6 +2,22 @@
 
 ## Aktueller Stand
 
+Herkunft-Dimension begonnen (Phase 7). Schritt 1 (Datenfundament) steht: der
+Import zieht jetzt neben den rollbaren Mods auch Corrupted und Desecrated aus
+dem CoE-Snapshot; `mods.json` trägt eine Herkunft (`origin`) und einen nullable
+`slot` (Corrupted belegt keinen Präfix/Suffix-Slot). Die Rechen-Engine bleibt
+herkunftsagnostisch, überspringt aber slot-lose Mods; die Trennung der Reiter
+läuft über die reine Funktion `filterRowsByOrigin`. Der bestehende Browser-Screen
+filtert strikt auf `origin: rollable` – die rollbare Ansicht ist unverändert (an
+den Ringen gegengeprüft: gleiche Mod-/Zeilenmenge). Entscheidung dokumentiert in
+ADR 0009. Datenstand 0.5.4: 491 rollbar, 100 Corrupted, 204 Desecrated.
+
+Als Nächstes: Schritt 2 – die Herkunft-Reiter im Browser sichtbar machen (rollbar
+und Desecrated als Präfix/Suffix, Corrupted flach; Chance nur bei rollbar).
+Danach Essence als eigener, item-typ-bezogener Datenweg.
+
+--- Stand Phase 6 (weiter gueltig fuer Datenquelle und Oberflaeche): ---
+
 Phase 6 (Datenquelle Craft of Exile) abgeschlossen. Die App läuft vollständig
 auf den CoE-Daten (Version 0.5.4): basis-zentriertes Schema
 (`src/data/schema.coe.ts`), reine Engine `runBaseQuery`, beide Screens
@@ -13,9 +29,9 @@ Attribution und Datenstand). Doku steht: ADR 0008 dokumentiert die
 Datenquelle, ADR 0003/0004/0006 sind als abgelöst markiert, `Architektur.md`
 ist auf CoE nachgezogen.
 
-Als Nächstes: nur noch Phase 5 (optional/später) und der laufende Betrieb –
-Daten bei neuem Patch aktualisieren (neuen CoE-Snapshot nach `data/_source/coe/`,
-`npm run import:coe`, `data/<version>/` und `manifest.json` fortschreiben).
+Laufender Betrieb (unverändert): Daten bei neuem Patch aktualisieren (neuen
+CoE-Snapshot nach `data/_source/coe/`, `npm run import:coe`, `data/<version>/`
+und `manifest.json` fortschreiben).
 Hinweis: Die Gewichte im aktuellen Snapshot wirken teils wie Platzhalter (bei
 den Ringen durchweg 1000) – das ist Datenqualität des Snapshots, nicht der
 Verdrahtung.
@@ -85,6 +101,17 @@ neuem Patch aktualisieren.
 
 ## Offene Vorhaben
 
+### Phase 7 – Herkünfte (rollbar / Corrupted / Desecrated / Essence)
+Eigene Reiter je Herkunft im Browser. Konzept und Entscheidungen in ADR 0009.
+Socket-Mods ausgeschlossen; Augment/Bonded zurückgestellt (im Snapshot 0.5.4
+nicht als eigene Herkunft vorhanden).
+- [x] Schritt 1: Datenfundament – Import zieht Corrupted + Desecrated, `origin`
+  und nullable `slot` im Schema, Engine überspringt slot-lose Mods,
+  `filterRowsByOrigin`, rollbare Ansicht unverändert. Tests, ADR 0009.
+- [ ] Schritt 2: Herkunft-Reiter im Browser (rollbar/Desecrated als Präfix/
+  Suffix, Corrupted flach; Chance nur bei rollbar)
+- [ ] Schritt 3: Essence als eigener, item-typ-bezogener Datenweg + Reiter
+
 ### Phase 5 – optional/später
 - [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
 - [ ] Feinschliff Design/Designsystem
@@ -145,6 +172,12 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.9.4 – Phase 7, Schritt 1: Herkunft-Fundament. Import zieht neben
+  rollbaren Mods jetzt Corrupted (mgroup 1, affix corrupted) und Desecrated
+  (mgroup 10); `mods.json` trägt `origin` und nullable `slot`. Engine
+  `runBaseQuery` überspringt slot-lose Mods, neue reine `filterRowsByOrigin`
+  trennt die Herkünfte; der Browser filtert strikt auf rollbar (Ansicht
+  unverändert, an den Ringen gegengeprüft). ADR 0009 neu. 5 neue Tests (51 gesamt).
 - 2026-07-03, 0.9.3 – Itemstufe-Slider sichtbar gemacht. Neue Klasse
   `.il-slider` (index.css) mit sichtbarer Schiene, bis zum Wert gefuelltem
   Bereich (WebKit via `--il-pct`, Firefox via `::-moz-range-progress`) und
@@ -194,14 +227,5 @@ ADR 0008.
   datengetrieben abgeleitet (`baseVariants.ts`, ADR 0006) mit Umschalter bei
   mehreren Basen. Neue Bausteine `ModifierBrowser`, `ModColumn`, `ModGroupBlock`,
   `TierRow`, `VariantSelect`, `Badge`; Helfer `modText`, `format`. 12 neue Tests.
-- 2026-07-03, 0.5.0 – Phase 3, Screen 1: Item-Typ-Auswahl. Gruppiertes
-  Kachel-Grid aus den Daten (Config in `itemGroups.ts` liefert Reihenfolge,
-  Labels und Icons; Unbekanntes fällt nach „Other"), Substring-Suche,
-  Navigation auf die Browser-Route `/$type` (noch Platzhalter). Reine
-  Gruppierungslogik mit 6 Tests. Input-Primitive und `ItemTypeTile` als
-  wiederverwendbare Bausteine.
-- 2026-07-03, 0.4.0 – Phase 3 gestartet: Design-System eingezogen. Dunkles Theme
-  aus dem Handoff als Tokens (Farben, Text-Abstufungen, Präfix-/Suffix- und
-  Tag-Farben), drei self-hosted Schriften (Space Grotesk, Manrope, JetBrains
-  Mono), Hintergrund-Glow, schlanke Layout-Shell ohne globalen Header. Grundlage
-  für die Item-Ansichten.
+
+Ältere Einträge (0.1.0–0.5.0) im Archiv: `docs/archive/PLAN-Log-Archiv.md`.

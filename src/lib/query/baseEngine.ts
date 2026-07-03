@@ -1,4 +1,4 @@
-import type { BaseMod, Mod, Slot } from '@/data/schema.coe'
+import type { BaseMod, Mod, Origin, Slot } from '@/data/schema.coe'
 
 /**
  * Reine, DOM-freie Query-Engine fuer das basis-zentrierte CoE-Schema. Sie
@@ -63,6 +63,7 @@ export interface QueryResult {
 /** Zwischen-Eintrag: ein erreichbarer Tier eines aufgeloesten Mods. */
 interface ReachableTier {
   mod: Mod
+  slot: Slot
   tier: number
   tierCount: number
   ilvl: number
@@ -70,8 +71,22 @@ interface ReachableTier {
   values: [number, number][]
 }
 
-function groupKey(mod: Mod): string {
-  return `${mod.group}|${mod.slot}`
+function groupKey(mod: Mod, slot: Slot): string {
+  return `${mod.group}|${slot}`
+}
+
+/**
+ * Reine Herkunft-Auswahl: liefert nur die Zeilen, deren Mod die gesuchte
+ * Herkunft hat. Trennt die Reiter (rollable/corrupted/desecrated), bevor die
+ * Rechen-Engine laeuft – so mischen sich die Pools nie. Zeilen mit unbekannter
+ * Mod-ID fallen heraus.
+ */
+export function filterRowsByOrigin(
+  rows: readonly BaseMod[],
+  modsById: ReadonlyMap<string, Mod>,
+  origin: Origin,
+): BaseMod[] {
+  return rows.filter((r) => modsById.get(r.mod)?.origin === origin)
 }
 
 /**
@@ -80,7 +95,12 @@ function groupKey(mod: Mod): string {
  * Der Rang wird ueber die volle Tier-Liste vergeben, damit er stabil bleibt,
  * auch wenn hohe Tiers durch die Itemstufe herausfallen.
  */
-function reachableTiers(mod: Mod, tiers: BaseMod['tiers'], itemLevel: number): ReachableTier[] {
+function reachableTiers(
+  mod: Mod,
+  slot: Slot,
+  tiers: BaseMod['tiers'],
+  itemLevel: number,
+): ReachableTier[] {
   const ranked = [...tiers]
     .map((t, index) => ({ t, index }))
     .sort((a, b) => b.t.ilvl - a.t.ilvl || a.index - b.index)
@@ -90,6 +110,7 @@ function reachableTiers(mod: Mod, tiers: BaseMod['tiers'], itemLevel: number): R
     if (t.ilvl > itemLevel) return
     out.push({
       mod,
+      slot,
       tier: i + 1,
       tierCount,
       ilvl: t.ilvl,
@@ -115,13 +136,16 @@ export function runBaseQuery(
   for (const row of rows) {
     const mod = modsById.get(row.mod)
     if (!mod) continue
-    reachable.push(...reachableTiers(mod, row.tiers, ctx.itemLevel))
+    // Slot-lose Mods (Corrupted) gehoeren nicht in die Praefix/Suffix-Rechnung;
+    // sie laufen ueber einen eigenen, flachen Weg.
+    if (mod.slot == null) continue
+    reachable.push(...reachableTiers(mod, mod.slot, row.tiers, ctx.itemLevel))
   }
 
   let prefixWeightTotal = 0
   let suffixWeightTotal = 0
   for (const r of reachable) {
-    if (r.mod.slot === 'prefix') prefixWeightTotal += r.weight
+    if (r.slot === 'prefix') prefixWeightTotal += r.weight
     else suffixWeightTotal += r.weight
   }
 
@@ -131,7 +155,7 @@ export function runBaseQuery(
   >()
 
   for (const r of reachable) {
-    const slotTotal = r.mod.slot === 'prefix' ? prefixWeightTotal : suffixWeightTotal
+    const slotTotal = r.slot === 'prefix' ? prefixWeightTotal : suffixWeightTotal
     const computed: ComputedMod = {
       mod: r.mod,
       tier: r.tier,
@@ -141,7 +165,7 @@ export function runBaseQuery(
       values: r.values,
       probability: slotTotal > 0 ? r.weight / slotTotal : 0,
     }
-    const key = groupKey(r.mod)
+    const key = groupKey(r.mod, r.slot)
     const existing = groups.get(key)
     if (existing) {
       existing.weight += r.weight
@@ -149,7 +173,7 @@ export function runBaseQuery(
     } else {
       groups.set(key, {
         group: r.mod.group,
-        slot: r.mod.slot,
+        slot: r.slot,
         weight: r.weight,
         mods: [computed],
       })

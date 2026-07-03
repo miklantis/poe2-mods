@@ -73,11 +73,13 @@ interface RawLang {
 
 // ---- Ziel-Schema (Zod = Quelle der Wahrheit) ----------------------------
 const slotSchema = z.enum(['prefix', 'suffix'])
+const originSchema = z.enum(['rollable', 'corrupted', 'desecrated'])
 
 const modSchema = z.object({
   id: z.string(),
   text: z.string(),
-  slot: slotSchema,
+  slot: slotSchema.nullable(),
+  origin: originSchema,
   group: z.string(),
   tags: z.array(z.string()),
 })
@@ -207,6 +209,22 @@ function main(): void {
   > = {}
   const usedMods = new Set<string>()
 
+  // Herkunft + Slot je Mod aus mgroup (Base=1, Desecrated=10) und affix. Gibt
+  // null zurueck fuer alles, was der Browser (noch) nicht zeigt: Socket-Mods,
+  // Essence (id_mgroup 13, eigener Datenweg spaeter) und Unbekanntes.
+  type Classified = { origin: 'rollable' | 'corrupted' | 'desecrated'; slot: 'prefix' | 'suffix' | null }
+  const classify = (m: RawModifier): Classified | null => {
+    if (m.id_mgroup === '1') {
+      if (m.affix === 'prefix' || m.affix === 'suffix')
+        return { origin: 'rollable', slot: m.affix }
+      if (m.affix === 'corrupted') return { origin: 'corrupted', slot: null }
+      return null // socket u. a.
+    }
+    if (m.id_mgroup === '10' && (m.affix === 'prefix' || m.affix === 'suffix'))
+      return { origin: 'desecrated', slot: m.affix }
+    return null
+  }
+
   for (const base of data.bases.seq) {
     const bid = base.id_base
     const modIds = data.basemods[bid] ?? []
@@ -218,8 +236,7 @@ function main(): void {
     for (const mid of modIds) {
       const m = modById.get(mid)
       if (!m) continue
-      if (m.affix !== 'prefix' && m.affix !== 'suffix') continue
-      if (m.id_mgroup !== '1') continue // nur der normale Basis-Pool
+      if (classify(m) === null) continue
       const rawTiers = data.tiers[mid]?.[bid]
       if (!rawTiers || rawTiers.length === 0) continue
       const tiers = rawTiers
@@ -234,11 +251,17 @@ function main(): void {
       usedMods.add(mid)
     }
 
-    if (rows.length === 0) continue // Basen ohne rollbare Mods ueberspringen
+    if (rows.length === 0) continue // Basen ohne aufgenommene Mods ueberspringen
 
     baseModsOut[bid] = rows
 
-    // Item-Typ + Variante ableiten und einsortieren.
+    // Item-Typ + Variante nur aus rollbaren Basen ableiten: Basen, die nur ueber
+    // Sonder-Herkuenfte Mods haetten, sollen keine neuen Item-Typen erzeugen.
+    const hasRollable = rows.some((r) => {
+      const rm = modById.get(r.mod)
+      return rm ? classify(rm)?.origin === 'rollable' : false
+    })
+    if (!hasRollable) continue
     const parsed = parseBase(baseName(bid, base.name_base))
     const typeId = slugify(parsed.itemType)
     const acc =
@@ -255,10 +278,12 @@ function main(): void {
   // Mods-Metadaten (dedupliziert) nur fuer verwendete Mods.
   const mods = [...usedMods].map((mid) => {
     const m = modById.get(mid)!
+    const c = classify(m)!
     return {
       id: mid,
       text: m.name_modifier,
-      slot: m.affix as 'prefix' | 'suffix',
+      slot: c.slot,
+      origin: c.origin,
       group: groupOf(m),
       tags: tagsOf(m),
     }

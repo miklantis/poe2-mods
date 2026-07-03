@@ -3,7 +3,7 @@ import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 import type { ItemType, Mod } from '@/data/schema.coe'
 import type { BrowserSearch } from '@/routes/$type'
 import { useMods, useBaseMods } from '@/hooks/useGameData'
-import { runBaseQuery } from '@/lib/query/baseEngine'
+import { runBaseQuery, filterRowsByOrigin } from '@/lib/query/baseEngine'
 import type { ModGroup } from '@/lib/query/baseEngine'
 import { filterResult, availableTags } from '@/lib/query/filter'
 import type { ColorTag } from '@/lib/modTags'
@@ -57,7 +57,11 @@ export function ModifierBrowser({
   const result = useMemo(() => {
     if (!mods.data || !baseMods.data || !selected) return null
     const rows = baseMods.data[selected.base] ?? []
-    return runBaseQuery(rows, modsById, { itemLevel: search.ilvl })
+    // Screen 2 zeigt derzeit den rollbaren Pool. Corrupted/Desecrated liegen in
+    // denselben Basis-Daten, gehoeren aber in eigene Reiter (folgt) – hier
+    // strikt heraushalten, damit sie die Chancen nicht verfaelschen.
+    const rollable = filterRowsByOrigin(rows, modsById, 'rollable')
+    return runBaseQuery(rollable, modsById, { itemLevel: search.ilvl })
   }, [mods.data, baseMods.data, modsById, selected, search.ilvl])
 
   const tags = useMemo(() => (result ? availableTags(result) : []), [result])

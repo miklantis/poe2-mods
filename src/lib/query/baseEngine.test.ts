@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import type { BaseMod, Mod, Tier } from '@/data/schema.coe'
-import { runBaseQuery } from './baseEngine'
+import { runBaseQuery, filterRowsByOrigin } from './baseEngine'
 
 /** Baut einen Mod mit sinnvollen Vorgaben; nur Relevantes wird ueberschrieben. */
 function makeMod(partial: Partial<Mod> & Pick<Mod, 'id'>): Mod {
   return {
     id: partial.id,
     text: partial.text ?? partial.id,
-    slot: partial.slot ?? 'prefix',
+    slot: partial.slot === undefined ? 'prefix' : partial.slot,
+    origin: partial.origin ?? 'rollable',
     group: partial.group ?? 'GroupA',
     tags: partial.tags ?? [],
   }
@@ -161,5 +162,43 @@ describe('runBaseQuery – Rollen-Bereiche', () => {
     const rows: BaseMod[] = [{ mod: 'm', tiers: [tier(1, 100, [[5, 5], [8, 12]])] }]
     const res = runBaseQuery(rows, modMap(mods), { itemLevel: 100 })
     expect(res.prefixes[0].mods[0].values).toEqual([[5, 5], [8, 12]])
+  })
+})
+
+describe('Herkunft-Trennung', () => {
+  const mods = [
+    makeMod({ id: 'roll', slot: 'prefix', origin: 'rollable' }),
+    makeMod({ id: 'cor', slot: null, origin: 'corrupted' }),
+    makeMod({ id: 'des', slot: 'suffix', origin: 'desecrated' }),
+  ]
+  const rows: BaseMod[] = [
+    { mod: 'roll', tiers: [tier(1, 100)] },
+    { mod: 'cor', tiers: [tier(1, 1)] },
+    { mod: 'des', tiers: [tier(65, 1)] },
+  ]
+
+  it('runBaseQuery ueberspringt slot-lose (Corrupted) Mods', () => {
+    const res = runBaseQuery(rows, modMap(mods), { itemLevel: 100 })
+    const ids = [...res.prefixes, ...res.suffixes].flatMap((g) =>
+      g.mods.map((m) => m.mod.id),
+    )
+    expect(ids).not.toContain('cor')
+    expect(ids).toContain('roll')
+    expect(ids).toContain('des')
+  })
+
+  it('filterRowsByOrigin liefert nur Zeilen der gesuchten Herkunft', () => {
+    const map = modMap(mods)
+    expect(filterRowsByOrigin(rows, map, 'rollable').map((r) => r.mod)).toEqual(['roll'])
+    expect(filterRowsByOrigin(rows, map, 'corrupted').map((r) => r.mod)).toEqual(['cor'])
+    expect(filterRowsByOrigin(rows, map, 'desecrated').map((r) => r.mod)).toEqual(['des'])
+  })
+
+  it('Rollbar-Pool bleibt ungestoert von anderen Herkuenften', () => {
+    const map = modMap(mods)
+    const rollable = filterRowsByOrigin(rows, map, 'rollable')
+    const res = runBaseQuery(rollable, map, { itemLevel: 100 })
+    expect(res.prefixWeightTotal).toBe(100)
+    expect(res.prefixes[0].mods[0].probability).toBe(1)
   })
 })

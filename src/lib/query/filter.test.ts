@@ -4,7 +4,7 @@ import type { ModGroup, QueryResult } from './baseEngine'
 import type { Mod, Slot } from '@/data/schema.coe'
 
 function mod(text: string, tags: string[]): Mod {
-  return { id: text, text, slot: 'prefix', group: text, tags }
+  return { id: text, text, slot: 'prefix', origin: 'rollable', group: text, tags }
 }
 
 function group(slot: Slot, name: string, m: Mod): ModGroup {

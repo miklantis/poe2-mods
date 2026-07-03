@@ -3,7 +3,7 @@ import { displayTags } from './modTags'
 import type { Mod } from '@/data/schema.coe'
 
 function mod(tags: string[]): Mod {
-  return { id: 'x', text: '', slot: 'prefix', group: 'g', tags }
+  return { id: 'x', text: '', slot: 'prefix', origin: 'rollable', group: 'g', tags }
 }
 
 describe('displayTags', () => {

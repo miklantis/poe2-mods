@@ -1,6 +1,13 @@
 {
-  "current": "0.9.3",
+  "current": "0.9.4",
   "entries": [
+    {
+      "version": "0.9.4",
+      "date": "2026-07-03",
+      "changes": [
+        "Datenbasis um zwei Herkünfte erweitert: Corrupted (über Vaal-Corruption) und Desecrated (über Well of Souls). Beide werden jetzt aus den Daten eingelesen und stehen bereit; die eigenen Herkunft-Reiter im Browser folgen im nächsten Schritt. Die rollbare Ansicht bleibt unverändert."
+      ]
+    },
     {
       "version": "0.9.3",
       "date": "2026-07-03",

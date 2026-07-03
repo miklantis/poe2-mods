@@ -19,11 +19,27 @@ import { z } from 'zod'
 export const slotSchema = z.enum(['prefix', 'suffix'])
 export type Slot = z.infer<typeof slotSchema>
 
-/** Ein Mod aus mods.json: schlanke Metadaten, ohne Gewichte oder Tiers. */
+/**
+ * Herkunft eines Mods – der Weg, auf dem er aufs Item kommt. Bestimmt, in
+ * welchem Reiter der Browser ihn zeigt:
+ * - rollable:   normaler, gewichteter Basis-Pool (Präfix/Suffix mit Chance).
+ * - corrupted:  über Corruption (Vaal) gesetzt; kein Präfix/Suffix-Slot.
+ * - desecrated: über Desecration (Well of Souls) gesetzte Präfixe/Suffixe.
+ * Weitere Herkünfte (z. B. Essence) kommen als eigener Datenweg dazu.
+ */
+export const originSchema = z.enum(['rollable', 'corrupted', 'desecrated'])
+export type Origin = z.infer<typeof originSchema>
+
+/**
+ * Ein Mod aus mods.json: schlanke Metadaten, ohne Gewichte oder Tiers. `slot`
+ * ist bei Corrupted-Mods `null`, weil sie keinen Präfix/Suffix-Slot belegen;
+ * `origin` trennt die Herkünfte für die Reiter-Ansicht.
+ */
 export const modSchema = z.object({
   id: z.string(),
   text: z.string(),
-  slot: slotSchema,
+  slot: slotSchema.nullable(),
+  origin: originSchema,
   group: z.string(),
   tags: z.array(z.string()),
 })
