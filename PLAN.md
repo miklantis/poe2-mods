@@ -105,6 +105,12 @@ die App während der Migration lauffähig bleibt.
 
 ## Log
 
+- 2026-07-03 – Phase 8, Schritt 2 (Teil): reine repoe-Query-Engine
+  (`repoeEngine.ts`) mit Eignung-über-Tags + Tier-Rangfolge, ohne
+  Gewicht/Chance; alle Herkünfte über eine flache Logik. Additiv, App
+  unberührt (Verdrahtung folgt). Essence-Behandlung: bleibt erhalten, aus den
+  CoE-Daten aufbereitet (Entscheidung bestätigt) – Umsetzung als nächster
+  Teil. Typecheck, 71 Tests (9 neu), Build grün.
 - 2026-07-03 – Phase 8, Schritt 1: Datenfundament repoe. Neues mod-zentriertes
   Schema (`schema.repoe.ts`) und Import (`import-repoe.ts`, `npm run
   import:repoe`) aus `repoe-fork/poe2` v4.5.4.3; Daten unter `data/4.5.4.3/`
