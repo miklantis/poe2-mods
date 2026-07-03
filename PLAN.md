@@ -24,24 +24,30 @@ CoE.
 ## Offene Vorhaben
 
 ### Phase 8 – Datenquelle zurück auf repoe (Vollständigkeit statt Wahrscheinlichkeit)
-Umstieg vom CoE-Snapshot auf den repoe-poe2-Export (Version 4.5.4.3, aus den
-Spieldateien). Bringt alle Pools inkl. der bisher fehlenden Otherworldly- und
-Genesis-Tree-Mods. Kostet die geschätzten Wahrscheinlichkeiten, weil repoe nur
-Spawn-Gewichte 0/1 führt; die Chance-Anzeige entfällt durchgängig, alle Pools
-werden einheitlich mit Tier und Wertebereich gezeigt. Entscheidung/Begründung in
-ADR 0011 (neu); ADR 0008 wird als abgelöst markiert. poe2db bleibt nur
-UX-/Abgleich-Vorbild, wird nicht gescrapt.
+Umstieg vom CoE-Snapshot auf den repoe-poe2-Export (Repo `repoe-fork/poe2`,
+Branch `master`, Version 4.5.4.3, aus den Spieldateien; Rohdaten unter
+`https://raw.githubusercontent.com/repoe-fork/poe2/master/data/`). Bringt alle
+Pools inkl. der bisher fehlenden Otherworldly- und Genesis-Tree-Mods. Kostet die
+geschätzten Wahrscheinlichkeiten, weil repoe nur Spawn-Gewichte 0/1 führt; die
+Chance-Anzeige entfällt durchgängig, alle Pools werden einheitlich mit Tier und
+Wertebereich gezeigt. Entscheidung/Begründung in ADR 0011 (neu); ADR 0008 wird
+als abgelöst markiert. poe2db bleibt nur UX-/Abgleich-Vorbild, wird nicht
+gescrapt. Bis Schritt 3 zeigt `manifest.json` weiter auf die CoE-Version, damit
+die App während der Migration lauffähig bleibt.
 - [ ] Schritt 1: Datenfundament. Neues `import-repoe.ts` zieht den
   repoe-poe2-Export (`mods.json`, `mods_by_base.json`, `base_items.json`,
-  `tags.json`, `item_classes.json`, `essences.json`), normalisiert auf ein
+  `tags.json`, `tag_details.json`, `item_classes.json`), normalisiert auf ein
   mod-zentriertes Schema (`origin` je Pool, `slot`, Eignung über
   `spawn_weight > 0` je Tag, kein Gewichtsfeld), Zod-validiert, unter
-  `data/<version>/` abgelegt, `manifest.json` fortgeschrieben. Gegenprobe an
-  Ringen und Gürteln gegen poe2db (Otherworldly muss erscheinen).
+  `data/<version>/` abgelegt. Essence ist keine eigene Datei: die
+  Essence-Modifier stecken in `mods.json` (`generation_type: essence` bzw.
+  `is_essence_only`), Corrupted (`generation_type: corrupted`) und Desecrated
+  (`domain: desecrated`) ebenso. Gegenprobe an Ringen und Gürteln gegen poe2db
+  (Otherworldly muss erscheinen). `manifest.json` noch nicht umschalten.
 - [ ] Schritt 2: Query-Engine ohne Wahrscheinlichkeit. `baseEngine` auf reine
   Eignung + Tier (requiredLevel-Rangfolge) + Wertebereich umstellen,
   Chance-Berechnung entfernen; Herkünfte über eine einheitliche Flat-Logik;
-  `essenceEngine` auf die repoe-`essences.json`. Unit-Tests anpassen.
+  `essenceEngine` auf die Essence-Mods aus `mods.json`. Unit-Tests anpassen.
 - [ ] Schritt 3: UI ohne Chance-Spalte. Wahrscheinlichkeits-Anzeige aus dem
   rollbaren Abschnitt entfernen (alle Pools einheitlich), Schätzwert-Hinweis
   raus, Fußzeilen-Attribution auf repoe umstellen. Neue Pools (Otherworldly,
