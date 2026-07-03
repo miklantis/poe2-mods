@@ -74,8 +74,11 @@ versionierten Daten liegen unter `data/` im Repo-Root; ein Vite-Plugin bedient
 
 ## Ist-Zustand
 
-Phase 0 (Setup) und Phase 1 (Datenpipeline und Schema) umgesetzt: Grundgerüst,
-Routing, Styling, Deploy-Pipeline; Zod-Schema, Import-Skript, normalisierte
-Daten (Version 4.5.4.3), Loader-Hooks mit Validierung beim Laden und eine
-Datenstatus-Anzeige auf der Startseite. Noch offen: Query-Engine (Tier,
-Wahrscheinlichkeit), fachliche Ansichten je Item-Typ, Facet-Search.
+Phase 0 (Setup), Phase 1 (Datenpipeline und Schema) und Phase 2 (Query-Engine)
+umgesetzt: Grundgerüst, Routing, Styling, Deploy-Pipeline; Zod-Schema,
+Import-Skript, normalisierte Daten (Version 4.5.4.3), Loader-Hooks mit
+Validierung beim Laden und eine Datenstatus-Anzeige auf der Startseite. Die
+Query-Engine (`src/lib/query/engine.ts`) errechnet als reines Modul aus
+Item-Tags plus Itemstufe die spawn-baren Mods mit Tier und Wahrscheinlichkeit
+(mit Unit-Tests). Noch offen: fachliche Ansichten je Item-Typ (UI-Grundgerüst)
+und Facet-Search.

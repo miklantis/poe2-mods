@@ -2,32 +2,31 @@
 
 ## Aktueller Stand
 
-Phase 0 (Setup) und Phase 1 (Datenpipeline und Schema) umgesetzt. Die App lädt
-die normalisierten Spieldaten (Version 4.5.4.3) über TanStack Query, validiert
-sie beim Laden gegen die Zod-Schemas und zeigt einen Datenstatus auf der
-Startseite (Version, Anzahl Mods/Basen/Item-Typen/Tags).
+Phase 0 (Setup), Phase 1 (Datenpipeline und Schema) und Phase 2 (Query-Engine)
+umgesetzt. Die App lädt die normalisierten Spieldaten (Version 4.5.4.3) über
+TanStack Query, validiert sie beim Laden gegen die Zod-Schemas und zeigt einen
+Datenstatus auf der Startseite.
 
 Datenpipeline: `scripts/import.ts` zieht den poe2-Export von `repoe-fork/poe2`,
 slimt ihn aufs Schema, validiert und legt ihn unter `data/4.5.4.3/` ab;
-`data/manifest.json` zeigt auf die aktive Version. Ergebnis rund 1,5 MB, gegen
-poe2db an den Ringen gegengeprüft (203 rollbare Mods).
+`data/manifest.json` zeigt auf die aktive Version. An den Ringen gegen poe2db
+gegengeprüft (203 rollbare Mods).
 
-Als Nächstes: Phase 2 – Query-Engine (reines, testbares Modul): Tier aus der
-Gruppen-Rangfolge, Wahrscheinlichkeit aus den Gewichten, Filter und Dedup. Das
-besprechen wir per Konzept-vor-Code, bevor gebaut wird.
+Query-Engine (`src/lib/query/engine.ts`): reines, DOM-freies Modul. `runQuery`
+nimmt Item-Tags plus Itemstufe und liefert Präfixe und Suffixe je Gruppe mit
+Tier und Wahrscheinlichkeit. Regeln: Eignung nach „erster passender Tag
+gewinnt", Tier als stabile Rangfolge je Gruppe plus Slot (requiredLevel
+absteigend), Itemstufe filtert den Pool, Wahrscheinlichkeit pro Slot über den
+erreichbaren Rest. 11 Unit-Tests (Vitest).
 
-Hinweis: Das UI-Design aus der poe2db-Vorlage soll in Claude Design prototypt
-und vor Phase 3 (UI-Grundgerüst) eingearbeitet werden.
+Als Nächstes: Phase 3 – UI-Grundgerüst. Vorher das UI-Design aus der
+poe2db-Vorlage in Claude Design prototypen und einarbeiten. Vorbild ist die
+ModifiersCalc-Ansicht (Item Level, Präfix/Suffix, Tier- und Prozentspalten),
+mit schlichter, moderner Oberfläche. Das besprechen wir per Konzept-vor-Code.
 
 ---
 
 ## Offene Vorhaben
-
-### Phase 2 – Query-Engine (reines Modul)
-- [ ] Filter: Domain, Slot (Präfix/Suffix), Itemstufe, Tag-Gewicht > 0
-- [ ] Dedup nach Mod-Group, Sortierung nach Tier
-- [ ] Gewichte → Wahrscheinlichkeiten
-- [ ] Unit-Tests (Vitest)
 
 ### Phase 3 – UI-Grundgerüst
 - [ ] Design-Vorlage aus Claude Design einarbeiten (vor dem Ausbau)
@@ -68,10 +67,19 @@ und vor Phase 3 (UI-Grundgerüst) eingearbeitet werden.
 - [x] Loader-Hooks (`useManifest`, `useMods`, `useBaseItems`, `useItemTypes`, `useTags`) über TanStack Query
 - [x] Zod-Validierung beim Laden
 
+### Phase 2 – Query-Engine (reines Modul)
+- [x] Filter: Domain (Item-Tags), Slot (Präfix/Suffix), Itemstufe, Tag-Gewicht > 0
+- [x] Dedup nach Mod-Group, Sortierung nach Tier
+- [x] Gewichte → Wahrscheinlichkeiten (pro Slot, über erreichbaren Pool)
+- [x] Unit-Tests (Vitest)
+
 ---
 
 ## Log
 
+- 2026-07-03, 0.3.0 – Phase 2 (Query-Engine) abgeschlossen. Reines Modul
+  `src/lib/query/engine.ts`: Eignung nach „erster passender Tag gewinnt", Tier je
+  Gruppe plus Slot, Itemstufen-Filter, Wahrscheinlichkeit pro Slot. 11 Unit-Tests.
 - 2026-07-03, 0.2.0 – Phase 1 (Datenpipeline und Schema) abgeschlossen. Zod-Schema,
   Import-Skript, normalisierte Daten (4.5.4.3), Loader-Hooks mit Validierung und
   Datenstatus-Anzeige. An den Ringen gegen poe2db gegengeprüft.

@@ -1,6 +1,13 @@
 {
-  "current": "0.2.0",
+  "current": "0.3.0",
   "entries": [
+    {
+      "version": "0.3.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Rechen-Kern für Modifier ergänzt: ermittelt je Item-Set die möglichen Mods, ihr Tier und die Spawn-Wahrscheinlichkeit. Noch ohne sichtbare Oberfläche – die kommt mit der Item-Ansicht."
+      ]
+    },
     {
       "version": "0.2.0",
       "date": "2026-07-03",
