@@ -71,7 +71,10 @@ Tabs, Input, Button, Separator, Collapsible. Icons über `lucide-react`.
 
 Vorhandene projektspezifische Bausteine (Screen 2): `Badge`, `TagChip` /
 `TagChipRow` (farbige Typ-Tags anhand der `tag-*`-Tokens; die vollen
-Klassennamen stehen statisch im Code, damit Tailwind sie erzeugt),
-`ProbabilityBar` (Chance-Balken, Breite relativ zum Slot-Max), `ViewSwitcher`
-(Segment-Control Karten/Tabelle/Balken). Zusammengesetzt in `ModifierBrowser`,
-`ModColumn`, `ModGroupBlock`, `ModTable`, `TierRow`, `TierBar`, `VariantSelect`.
+Klassennamen stehen statisch in `ui/tagColors.ts`, damit Tailwind sie erzeugt),
+`TagFilterPill` (klickbarer Tag-Filter, gleiche Farben), `ProbabilityBar`
+(Chance-Balken, Breite relativ zum Slot-Max), `ViewSwitcher` (Segment-Control
+Karten/Tabelle/Balken), `Slider` (gestyltes natives Range-Element),
+`FilterBar` (Suche, Tag-Pills, Itemstufen-Slider). Zusammengesetzt in
+`ModifierBrowser`, `ModColumn`, `ModGroupBlock`, `ModTable`, `TierRow`,
+`TierBar`, `VariantSelect`.

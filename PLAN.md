@@ -26,11 +26,19 @@ umschalten und zeigt Präfixe und Suffixe getrennt. Der Feinschliff ist drin: dr
 umschaltbare Darstellungen (Karten, Tabelle, Balken über `ViewSwitcher`), farbige
 Typ-Tag-Chips je Mod-Familie (`TagChip`, Quelle `implicitTags` gefiltert auf die
 Farb-Tags, `src/lib/modTags.ts`) und ein-/ausklappbare Familien samt globalem
-„Alle ein-/ausklappen". Gerechnet über `runQuery` bei fester Itemstufe 100.
+„Alle ein-/ausklappen".
 Wiederverwendbare Bausteine: `ModifierBrowser`, `ModColumn`, `ModGroupBlock`,
 `ModTable`, `TierRow`, `TierBar`, `VariantSelect`, `ViewSwitcher`, `Badge`,
 `TagChip`, `ProbabilityBar`; reine Helfer `baseVariants`, `modText`, `modTags`,
 `format` mit Tests.
+
+Phase 4 (Facet-Search) ist umgesetzt: eine `FilterBar` mit Volltextsuche über den
+Mod-Text, Tag-Pills (ODER-Verknüpfung) und einem Itemstufen-Slider, der `runQuery`
+live neu füttert. Die nachgelagerte Filterung ist ein reines Modul
+(`src/lib/query/filter.ts`, `filterResult`/`availableTags`, mit Tests). Der
+gesamte Filter-, Varianten- und View-Zustand liegt als URL-State auf der Route
+`/$type` (Zod-`validateSearch`), Ansichten sind damit teil- und bookmarkbar. Neue
+Bausteine: `FilterBar`, `TagFilterPill`, `Slider`, gemeinsames `ui/tagColors`.
 
 Das folgende beschreibt den Stand vor Screen 2:
 
@@ -48,27 +56,14 @@ tatsächlichen Typen kommen aus den geladenen Daten, Unbekanntes fällt nach
 „Other". Grouping-Entscheidungen: `Warstaff` zeigt „Quarterstaff",
 `FishingRod`/`TrapTool` laufen unter „Other".
 
-Als Nächstes: Phase 4 (Facet-Search) – Tag-Pills, Itemstufen-Slider, Fuzzy-Suche,
-Filter als URL-State. Die Unique-Ansicht ist zurückgestellt, weil der Export
-keine verknüpfbaren Unique-Mod-Daten liefert (ADR 0007).
+Als Nächstes: Phase 5 (optional/später) – PWA-Hülle, Design-Feinschliff,
+`docs/Referenz.md`. Die Unique-Ansicht ist zurückgestellt, weil der Export keine
+verknüpfbaren Unique-Mod-Daten liefert (ADR 0007). Laufender Betrieb: Daten bei
+neuem Patch aktualisieren.
 
 ---
 
 ## Offene Vorhaben
-
-### Phase 3 – UI-Grundgerüst
-- [x] Design-Vorlage einarbeiten (Design-System: Tokens, Schriften, Layout-Shell)
-- [x] Screen 1: Item-Typ-Auswahl (gruppiertes Kachel-Grid, Suche, Navigation)
-- [x] Screen 2: Modifier-Browser (Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht/Wahrscheinlichkeit)
-- [x] Basis-Varianten-Selektor (Attribut/Restriktion, datengetrieben) – ADR 0006
-- [x] Screen-2-Feinschliff (Tag-Highlight, View-Switcher Cards/Table/Bars, Collapse-all)
-- [~] Unique-Ansicht – zurückgestellt: keine verknüpfbaren Unique-Mod-Daten im Export (ADR 0007)
-
-### Phase 4 – Facet-Search
-- [ ] Tag-Pills (Caster, Fire, Cold, Lightning, …)
-- [ ] Slider für Itemstufe mit Live-Neuberechnung
-- [ ] Fuzzy-Suche über Mod-Text
-- [ ] Filter-Zustand als URL-State (teil- und bookmarkbar)
 
 ### Phase 5 – optional/später
 - [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
@@ -103,10 +98,30 @@ keine verknüpfbaren Unique-Mod-Daten liefert (ADR 0007).
 - [x] Gewichte → Wahrscheinlichkeiten (pro Slot, über erreichbaren Pool)
 - [x] Unit-Tests (Vitest)
 
+### Phase 3 – UI-Grundgerüst
+- [x] Design-Vorlage einarbeiten (Design-System: Tokens, Schriften, Layout-Shell)
+- [x] Screen 1: Item-Typ-Auswahl (gruppiertes Kachel-Grid, Suche, Navigation)
+- [x] Screen 2: Modifier-Browser (Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht/Wahrscheinlichkeit)
+- [x] Basis-Varianten-Selektor (Attribut/Restriktion, datengetrieben) – ADR 0006
+- [x] Screen-2-Feinschliff (Tag-Highlight, View-Switcher Cards/Table/Bars, Collapse-all)
+- [~] Unique-Ansicht – zurückgestellt: keine verknüpfbaren Unique-Mod-Daten im Export (ADR 0007)
+
+### Phase 4 – Facet-Search
+- [x] Tag-Pills (Caster, Fire, Cold, Lightning, …), mehrere als ODER
+- [x] Slider für Itemstufe mit Live-Neuberechnung
+- [x] Textsuche (Substring/Token) über Mod-Text
+- [x] Filter-Zustand als URL-State (teil- und bookmarkbar)
+
 ---
 
 ## Log
 
+- 2026-07-03, 0.8.0 – Phase 4 (Facet-Search) abgeschlossen. `FilterBar` mit
+  Textsuche, Tag-Pills (ODER) und Itemstufen-Slider; nachgelagerte Filterung als
+  reines Modul `filter.ts` (`filterResult`/`availableTags`, 7 Tests). Filter-,
+  Varianten- und View-Zustand als URL-State auf `/$type` (Zod-`validateSearch`),
+  teil- und bookmarkbar. Neue Bausteine `FilterBar`, `TagFilterPill`, `Slider`,
+  gemeinsames `ui/tagColors`; itemLevel jetzt live statt fest.
 - 2026-07-03, 0.7.0 – Phase 3, Screen-2-Feinschliff. Drei umschaltbare
   Darstellungen (Karten/Tabelle/Balken, `ViewSwitcher`), farbige Typ-Tag-Chips
   je Familie (`TagChip`, Quelle `implicitTags`, `modTags.ts`), ein-/ausklappbare

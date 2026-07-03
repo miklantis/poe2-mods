@@ -1,6 +1,14 @@
 {
-  "current": "0.7.0",
+  "current": "0.8.0",
   "entries": [
+    {
+      "version": "0.8.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Facet-Suche im Modifier-Browser: Volltextsuche über den Mod-Text, Tag-Filter (mehrere Tags als Oder-Verknüpfung) und ein Itemstufen-Regler, der die Liste live neu berechnet.",
+        "Filter, Variante und Darstellung stehen jetzt in der Adresse (URL): Ansichten lassen sich teilen und als Lesezeichen speichern."
+      ]
+    },
     {
       "version": "0.7.0",
       "date": "2026-07-03",

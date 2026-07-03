@@ -1,18 +1,46 @@
 import { useMemo } from 'react'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { ChevronLeft } from 'lucide-react'
+import { z } from 'zod'
 import { useItemTypes } from '@/hooks/useGameData'
 import { buildItemGroups, resolveSlug } from '@/lib/itemGroups'
 import { getIcon } from '@/lib/icons'
 import { ModifierBrowser } from '@/components/ModifierBrowser'
 
+/**
+ * URL-State fuer Screen 2: Variante, Darstellung, Itemstufe, aktive Tags und
+ * Suche. `.catch` haelt kaputte Bookmarks robust auf sinnvollen Defaults.
+ */
+const searchSchema = z.object({
+  v: z.string().optional(),
+  view: z.enum(['cards', 'table', 'bars']).default('cards').catch('cards'),
+  ilvl: z.number().int().min(1).max(100).default(100).catch(100),
+  tags: z.array(z.string()).default([]).catch([]),
+  q: z.string().default('').catch(''),
+})
+export type BrowserSearch = z.infer<typeof searchSchema>
+
+/** Frische Ansicht (Defaults) fuer Links auf die Browser-Route. */
+export const DEFAULT_BROWSER_SEARCH: BrowserSearch = {
+  view: 'cards',
+  ilvl: 100,
+  tags: [],
+  q: '',
+}
+
 export const Route = createFileRoute('/$type')({
+  validateSearch: (search) => searchSchema.parse(search),
   component: BrowserPage,
 })
 
 function BrowserPage() {
   const { type } = Route.useParams()
+  const search = Route.useSearch()
+  const navigate = useNavigate({ from: Route.fullPath })
   const itemTypes = useItemTypes()
+
+  const patchSearch = (patch: Partial<BrowserSearch>) =>
+    navigate({ search: (prev) => ({ ...prev, ...patch }) })
 
   const tile = useMemo(() => {
     for (const group of buildItemGroups(itemTypes.data ?? [])) {
@@ -63,7 +91,12 @@ function BrowserPage() {
               {itemType.name}
             </h1>
           </div>
-          <ModifierBrowser itemType={itemType} />
+
+          <ModifierBrowser
+            itemType={itemType}
+            search={search}
+            patchSearch={patchSearch}
+          />
         </>
       )}
     </section>

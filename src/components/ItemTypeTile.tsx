@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { getIcon } from '@/lib/icons'
+import { DEFAULT_BROWSER_SEARCH } from '@/routes/$type'
 import type { TileView } from '@/lib/itemGroups'
 
 /**
@@ -12,6 +13,7 @@ export function ItemTypeTile({ tile }: { tile: TileView }) {
     <Link
       to="/$type"
       params={{ type: tile.slug }}
+      search={DEFAULT_BROWSER_SEARCH}
       className="group flex flex-col items-center gap-2 rounded-lg border border-border bg-surface-raised px-2.5 py-[19px] text-center transition-all hover:-translate-y-0.5 hover:border-suffix hover:bg-accent"
     >
       <Icon

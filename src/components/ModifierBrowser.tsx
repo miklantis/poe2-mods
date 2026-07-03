@@ -1,17 +1,20 @@
 import { useMemo, useState } from 'react'
 import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 import type { ItemType } from '@/data/schema'
+import type { BrowserSearch } from '@/routes/$type'
 import { useMods, useBaseItems } from '@/hooks/useGameData'
 import { deriveVariants } from '@/lib/baseVariants'
 import { runQuery } from '@/lib/query/engine'
 import type { ModGroup } from '@/lib/query/engine'
+import { filterResult, availableTags } from '@/lib/query/filter'
+import type { ColorTag } from '@/lib/modTags'
 import { VariantSelect } from '@/components/VariantSelect'
 import { ModColumn } from '@/components/ModColumn'
 import { ViewSwitcher } from '@/components/ViewSwitcher'
-import type { ModView } from '@/components/ViewSwitcher'
+import { FilterBar } from '@/components/FilterBar'
 
-/** Feste Itemstufe, bis der Slider (Phase 4) sie steuerbar macht. */
-const DEFAULT_ITEM_LEVEL = 100
+const MIN_ITEM_LEVEL = 1
+const MAX_ITEM_LEVEL = 100
 
 function keyOf(g: ModGroup): string {
   return `${g.slot}-${g.group}`
@@ -19,10 +22,20 @@ function keyOf(g: ModGroup): string {
 
 /**
  * Modifier-Browser je Item-Typ (Screen 2). Basis-Varianten aus den Daten,
- * Umschalter, Praefixe/Suffixe getrennt. Darstellung als Karten/Tabelle/Balken,
- * Familien ein-/ausklappbar. Query-Logik bleibt im reinen Modul `runQuery`.
+ * Umschalter, Praefixe/Suffixe getrennt, drei Darstellungen, Facet-Filter
+ * (Suche, Tag-Pills, Itemstufe). Filterzustand liegt im URL-State (Props
+ * `search`/`patchSearch`); nur das Ein-/Ausklappen ist lokal. Query- und
+ * Filter-Logik bleiben in den reinen Modulen `runQuery`/`filterResult`.
  */
-export function ModifierBrowser({ itemType }: { itemType: ItemType }) {
+export function ModifierBrowser({
+  itemType,
+  search,
+  patchSearch,
+}: {
+  itemType: ItemType
+  search: BrowserSearch
+  patchSearch: (patch: Partial<BrowserSearch>) => void
+}) {
   const mods = useMods()
   const baseItems = useBaseItems()
 
@@ -31,27 +44,33 @@ export function ModifierBrowser({ itemType }: { itemType: ItemType }) {
     [baseItems.data, itemType.id],
   )
 
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const selected =
-    variants.find((v) => v.id === selectedId) ?? variants[0] ?? null
-
-  const [view, setView] = useState<ModView>('cards')
+  const selected = variants.find((v) => v.id === search.v) ?? variants[0] ?? null
   const [collapsedKeys, setCollapsedKeys] = useState<ReadonlySet<string>>(
     new Set(),
   )
 
   const result = useMemo(() => {
     if (!mods.data || !selected) return null
-    return runQuery(mods.data, {
-      tags: selected.tags,
-      itemLevel: DEFAULT_ITEM_LEVEL,
-    })
-  }, [mods.data, selected])
+    return runQuery(mods.data, { tags: selected.tags, itemLevel: search.ilvl })
+  }, [mods.data, selected, search.ilvl])
+
+  const tags = useMemo(
+    () => (result ? availableTags(result) : []),
+    [result],
+  )
+
+  const filtered = useMemo(
+    () =>
+      result
+        ? filterResult(result, { tags: search.tags, search: search.q })
+        : null,
+    [result, search.tags, search.q],
+  )
 
   const allKeys = useMemo(() => {
-    if (!result) return [] as string[]
-    return [...result.prefixes, ...result.suffixes].map(keyOf)
-  }, [result])
+    if (!filtered) return [] as string[]
+    return [...filtered.prefixes, ...filtered.suffixes].map(keyOf)
+  }, [filtered])
 
   const allCollapsed =
     allKeys.length > 0 && allKeys.every((k) => collapsedKeys.has(k))
@@ -67,6 +86,13 @@ export function ModifierBrowser({ itemType }: { itemType: ItemType }) {
   const toggleAll = () =>
     setCollapsedKeys(allCollapsed ? new Set() : new Set(allKeys))
 
+  const toggleTag = (tag: ColorTag) => {
+    const active = new Set(search.tags)
+    if (active.has(tag)) active.delete(tag)
+    else active.add(tag)
+    patchSearch({ tags: [...active] })
+  }
+
   const isPending = mods.isPending || baseItems.isPending
   const error = mods.error ?? baseItems.error
 
@@ -80,7 +106,7 @@ export function ModifierBrowser({ itemType }: { itemType: ItemType }) {
   if (isPending) {
     return <p className="mt-8 text-sm text-secondary-text">Lade Modifier …</p>
   }
-  if (!selected || !result) {
+  if (!selected || !result || !filtered) {
     return (
       <p className="mt-8 text-sm text-secondary-text">
         Für diesen Item-Typ liegen keine Basen vor.
@@ -100,46 +126,52 @@ export function ModifierBrowser({ itemType }: { itemType: ItemType }) {
           <VariantSelect
             variants={variants}
             selectedId={selected.id}
-            onSelect={setSelectedId}
+            onSelect={(id) => patchSearch({ v: id })}
           />
         </div>
       )}
 
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[13px] text-secondary-text">
-          Itemstufe{' '}
-          <span className="font-mono tabular-nums text-body">
-            {DEFAULT_ITEM_LEVEL}
-          </span>{' '}
-          · voller Pool
-        </p>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={toggleAll}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2.5 py-1.5 text-[12.5px] font-semibold text-secondary-text transition-colors hover:text-body"
-          >
-            <CollapseIcon className="size-3.5" strokeWidth={2} aria-hidden />
-            <span className="hidden sm:inline">
-              {allCollapsed ? 'Alle ausklappen' : 'Alle einklappen'}
-            </span>
-          </button>
-          <ViewSwitcher value={view} onChange={setView} />
-        </div>
+      <FilterBar
+        search={search.q}
+        onSearch={(q) => patchSearch({ q })}
+        availableTags={tags}
+        activeTags={search.tags}
+        onToggleTag={toggleTag}
+        itemLevel={search.ilvl}
+        minLevel={MIN_ITEM_LEVEL}
+        maxLevel={MAX_ITEM_LEVEL}
+        onItemLevel={(ilvl) => patchSearch({ ilvl })}
+      />
+
+      <div className="mb-5 flex items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={toggleAll}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2.5 py-1.5 text-[12.5px] font-semibold text-secondary-text transition-colors hover:text-body"
+        >
+          <CollapseIcon className="size-3.5" strokeWidth={2} aria-hidden />
+          <span className="hidden sm:inline">
+            {allCollapsed ? 'Alle ausklappen' : 'Alle einklappen'}
+          </span>
+        </button>
+        <ViewSwitcher
+          value={search.view}
+          onChange={(view) => patchSearch({ view })}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
         <ModColumn
           slot="prefix"
-          groups={result.prefixes}
-          view={view}
+          groups={filtered.prefixes}
+          view={search.view}
           collapsedKeys={collapsedKeys}
           onToggle={toggleKey}
         />
         <ModColumn
           slot="suffix"
-          groups={result.suffixes}
-          view={view}
+          groups={filtered.suffixes}
+          view={search.view}
           collapsedKeys={collapsedKeys}
           onToggle={toggleKey}
         />
