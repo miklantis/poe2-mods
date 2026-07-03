@@ -91,3 +91,43 @@ Ausgelagerte, älteste Log-Einträge aus `PLAN.md`. Chronologisch, älteste zuer
   Phase-8-Richtung eingedampft, abgeschlossene Phasen 0–7 zu einem Überblick
   verdichtet (Detail in Commits/ADRs), Log-Einträge 0.9.2–0.11.0 ins Archiv
   verschoben.
+- 2026-07-03, 0.12.0 – Phase 7, Schritt 3: Essence-Abschnitt (Phase 7 komplett).
+  Import zieht mgroup 13 und schreibt `essences.json` je Basis (Stufen je Mod zu
+  einem Bereich verdichtet, kleinste Itemstufe); Essence-exklusive Mods mit
+  `origin: essence` in `mods.json`. Neue reine `runEssenceQuery` + 5 Tests;
+  flache `EssenceColumn`, violetter Akzent, Loader `useEssences`. Snapshot 0.5.4:
+  59 Basen mit Essence, 1086 Zeilen. ADR 0009 (Nachtrag).
+- 2026-07-03, 0.12.1 – Phase 5 (Design-Feinschliff): Typ-Tags aus den Tabellen
+  entfernt (`displayTags` bleibt für die Filterung), Modifier-Text 13→14px.
+  Herkunfts-Überschriften raus, Herkunft steht im Tabellennamen; Spaltentitel
+  ruhiger. Itemstufen-Regler auf schmalen, linksbündigen Block begrenzt.
+- 2026-07-03, 0.12.2 – Phase 5 (Design-Feinschliff): Textgrößen vereinheitlicht,
+  alle Modifier-Texte weiß. Theme heller und kontrastärmer (Background, Surface-,
+  Border- und shadcn-Basis-Tokens angehoben). Globaler „Alle ein-/ausklappen"-
+  Button entfernt; Einzel-Toggle bleibt.
+- 2026-07-03, 0.12.3 – Phase 5: Filter-Tags auf poe2db-Granularität erweitert.
+  `COLOR_TAG_ORDER` von 10 auf 26 primäre Tags plus die drei Desecrated-Herkünfte
+  erweitert; interne Unter-Tags aussen vor (jeder trägt im Snapshot seinen
+  Ober-Tag). `tagColors`: nur Schadensarten farbig, Rest neutral.
+- 2026-07-03, 0.12.4 – Phase 5: Aufgeklappte Tier-Zeilen zeigen nur noch die
+  Wertespanne statt den ganzen Mod-Satz (neuer `tierValueText` in modText.ts,
+  +4 Tests). Gruppenkopf trägt weiterhin den vollen Text.
+- 2026-07-03, 0.12.5 – Anzeige-Einheit auf den einzelnen Modifier umgestellt
+  statt auf die interne Ausschluss-Gruppe. Query-Funktionen gruppieren nach
+  Mod-ID; behebt vermischte Tier bei Modifiern, die sich eine Ausschluss-Gruppe
+  teilen. Chance je Modifier statt Gruppen-Summe. ADR 0010 neu.
+- 2026-07-03 – Phase 8, Schritt 1: Datenfundament repoe. Neues mod-zentriertes
+  Schema (`schema.repoe.ts`) und Import (`import-repoe.ts`) aus `repoe-fork/poe2`
+  v4.5.4.3; Daten unter `data/4.5.4.3/` (669 Familien inkl. 29 Genesis-Tree,
+  1829 Basen, 30 Item-Typen). `manifest.json` bewusst noch auf CoE.
+- 2026-07-03 – Phase 8, Schritt 2 (Teil): reine repoe-Query-Engine
+  (`repoeEngine.ts`) mit Eignung-über-Tags + Tier-Rangfolge, ohne Gewicht/Chance;
+  alle Herkünfte über eine flache Logik. Additiv, App noch unberührt.
+- 2026-07-03 – Phase 8, Schritt 2+3 live: App auf repoe umgeschaltet
+  (manifest 4.5.4.3). Essence aus CoE je Item-Klasse aufbereitet
+  (`import-essences-coe.ts`). ModifierBrowser/Filter/Tabellen auf `RepoeGroup`,
+  Chance/Gewicht entfernt. ADR 0011 (löst ADR 0008 ab). Changelog 0.13.0.
+- 2026-07-03 – Phase 8, Schritt 4: CoE-Reste entfernt (import-coe, schema.coe,
+  baseEngine/essenceEngine + Tests, format.ts, data/0.5.4, roher _source/coe).
+  CoE-Essence-Quelle nach `data/_source/coe-essence/` archiviert. Architektur.md
+  auf repoe. Phase 8 abgeschlossen.
