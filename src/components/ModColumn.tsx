@@ -30,7 +30,7 @@ export function ModColumn({
     <div>
       <div className="mb-3 flex items-center gap-2">
         <span className={cn('size-2 rounded-full', ACCENT_DOT[accent])} aria-hidden />
-        <h3 className={cn('font-display text-[15px] font-bold', ACCENT_TEXT[accent])}>
+        <h3 className={cn('text-[13px] font-semibold', ACCENT_TEXT[accent])}>
           {title}
         </h3>
         <span className="font-mono text-[12px] tabular-nums text-muted-text">

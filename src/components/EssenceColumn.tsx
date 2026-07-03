@@ -1,7 +1,5 @@
 import type { DisplayGroup } from '@/lib/query/baseEngine'
 import { fillModText } from '@/lib/modText'
-import { displayTags } from '@/lib/modTags'
-import { TagChipRow } from '@/components/ui/TagChip'
 import type { Accent } from '@/components/ui/accent'
 import { ACCENT_DOT, ACCENT_TEXT } from '@/components/ui/accent'
 import { cn } from '@/lib/utils'
@@ -30,7 +28,7 @@ export function EssenceColumn({
     <div>
       <div className="mb-3 flex items-center gap-2">
         <span className={cn('size-2 rounded-full', ACCENT_DOT[accent])} aria-hidden />
-        <h3 className={cn('font-display text-[15px] font-bold', ACCENT_TEXT[accent])}>
+        <h3 className={cn('text-[13px] font-semibold', ACCENT_TEXT[accent])}>
           {title}
         </h3>
         <span className="font-mono text-[12px] tabular-nums text-muted-text">
@@ -58,11 +56,8 @@ export function EssenceColumn({
                     key={mod.mod.id}
                     className="border-t border-border-subtle"
                   >
-                    <td className="px-2 py-1.5 text-[13px] text-body">
-                      <span className="align-middle">
-                        {fillModText(mod.mod.text, mod.values)}
-                      </span>
-                      <TagChipRow tags={displayTags(mod.mod)} />
+                    <td className="px-2 py-1.5 text-[14px] text-body">
+                      {fillModText(mod.mod.text, mod.values)}
                     </td>
                     <td className="px-2 py-1.5 text-right font-mono text-[11.5px] tabular-nums text-muted-text">
                       {mod.ilvl}

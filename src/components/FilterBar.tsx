@@ -76,7 +76,7 @@ export function FilterBar({
           Itemstufe{' '}
           <span className="font-mono tabular-nums text-body">{itemLevel}</span>
         </span>
-        <div className="flex-1">
+        <div className="w-full max-w-[260px]">
           <Slider
             value={itemLevel}
             min={minLevel}

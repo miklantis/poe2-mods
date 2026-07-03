@@ -21,6 +21,11 @@ keine Markierung nötig. Entscheidung/Nachtrag in ADR 0009.
 
 Damit ist Phase 7 vollständig abgeschlossen.
 
+Design-Feinschliff (0.12.1): Typ-Tags werden in den Tabellen nicht mehr
+angezeigt (Filter-Pills oben bleiben), Modifier-Text etwas größer,
+Herkunfts-Überschriften entfallen zugunsten sprechender Tabellennamen
+(„Desecrated Präfixe" usw.), Itemstufen-Regler kompakt links.
+
 --- Stand Phase 6 (weiter gueltig fuer Datenquelle und Oberflaeche): ---
 
 Phase 6 (Datenquelle Craft of Exile) abgeschlossen. Die App läuft vollständig
@@ -181,6 +186,13 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.12.1 – Phase 5 (Design-Feinschliff): Typ-Tags aus den Tabellen
+  entfernt (Filter-Pills oben unverändert, `displayTags` bleibt für die
+  Filterung), Modifier-Text 13→14px. Übergeordnete Herkunfts-Überschriften
+  (Rollbar/Desecrated/Essence) raus, Herkunft steht im Tabellennamen (z. B.
+  „Desecrated Präfixe"); Spaltentitel ruhiger (kein Display-Font, kleiner).
+  Itemstufen-Regler auf schmalen, linksbündigen Block begrenzt. Typecheck, 57
+  Tests, Build grün.
 - 2026-07-03, 0.12.0 – Phase 7, Schritt 3: Essence-Abschnitt (Phase 7 komplett).
   Import zieht mgroup 13 und schreibt `essences.json` je Basis (Stufen je Mod zu
   einem Bereich verdichtet, kleinste Itemstufe); Essence-exklusive Mods mit

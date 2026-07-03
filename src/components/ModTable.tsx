@@ -2,9 +2,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { DisplayGroup } from '@/lib/query/baseEngine'
 import { modFamilyLabel, fillModText } from '@/lib/modText'
-import { displayTags } from '@/lib/modTags'
 import { formatPercent, formatWeight } from '@/lib/format'
-import { TagChipRow } from '@/components/ui/TagChip'
 import type { Accent } from '@/components/ui/accent'
 import { ACCENT_TEXT } from '@/components/ui/accent'
 import { cn } from '@/lib/utils'
@@ -53,7 +51,6 @@ export function ModTable({
             const collapsed = isCollapsed(key)
             const top = group.mods[0]
             const family = top ? modFamilyLabel(top.mod.text) : group.group
-            const tags = top ? displayTags(top.mod) : []
             const Chevron = collapsed ? ChevronRight : ChevronDown
             return (
               <FamilyRows key={key}>
@@ -73,7 +70,6 @@ export function ModTable({
                       <span className="text-[12.5px] font-semibold text-heading">
                         {family}
                       </span>
-                      <TagChipRow tags={tags} />
                       {showProbability && (
                         <span className="ml-auto font-mono text-[11.5px] tabular-nums text-secondary-text">
                           {formatPercent(group.probability)}
@@ -91,7 +87,7 @@ export function ModTable({
                       <td className="px-2 py-1.5 font-mono text-[11.5px] tabular-nums text-muted-text">
                         T{m.tier}
                       </td>
-                      <td className="px-2 py-1.5 text-[13px] text-body">
+                      <td className="px-2 py-1.5 text-[14px] text-body">
                         {fillModText(m.mod.text, m.values)}
                       </td>
                       <td className="px-2 py-1.5 text-right font-mono text-[11.5px] tabular-nums text-muted-text">

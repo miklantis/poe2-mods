@@ -219,9 +219,6 @@ export function ModifierBrowser({
 
       {/* Rollbar */}
       <section>
-        <h2 className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-secondary-text">
-          Rollbar
-        </h2>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
           <ModColumn
             title="Präfixe"
@@ -247,12 +244,9 @@ export function ModifierBrowser({
       {/* Desecrated */}
       {hasDesecrated && (
         <section className="mt-10">
-          <h2 className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-desecrated">
-            Desecrated
-          </h2>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
             <ModColumn
-              title="Präfixe"
+              title="Desecrated Präfixe"
               accent="desecrated"
               keyNs="d-pre"
               showProbability={false}
@@ -261,7 +255,7 @@ export function ModifierBrowser({
               onToggle={toggleKey}
             />
             <ModColumn
-              title="Suffixe"
+              title="Desecrated Suffixe"
               accent="desecrated"
               keyNs="d-suf"
               showProbability={false}
@@ -276,12 +270,17 @@ export function ModifierBrowser({
       {/* Essence */}
       {hasEssence && (
         <section className="mt-10">
-          <h2 className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-essence">
-            Essence
-          </h2>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
-            <EssenceColumn title="Präfixe" accent="essence" groups={f.essPre} />
-            <EssenceColumn title="Suffixe" accent="essence" groups={f.essSuf} />
+            <EssenceColumn
+              title="Essence Präfixe"
+              accent="essence"
+              groups={f.essPre}
+            />
+            <EssenceColumn
+              title="Essence Suffixe"
+              accent="essence"
+              groups={f.essSuf}
+            />
           </div>
         </section>
       )}
