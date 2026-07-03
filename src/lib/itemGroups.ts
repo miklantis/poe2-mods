@@ -1,12 +1,12 @@
 import type { ItemType } from '@/data/schema.repoe'
 
 /**
- * Gruppierung der Item-Typen fuer Screen 1. Die Struktur kommt aus den Daten:
- * gruppiert wird nach der `category` jedes Item-Typs. Eine schlanke Config gibt
- * nur die Reihenfolge der Kategorien und ein Icon je Typ vor; die Anzeigenamen
- * und die Zugehoerigkeit stammen aus den geladenen Daten. Kategorien, die in
- * der Reihenfolge fehlen (z. B. kuenftige neue), werden hinten alphabetisch
- * angehaengt, damit nie Daten verschwinden.
+ * Gruppierung der Item-Typen fuer Screen 1. Die Item-Typen kommen aus den Daten;
+ * fuer die Uebersicht werden sie ueber eine Zuordnung (Klassen-ID -> Kategorie)
+ * zu Sammelgruppen gebuendelt. Eine schlanke Config gibt die Reihenfolge der
+ * Kategorien und ein Icon je Typ vor. Kategorien, die in der Reihenfolge fehlen,
+ * werden hinten alphabetisch angehaengt; unbekannte IDs fallen auf ihre
+ * Roh-`category` zurueck, damit nie Daten verschwinden.
  *
  * Der Icon-Schluessel bleibt ein String (kein React-Import), damit dieses Modul
  * DOM-frei und testbar bleibt; die Zuordnung zur Icon-Komponente passiert erst
@@ -45,47 +45,83 @@ const CATEGORY_ORDER = [
   'Jewels',
   'Tablets',
   'Waystones',
+  'Tools',
 ]
 
-/** Icon je Item-Typ-Id; unbekannte Typen fallen auf ein neutrales Icon. */
-const TYPE_ICONS: Record<string, string> = {
-  'one-hand-axe': 'axe',
-  'one-hand-mace': 'gavel',
-  'one-hand-sword': 'sword',
-  sceptre: 'wand-sparkles',
-  wand: 'wand-2',
-  dagger: 'pen-tool',
-  claw: 'grab',
-  spear: 'navigation',
-  flail: 'link',
-  'two-hand-axe': 'axe',
-  'two-hand-mace': 'hammer',
-  'two-hand-sword': 'swords',
-  warstaff: 'grip-vertical',
-  staff: 'wand',
-  bow: 'moon',
-  crossbow: 'crosshair',
-  talisman: 'sparkles',
-  shield: 'shield',
-  focus: 'focus',
-  quiver: 'feather',
-  'body-armour': 'shirt',
-  'grasping-mail': 'shirt',
-  helmet: 'hard-hat',
-  gloves: 'hand',
-  boots: 'footprints',
-  ring: 'circle-dot',
-  amulet: 'gem',
-  belt: 'rectangle-horizontal',
-  charm: 'sparkles',
-  'life-flask': 'flask-conical',
-  'mana-flask': 'flask-conical',
-  emerald: 'gem',
-  ruby: 'gem',
-  sapphire: 'gem',
+/**
+ * Zuordnung der repoe-Klassen-ID zur angezeigten Sammelkategorie. Die Daten
+ * fuehren jede Klasse als eigene `category`; fuer die Uebersicht fassen wir sie
+ * hier zu Gruppen zusammen (angelehnt an poe2db). Unbekannte IDs fallen in
+ * `buildItemGroups` auf ihre Roh-`category` zurueck, damit nie etwas verschwindet.
+ */
+const CATEGORY_OF: Record<string, string> = {
+  Claw: 'One-Handed Weapons',
+  Dagger: 'One-Handed Weapons',
+  'One Hand Axe': 'One-Handed Weapons',
+  'One Hand Mace': 'One-Handed Weapons',
+  'One Hand Sword': 'One-Handed Weapons',
+  Sceptre: 'One-Handed Weapons',
+  Spear: 'One-Handed Weapons',
+  Flail: 'One-Handed Weapons',
+  Wand: 'One-Handed Weapons',
+  Bow: 'Two-Handed Weapons',
+  Crossbow: 'Two-Handed Weapons',
+  Staff: 'Two-Handed Weapons',
+  Warstaff: 'Two-Handed Weapons',
+  'Two Hand Axe': 'Two-Handed Weapons',
+  'Two Hand Mace': 'Two-Handed Weapons',
+  'Two Hand Sword': 'Two-Handed Weapons',
+  FishingRod: 'Two-Handed Weapons',
+  Buckler: 'Offhands',
+  Focus: 'Offhands',
+  Quiver: 'Offhands',
+  Shield: 'Offhands',
+  'Body Armour': 'Body Armours',
+  Helmet: 'Helmets',
+  Gloves: 'Gloves',
+  Boots: 'Boots',
+  Amulet: 'Jewellery',
+  Belt: 'Jewellery',
+  Ring: 'Jewellery',
+  Talisman: 'Jewellery',
+  TrapTool: 'Tools',
 }
 
-/** Tablets und Waystones teilen sich je ein Icon (per Kategorie). */
+/** Icon je repoe-Klassen-ID; unbekannte Typen fallen auf ein neutrales Icon. */
+const TYPE_ICONS: Record<string, string> = {
+  'One Hand Axe': 'axe',
+  'One Hand Mace': 'gavel',
+  'One Hand Sword': 'sword',
+  Sceptre: 'wand-sparkles',
+  Wand: 'wand-2',
+  Dagger: 'pen-tool',
+  Claw: 'grab',
+  Spear: 'navigation',
+  Flail: 'link',
+  'Two Hand Axe': 'axe',
+  'Two Hand Mace': 'hammer',
+  'Two Hand Sword': 'swords',
+  Warstaff: 'grip-vertical',
+  Staff: 'wand',
+  Bow: 'moon',
+  Crossbow: 'crosshair',
+  FishingRod: 'fish',
+  Talisman: 'sparkles',
+  Shield: 'shield',
+  Buckler: 'shield-half',
+  Focus: 'focus',
+  Quiver: 'feather',
+  'Body Armour': 'shirt',
+  Helmet: 'hard-hat',
+  Gloves: 'hand',
+  Boots: 'footprints',
+  Ring: 'circle-dot',
+  Amulet: 'gem',
+  Belt: 'rectangle-horizontal',
+  TrapTool: 'wrench',
+}
+
+/** Fallback-Icon je Sammelkategorie, falls die ID kein eigenes Icon hat. */
 const CATEGORY_ICONS: Record<string, string> = {
   Tablets: 'square',
   Waystones: 'map',
@@ -117,9 +153,10 @@ function toTile(itemType: ItemType): TileView {
 export function buildItemGroups(itemTypes: readonly ItemType[]): GroupView[] {
   const byCategory = new Map<string, ItemType[]>()
   for (const t of itemTypes) {
-    const list = byCategory.get(t.category)
+    const category = CATEGORY_OF[t.id] ?? t.category
+    const list = byCategory.get(category)
     if (list) list.push(t)
-    else byCategory.set(t.category, [t])
+    else byCategory.set(category, [t])
   }
 
   const categories = [...byCategory.keys()].sort((a, b) => {

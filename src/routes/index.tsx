@@ -43,7 +43,7 @@ function HomePage() {
 
       <p className="mt-3 max-w-prose text-secondary-text">
         Durchsuchbarer Modifier-Browser für Path of Exile 2. Wähle einen
-        Item-Typ, um seine möglichen Modifier, Tier und Spawn-Gewichte
+        Item-Typ, um seine möglichen Modifier mit Tier und Wertebereich
         durchzusehen.
       </p>
 

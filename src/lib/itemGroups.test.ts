@@ -18,37 +18,39 @@ const t = (
 })
 
 describe('buildItemGroups', () => {
-  it('gruppiert nach Kategorie in Config-Reihenfolge', () => {
+  it('buendelt Klassen ueber die Zuordnung zu Sammelkategorien, in Config-Reihenfolge', () => {
     const groups = buildItemGroups([
-      t('ring', 'Ring', 'Jewellery'),
-      t('one-hand-axe', 'One Hand Axe', 'One-Handed Weapons'),
-      t('ruby', 'Ruby', 'Jewels'),
+      t('Ring', 'Rings', 'Ring'),
+      t('One Hand Axe', 'One Hand Axes', 'One Hand Axe'),
+      t('Focus', 'Foci', 'Focus'),
     ])
     expect(groups.map((g) => g.label)).toEqual([
       'One-Handed Weapons',
+      'Offhands',
       'Jewellery',
-      'Jewels',
     ])
   })
 
-  it('sortiert Typen je Kategorie alphabetisch nach Namen', () => {
-    const [group] = buildItemGroups([
-      t('sapphire', 'Sapphire', 'Jewels'),
-      t('emerald', 'Emerald', 'Jewels'),
-      t('ruby', 'Ruby', 'Jewels'),
+  it('fasst mehrere Klassen einer Gruppe zusammen', () => {
+    const groups = buildItemGroups([
+      t('Ring', 'Rings', 'Ring'),
+      t('Amulet', 'Amulets', 'Amulet'),
+      t('Belt', 'Belts', 'Belt'),
     ])
-    expect(group.types.map((x) => x.label)).toEqual([
-      'Emerald',
-      'Ruby',
-      'Sapphire',
+    expect(groups).toHaveLength(1)
+    expect(groups[0].label).toBe('Jewellery')
+    expect(groups[0].types.map((x) => x.label)).toEqual([
+      'Amulets',
+      'Belts',
+      'Rings',
     ])
   })
 
   it('fuehrt jeden Typ genau einmal, Slug ist die Id', () => {
     const types = [
-      t('ring', 'Ring', 'Jewellery'),
-      t('amulet', 'Amulet', 'Jewellery'),
-      t('body-armour', 'Body Armour', 'Body Armours'),
+      t('Ring', 'Rings', 'Ring'),
+      t('Amulet', 'Amulets', 'Amulet'),
+      t('Body Armour', 'Body Armours', 'Body Armour'),
     ]
     const tiles = buildItemGroups(types).flatMap((g) => g.types)
     expect(tiles).toHaveLength(types.length)
@@ -57,29 +59,29 @@ describe('buildItemGroups', () => {
 
   it('setzt hasVariants bei mehr als einer Variante', () => {
     const groups = buildItemGroups([
-      t('body-armour', 'Body Armour', 'Body Armours', 6),
-      t('ring', 'Ring', 'Jewellery', 1),
+      t('Body Armour', 'Body Armours', 'Body Armour', 6),
+      t('Ring', 'Rings', 'Ring', 1),
     ])
     const all = groups.flatMap((g) => g.types)
-    expect(all.find((x) => x.id === 'body-armour')?.hasVariants).toBe(true)
-    expect(all.find((x) => x.id === 'ring')?.hasVariants).toBe(false)
+    expect(all.find((x) => x.id === 'Body Armour')?.hasVariants).toBe(true)
+    expect(all.find((x) => x.id === 'Ring')?.hasVariants).toBe(false)
   })
 
-  it('ordnet bekannte Icons zu, Unbekanntes faellt auf box', () => {
+  it('ordnet bekannte Icons je Id zu, Unbekanntes faellt auf box', () => {
     const groups = buildItemGroups([
-      t('ring', 'Ring', 'Jewellery'),
-      t('mystery', 'Mystery', 'Mysteries'),
+      t('Ring', 'Rings', 'Ring'),
+      t('Mystery', 'Mystery', 'Mystery'),
     ])
     const all = groups.flatMap((g) => g.types)
-    expect(all.find((x) => x.id === 'ring')?.iconKey).toBe('circle-dot')
-    expect(all.find((x) => x.id === 'mystery')?.iconKey).toBe('box')
+    expect(all.find((x) => x.id === 'Ring')?.iconKey).toBe('circle-dot')
+    expect(all.find((x) => x.id === 'Mystery')?.iconKey).toBe('box')
   })
 
-  it('haengt unbekannte Kategorien alphabetisch hinten an', () => {
+  it('haengt unbekannte Kategorien alphabetisch hinten an (Fallback auf Roh-category)', () => {
     const groups = buildItemGroups([
-      t('mystery', 'Mystery', 'Zeta'),
-      t('ring', 'Ring', 'Jewellery'),
-      t('other', 'Other', 'Alpha'),
+      t('Mystery', 'Mystery', 'Zeta'),
+      t('Ring', 'Rings', 'Ring'),
+      t('Other', 'Other', 'Alpha'),
     ])
     expect(groups.map((g) => g.label)).toEqual(['Jewellery', 'Alpha', 'Zeta'])
   })
@@ -88,10 +90,10 @@ describe('buildItemGroups', () => {
 describe('resolveSlug', () => {
   it('findet den Item-Typ ueber die Id', () => {
     const types = [
-      t('body-armour', 'Body Armour', 'Body Armours'),
-      t('ring', 'Ring', 'Jewellery'),
+      t('Body Armour', 'Body Armours', 'Body Armour'),
+      t('Ring', 'Rings', 'Ring'),
     ]
-    expect(resolveSlug(types, 'body-armour')?.id).toBe('body-armour')
+    expect(resolveSlug(types, 'Body Armour')?.id).toBe('Body Armour')
     expect(resolveSlug(types, 'unbekannt')).toBeUndefined()
   })
 })

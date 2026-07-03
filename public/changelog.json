@@ -1,6 +1,15 @@
 {
-  "current": "0.13.1",
+  "current": "0.13.2",
   "entries": [
+    {
+      "version": "0.13.2",
+      "date": "2026-07-03",
+      "changes": [
+        "Startseite: Item-Typen sind wieder zu Sammelkategorien gruppiert (Einhandwaffen, Zweihandwaffen, Offhands, Körperrüstung, Helme, Handschuhe, Stiefel, Schmuck, Werkzeuge) statt jede Art als eigener Block.",
+        "Die typspezifischen Icons sind wieder da (Axt, Schwert, Ring, Handschuh …) – nach der Datenumstellung hatten alle Kacheln nur das neutrale Würfel-Icon.",
+        "Untertitel korrigiert: es ist von Modifier, Tier und Wertebereich die Rede statt von Spawn-Gewichten (die es seit der repoe-Umstellung nicht mehr gibt)."
+      ]
+    },
     {
       "version": "0.13.1",
       "date": "2026-07-03",
