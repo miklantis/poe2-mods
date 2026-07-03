@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { DisplayGroup } from '@/lib/query/baseEngine'
-import { modFamilyLabel, fillModText } from '@/lib/modText'
+import { modFamilyLabel, tierValueText } from '@/lib/modText'
 import { formatPercent, formatWeight } from '@/lib/format'
 import type { Accent } from '@/components/ui/accent'
 import { ACCENT_TEXT } from '@/components/ui/accent'
@@ -87,8 +87,8 @@ export function ModTable({
                       <td className="px-2 py-1.5 font-mono text-[11.5px] tabular-nums text-muted-text">
                         T{m.tier}
                       </td>
-                      <td className="px-2 py-1.5 text-[14px] text-body">
-                        {fillModText(m.mod.text, m.values)}
+                      <td className="px-2 py-1.5 text-[14px] tabular-nums text-body">
+                        {tierValueText(m.mod.text, m.values)}
                       </td>
                       <td className="px-2 py-1.5 text-right font-mono text-[11.5px] tabular-nums text-muted-text">
                         {m.ilvl}

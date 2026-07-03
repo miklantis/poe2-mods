@@ -59,3 +59,19 @@ export function fillModText(
     return v ? formatRoll(v[0], v[1]) : '#'
   })
 }
+
+/**
+ * Kompakte Tier-Darstellung: nur die Rollen-Bereiche eines Tiers, nicht der
+ * ganze Mod-Satz. Ueber der Gruppe steht bereits der volle Vorlagentext mit
+ * `#`, daher genuegt in der Tier-Zeile die Zahl bzw. Zahlenspanne. Mehrere
+ * Platzhalter (z. B. `Adds # to # Fire Damage`) werden mit ` / ` getrennt.
+ * Hat ein Mod keine Rollen-Werte (reiner Text ohne Zahl), wird ausnahmsweise
+ * der lesbare Text gezeigt, damit die Zeile nicht leer bleibt.
+ */
+export function tierValueText(
+  template: string,
+  values: readonly (readonly [number, number])[],
+): string {
+  if (values.length === 0) return cleanModText(template)
+  return values.map((v) => formatRoll(v[0], v[1])).join(' / ')
+}

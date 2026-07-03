@@ -1,6 +1,14 @@
 {
-  "current": "0.12.3",
+  "current": "0.12.4",
   "entries": [
+    {
+      "version": "0.12.4",
+      "date": "2026-07-03",
+      "changes": [
+        "Aufgeklappte Tier-Zeilen zeigen jetzt nur noch die Wertespanne (z. B. (60-69)) statt den kompletten Mod-Satz zu wiederholen; der volle Text steht weiterhin einmal als Gruppenkopf darüber.",
+        "Mods mit mehreren Werten (z. B. Adds # to # Fire Damage) zeigen die Spannen mit Schrägstrich getrennt."
+      ]
+    },
     {
       "version": "0.12.3",
       "date": "2026-07-03",

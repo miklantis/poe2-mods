@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { cleanModText, modFamilyLabel, fillModText, formatRoll } from './modText'
+import { cleanModText, modFamilyLabel, fillModText, formatRoll, tierValueText } from './modText'
 
 describe('cleanModText', () => {
   it('entfernt Link-Markup mit Ziel', () => {
@@ -78,5 +78,29 @@ describe('fillModText', () => {
 
   it('laesst ueberzaehlige Platzhalter stehen', () => {
     expect(fillModText('# to #', [[1, 2]])).toBe('(1-2) to #')
+  })
+})
+
+describe('tierValueText', () => {
+  it('zeigt nur die Zahlenspanne bei einem Platzhalter', () => {
+    expect(tierValueText('#% increased Mana Regeneration Rate', [[60, 69]])).toBe(
+      '(60-69)',
+    )
+  })
+
+  it('trennt mehrere Werte mit Schraegstrich', () => {
+    expect(tierValueText('Adds # to # Fire Damage', [[6, 70], [10, 107]])).toBe(
+      '(6-70) / (10-107)',
+    )
+  })
+
+  it('nutzt eine einzelne Zahl bei gleichen Grenzen', () => {
+    expect(tierValueText('+# to Strength', [[9, 9]])).toBe('9')
+  })
+
+  it('faellt auf den Text zurueck, wenn es keine Werte gibt', () => {
+    expect(tierValueText('Bears the Mark of the Abyssal Lord', [])).toBe(
+      'Bears the Mark of the Abyssal Lord',
+    )
   })
 })

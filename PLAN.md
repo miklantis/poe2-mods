@@ -186,6 +186,12 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.12.4 – Phase 5: Aufgeklappte Tier-Zeilen zeigen nur noch die
+  Wertespanne statt den ganzen Mod-Satz (neuer `tierValueText` in modText.ts,
+  mehrere Werte per ` / `, Fallback auf Text ohne Zahlen; +4 Tests). ModTable
+  nutzt ihn mit `tabular-nums`. Gruppenkopf trägt weiterhin den vollen Text;
+  EssenceColumn unverändert (keine Kopfzeile, keine Doppelung). Typecheck, 61
+  Tests, Build grün.
 - 2026-07-03, 0.12.3 – Phase 5: Filter-Tags auf poe2db-Granularität erweitert.
   `COLOR_TAG_ORDER` (modTags.ts) von 10 auf 26 primäre Tags plus die drei
   Desecrated-Herkünfte (ulaman/amanamu/kurgal_mod) erweitert; interne Unter-Tags
