@@ -1,6 +1,13 @@
 {
-  "current": "0.13.0",
+  "current": "0.13.1",
   "entries": [
+    {
+      "version": "0.13.1",
+      "date": "2026-07-03",
+      "changes": [
+        "Basis-Auswahl: gleichnamige Basen (z. B. drei „Two-Stone Ring“ oder vier „Runemastered Heavy Belt“) erscheinen nicht mehr mehrfach, sondern als ein Eintrag. Bei Namensgleichheit wird die reguläre, handelbare Basis bevorzugt."
+      ]
+    },
     {
       "version": "0.13.0",
       "date": "2026-07-03",

@@ -231,10 +231,19 @@ async function main(): Promise<void> {
     )
     if (craftableBases.length === 0) continue
 
-    // Variante je Attribut, falls vorhanden; sonst je Basis.
+    // Variante je Attribut, falls vorhanden; sonst je Basis. Basen mit
+    // gleichem Anzeigenamen (z. B. drei "Two-Stone Ring") ergeben eine einzige
+    // Variante – die Eignung haengt nur an den Tags, gleichnamige Basen sind
+    // dafuer i. d. R. deckungsgleich. Bei Namensgleichheit wird die am wenigsten
+    // spezielle Basis gewaehlt (handelbar vor demigod/not_for_sale).
     const byAttr = new Map<string, Variant>()
-    const plainVariants: Variant[] = []
+    const plainByLabel = new Map<
+      string,
+      { base: string; label: string; score: number }
+    >()
     const attrOrder = new Map<string, number>()
+    const specialScore = (tags: string[]): number =>
+      tags.filter((t) => t === 'not_for_sale' || t === 'demigods').length
     for (const b of craftableBases) {
       const id = idOfRaw.get(b) ?? b.name
       const a = attrOf(b.tags)
@@ -244,9 +253,21 @@ async function main(): Promise<void> {
           attrOrder.set(a.label, a.order)
         }
       } else {
-        plainVariants.push({ base: id, label: b.name })
+        const cand = { base: id, label: b.name, score: specialScore(b.tags) }
+        const cur = plainByLabel.get(b.name)
+        if (
+          !cur ||
+          cand.score < cur.score ||
+          (cand.score === cur.score && cand.base < cur.base)
+        ) {
+          plainByLabel.set(b.name, cand)
+        }
       }
     }
+    const plainVariants: Variant[] = [...plainByLabel.values()].map((v) => ({
+      base: v.base,
+      label: v.label,
+    }))
     let variants: Variant[]
     if (byAttr.size > 0) {
       variants = Array.from(byAttr.values()).sort(
