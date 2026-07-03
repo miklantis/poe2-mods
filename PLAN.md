@@ -19,27 +19,34 @@ gewinnt", Tier als stabile Rangfolge je Gruppe plus Slot (requiredLevel
 absteigend), Itemstufe filtert den Pool, Wahrscheinlichkeit pro Slot über den
 erreichbaren Rest. 11 Unit-Tests (Vitest).
 
-Phase 3 (UI-Grundgerüst) läuft. Das Design-Fundament steht: das dunkle Theme
-aus dem Design-Handoff ist als Design-System eingezogen (Farb- und Text-Tokens,
-Präfix-/Suffix- und Tag-Farben, drei self-hosted Schriften, Hintergrund-Glow,
-schlanke Layout-Shell). Die Startseite zeigt weiter den Datenstatus, jetzt im
-neuen Look. Doku in `docs/Designsystem.md`.
+Phase 3 (UI-Grundgerüst) läuft. Design-Fundament und Screen 1 stehen: das
+dunkle Theme aus dem Handoff ist als Design-System eingezogen (Farb- und
+Text-Tokens, Präfix-/Suffix- und Tag-Farben, drei self-hosted Schriften,
+Hintergrund-Glow, schlanke Layout-Shell). Die Startseite ist die
+Item-Typ-Auswahl: alle Typen als Kacheln, nach Kategorien gruppiert, mit Suche;
+ein Klick navigiert auf die Browser-Route je Typ (`/$type`, aktuell noch
+Platzhalter). Doku in `docs/Designsystem.md`.
 
-Als Nächstes in Phase 3: Screen 1 (Item-Typ-Auswahl mit gruppiertem
-Kachel-Grid), danach der Modifier-Browser je Item-Typ (Screen 2) und dessen
-Feinschliff (Tag-Highlight, View-Switcher, Collapse-all). Grouping-Entscheidung:
-`Warstaff` bekommt das Anzeige-Label „Quarterstaff", `FishingRod` und `TrapTool`
-laufen unter „Sonstige" mit.
+Die Gruppierung leitet sich aus den Daten ab: eine Config in
+`src/lib/itemGroups.ts` liefert Reihenfolge, Anzeigenamen und Icons, die
+tatsächlichen Typen kommen aus den geladenen Daten, Unbekanntes fällt nach
+„Other". Grouping-Entscheidungen: `Warstaff` zeigt „Quarterstaff",
+`FishingRod`/`TrapTool` laufen unter „Other".
+
+Als Nächstes in Phase 3: Screen 2 (Modifier-Browser je Item-Typ) auf Basis von
+`runQuery`, danach dessen Feinschliff (Tag-Highlight, View-Switcher,
+Collapse-all).
 
 ---
 
 ## Offene Vorhaben
 
 ### Phase 3 – UI-Grundgerüst
-- [x] Design-Vorlage aus Claude Design einarbeiten (Design-System: Tokens, Schriften, Layout-Shell)
-- [ ] Routen je Item-Typ (`/rings`, `/amulets`, …)
-- [ ] Mod-Tabelle: Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht
-- [ ] Basis- und Unique-Ansicht je Item-Typ
+- [x] Design-Vorlage einarbeiten (Design-System: Tokens, Schriften, Layout-Shell)
+- [x] Screen 1: Item-Typ-Auswahl (gruppiertes Kachel-Grid, Suche, Navigation)
+- [ ] Screen 2: Modifier-Browser (Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht/Wahrscheinlichkeit)
+- [ ] Screen-2-Feinschliff (Tag-Highlight, View-Switcher Cards/Table/Bars, Collapse-all)
+- [ ] Basis-Varianten-Selektor (Str/Dex/Int) und Unique-Ansicht – Datenlage klären
 
 ### Phase 4 – Facet-Search
 - [ ] Tag-Pills (Caster, Fire, Cold, Lightning, …)
@@ -84,6 +91,12 @@ laufen unter „Sonstige" mit.
 
 ## Log
 
+- 2026-07-03, 0.5.0 – Phase 3, Screen 1: Item-Typ-Auswahl. Gruppiertes
+  Kachel-Grid aus den Daten (Config in `itemGroups.ts` liefert Reihenfolge,
+  Labels und Icons; Unbekanntes fällt nach „Other"), Substring-Suche,
+  Navigation auf die Browser-Route `/$type` (noch Platzhalter). Reine
+  Gruppierungslogik mit 6 Tests. Input-Primitive und `ItemTypeTile` als
+  wiederverwendbare Bausteine.
 - 2026-07-03, 0.4.0 – Phase 3 gestartet: Design-System eingezogen. Dunkles Theme
   aus dem Handoff als Tokens (Farben, Text-Abstufungen, Präfix-/Suffix- und
   Tag-Farben), drei self-hosted Schriften (Space Grotesk, Manrope, JetBrains

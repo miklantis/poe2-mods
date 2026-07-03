@@ -1,71 +1,94 @@
+import { useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useManifest } from '@/hooks/useManifest'
-import { useMods, useBaseItems, useItemTypes, useTags } from '@/hooks/useGameData'
+import { Gem, Search } from 'lucide-react'
+import { useItemTypes } from '@/hooks/useGameData'
+import { buildItemGroups } from '@/lib/itemGroups'
+import { ItemTypeTile } from '@/components/ItemTypeTile'
+import { Input } from '@/components/ui/input'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
 })
 
 function HomePage() {
-  const manifest = useManifest()
-  const mods = useMods()
-  const baseItems = useBaseItems()
   const itemTypes = useItemTypes()
-  const tags = useTags()
+  const [query, setQuery] = useState('')
 
-  const loading =
-    manifest.isPending ||
-    mods.isPending ||
-    baseItems.isPending ||
-    itemTypes.isPending ||
-    tags.isPending
-
-  const error =
-    manifest.error ?? mods.error ?? baseItems.error ?? itemTypes.error ?? tags.error
-
-  return (
-    <section className="mx-auto w-full max-w-5xl px-6 py-14 space-y-8">
-      <div className="space-y-3">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-heading">
-          poe2-mods
-        </h1>
-        <p className="max-w-prose text-secondary-text">
-          Durchsuchbarer Modifier-Browser für Path of Exile 2. Die Datenpipeline
-          steht; die Ansichten je Item-Typ folgen als Nächstes.
-        </p>
-      </div>
-
-      <div className="rounded-lg border border-border-card bg-surface p-5">
-        <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.12em] text-muted-text">
-          Datenstatus
-        </h2>
-        {error ? (
-          <p className="text-sm text-destructive">
-            Daten konnten nicht geladen oder nicht validiert werden: {error.message}
-          </p>
-        ) : loading ? (
-          <p className="text-sm text-secondary-text">Lade und validiere Daten …</p>
-        ) : (
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
-            <Stat label="Version" value={manifest.data?.current ?? '–'} />
-            <Stat label="Item-Typen" value={itemTypes.data?.length ?? 0} />
-            <Stat label="Modifier" value={mods.data?.length ?? 0} />
-            <Stat label="Basis-Items" value={baseItems.data?.length ?? 0} />
-            <Stat label="Tags" value={tags.data?.length ?? 0} />
-          </dl>
-        )}
-      </div>
-    </section>
+  const groups = useMemo(
+    () => buildItemGroups(itemTypes.data ?? []),
+    [itemTypes.data],
   )
-}
 
-function Stat({ label, value }: { label: string; value: string | number }) {
+  const q = query.trim().toLowerCase()
+  const filtered = useMemo(() => {
+    if (!q) return groups
+    return groups
+      .map((g) => ({
+        ...g,
+        types: g.types.filter((t) => t.label.toLowerCase().includes(q)),
+      }))
+      .filter((g) => g.types.length > 0)
+  }, [groups, q])
+
   return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-secondary-text">{label}</dt>
-      <dd className="font-mono text-base font-medium tabular-nums text-body">
-        {value}
-      </dd>
-    </div>
+    <section className="mx-auto w-full max-w-[1120px] px-6 pt-[54px] pb-24">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 items-center justify-center rounded-md border border-border bg-surface-raised">
+          <Gem className="size-5 text-suffix" strokeWidth={1.5} aria-hidden />
+        </span>
+        <span className="font-display text-[22px] font-bold tracking-[-0.01em] text-heading">
+          poe2-mods
+        </span>
+      </div>
+
+      <p className="mt-3 max-w-prose text-secondary-text">
+        Durchsuchbarer Modifier-Browser für Path of Exile 2. Wähle einen
+        Item-Typ, um seine möglichen Modifier, Tier und Spawn-Gewichte
+        durchzusehen.
+      </p>
+
+      <div className="relative mt-6 max-w-[520px]">
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-dim"
+          aria-hidden
+        />
+        <Input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Item-Typ suchen …"
+          aria-label="Item-Typ suchen"
+          className="pl-9"
+        />
+      </div>
+
+      {itemTypes.error ? (
+        <p className="mt-10 text-sm text-destructive">
+          Daten konnten nicht geladen oder nicht validiert werden:{' '}
+          {itemTypes.error.message}
+        </p>
+      ) : itemTypes.isPending ? (
+        <p className="mt-10 text-sm text-secondary-text">Lade Item-Typen …</p>
+      ) : filtered.length === 0 ? (
+        <p className="mt-10 text-sm text-secondary-text">
+          Keine Item-Typen passen zu „{query.trim()}".
+        </p>
+      ) : (
+        <div className="mt-10 space-y-9">
+          {filtered.map((group) => (
+            <div key={group.label}>
+              <h2 className="mb-3 border-b border-border-subtle pb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-muted-text">
+                {group.label}
+              </h2>
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-3">
+                {group.types.map((tile) => (
+                  <ItemTypeTile key={tile.id} tile={tile} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   )
 }

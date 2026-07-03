@@ -1,6 +1,13 @@
 {
-  "current": "0.4.0",
+  "current": "0.5.0",
   "entries": [
+    {
+      "version": "0.5.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Startseite mit Item-Typ-Auswahl: alle Item-Typen als Kacheln, nach Kategorien gruppiert, mit Suche. Ein Klick öffnet die Ansicht des Item-Typs – die Modifier-Tabelle dort folgt im nächsten Schritt."
+      ]
+    },
     {
       "version": "0.4.0",
       "date": "2026-07-03",
