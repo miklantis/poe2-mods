@@ -19,7 +19,18 @@ gewinnt", Tier als stabile Rangfolge je Gruppe plus Slot (requiredLevel
 absteigend), Itemstufe filtert den Pool, Wahrscheinlichkeit pro Slot über den
 erreichbaren Rest. 11 Unit-Tests (Vitest).
 
-Phase 3 (UI-Grundgerüst) läuft. Design-Fundament und Screen 1 stehen: das
+Phase 3 (UI-Grundgerüst) läuft. Design-Fundament, Screen 1 und Screen 2
+(Grundversion) stehen. Screen 2 ist der Modifier-Browser je Item-Typ: er leitet
+die Basis-Varianten aus den Daten ab (`src/lib/baseVariants.ts`, ADR 0006), lässt
+zwischen ihnen umschalten und zeigt Präfixe und Suffixe getrennt – je Mod-Familie
+die Tiers mit Rollen-Bereich, Itemstufe, Gewicht und Chance, gerechnet über
+`runQuery` bei fester Itemstufe 100. Wiederverwendbare Bausteine: `ModifierBrowser`,
+`ModColumn`, `ModGroupBlock`, `TierRow`, `VariantSelect`, `Badge`; reine Helfer
+`baseVariants`, `modText`, `format` mit Tests.
+
+Das folgende beschreibt den Stand vor Screen 2:
+
+Design-Fundament und Screen 1 stehen: das
 dunkle Theme aus dem Handoff ist als Design-System eingezogen (Farb- und
 Text-Tokens, Präfix-/Suffix- und Tag-Farben, drei self-hosted Schriften,
 Hintergrund-Glow, schlanke Layout-Shell). Die Startseite ist die
@@ -33,9 +44,8 @@ tatsächlichen Typen kommen aus den geladenen Daten, Unbekanntes fällt nach
 „Other". Grouping-Entscheidungen: `Warstaff` zeigt „Quarterstaff",
 `FishingRod`/`TrapTool` laufen unter „Other".
 
-Als Nächstes in Phase 3: Screen 2 (Modifier-Browser je Item-Typ) auf Basis von
-`runQuery`, danach dessen Feinschliff (Tag-Highlight, View-Switcher,
-Collapse-all).
+Als Nächstes in Phase 3: Screen-2-Feinschliff (Tag-Highlight, View-Switcher
+Cards/Table/Bars, Collapse-all), danach die Unique-Ansicht (Datenlage klären).
 
 ---
 
@@ -44,9 +54,10 @@ Collapse-all).
 ### Phase 3 – UI-Grundgerüst
 - [x] Design-Vorlage einarbeiten (Design-System: Tokens, Schriften, Layout-Shell)
 - [x] Screen 1: Item-Typ-Auswahl (gruppiertes Kachel-Grid, Suche, Navigation)
-- [ ] Screen 2: Modifier-Browser (Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht/Wahrscheinlichkeit)
+- [x] Screen 2: Modifier-Browser (Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht/Wahrscheinlichkeit)
+- [x] Basis-Varianten-Selektor (Attribut/Restriktion, datengetrieben) – ADR 0006
 - [ ] Screen-2-Feinschliff (Tag-Highlight, View-Switcher Cards/Table/Bars, Collapse-all)
-- [ ] Basis-Varianten-Selektor (Str/Dex/Int) und Unique-Ansicht – Datenlage klären
+- [ ] Unique-Ansicht – Datenlage klären
 
 ### Phase 4 – Facet-Search
 - [ ] Tag-Pills (Caster, Fire, Cold, Lightning, …)
@@ -91,6 +102,12 @@ Collapse-all).
 
 ## Log
 
+- 2026-07-03, 0.6.0 – Phase 3, Screen 2: Modifier-Browser je Item-Typ. Präfixe
+  und Suffixe getrennt, je Mod-Familie die Tiers mit Rollen-Bereich, Itemstufe,
+  Gewicht und Chance über `runQuery` (Itemstufe fest 100). Basis-Varianten
+  datengetrieben abgeleitet (`baseVariants.ts`, ADR 0006) mit Umschalter bei
+  mehreren Basen. Neue Bausteine `ModifierBrowser`, `ModColumn`, `ModGroupBlock`,
+  `TierRow`, `VariantSelect`, `Badge`; Helfer `modText`, `format`. 12 neue Tests.
 - 2026-07-03, 0.5.0 – Phase 3, Screen 1: Item-Typ-Auswahl. Gruppiertes
   Kachel-Grid aus den Daten (Config in `itemGroups.ts` liefert Reihenfolge,
   Labels und Icons; Unbekanntes fällt nach „Other"), Substring-Suche,

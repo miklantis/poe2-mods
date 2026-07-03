@@ -4,6 +4,7 @@ import { ChevronLeft } from 'lucide-react'
 import { useItemTypes } from '@/hooks/useGameData'
 import { buildItemGroups, resolveSlug } from '@/lib/itemGroups'
 import { getIcon } from '@/lib/icons'
+import { ModifierBrowser } from '@/components/ModifierBrowser'
 
 export const Route = createFileRoute('/$type')({
   component: BrowserPage,
@@ -62,9 +63,7 @@ function BrowserPage() {
               {itemType.name}
             </h1>
           </div>
-          <p className="mt-6 text-sm text-secondary-text">
-            Der Modifier-Browser für diesen Item-Typ folgt im nächsten Schritt.
-          </p>
+          <ModifierBrowser itemType={itemType} />
         </>
       )}
     </section>
