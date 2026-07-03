@@ -2,6 +2,15 @@
 
 ## Aktueller Stand
 
+Nächste Richtung beschlossen (noch nicht umgesetzt): Phase 8 – Rückkehr zu
+repoe als Datenquelle. Grund: Der CoE-Snapshot kennt die 0.5-Sonderpools
+Otherworldly und Genesis-Tree-Mods gar nicht (Datenlücke der Quelle, kein
+Import-Fehler), repoe deckt sie vollständig ab. Preis: repoe legt nur binäre
+Spawn-Gewichte offen (0/1, an den Belt-Mods verifiziert), also entfällt die
+Wahrscheinlichkeits-Anzeige im rollbaren Pool. Der Trade-off wurde bewusst
+zugunsten der Vollständigkeit entschieden; ADR 0008 (CoE) wird damit abgelöst.
+Bis Phase 8 umgesetzt ist, läuft die App unverändert auf CoE (0.5.4).
+
 Herkünfte stehen im Browser, alle gleichzeitig (Phase 7 abgeschlossen). Kein
 Reiter-Umschalten mehr: oben der rollbare Pool (Präfixe blau, Suffixe gelb, mit
 Chance), darunter Desecrated (Präfixe/Suffixe grün, ohne Chance), dann Essence
@@ -118,6 +127,33 @@ neuem Patch aktualisieren.
 ---
 
 ## Offene Vorhaben
+
+### Phase 8 – Datenquelle zurück auf repoe (Vollständigkeit statt Wahrscheinlichkeit)
+Umstieg vom CoE-Snapshot auf den repoe-poe2-Export (Version 4.5.4.3, aus den
+Spieldateien). Bringt alle Pools inkl. der bisher fehlenden Otherworldly- und
+Genesis-Tree-Mods. Kostet die geschätzten Wahrscheinlichkeiten, weil repoe nur
+Spawn-Gewichte 0/1 führt; die Chance-Anzeige entfällt durchgängig, alle Pools
+werden einheitlich mit Tier und Wertebereich gezeigt. Entscheidung/Begründung in
+ADR 0011 (neu); ADR 0008 wird als abgelöst markiert. poe2db bleibt nur
+UX-/Abgleich-Vorbild, wird nicht gescrapt.
+- [ ] Schritt 1: Datenfundament. Neues `import-repoe.ts` zieht den
+  repoe-poe2-Export (`mods.json`, `mods_by_base.json`, `base_items.json`,
+  `tags.json`, `item_classes.json`, `essences.json`), normalisiert auf ein
+  mod-zentriertes Schema (`origin` je Pool, `slot`, Eignung über
+  `spawn_weight > 0` je Tag, kein Gewichtsfeld), Zod-validiert, unter
+  `data/<version>/` abgelegt, `manifest.json` fortgeschrieben. Gegenprobe an
+  Ringen und Gürteln gegen poe2db (Otherworldly muss erscheinen).
+- [ ] Schritt 2: Query-Engine ohne Wahrscheinlichkeit. `baseEngine` auf reine
+  Eignung + Tier (requiredLevel-Rangfolge) + Wertebereich umstellen,
+  Chance-Berechnung entfernen; Herkünfte über eine einheitliche Flat-Logik;
+  `essenceEngine` auf die repoe-`essences.json`. Unit-Tests anpassen.
+- [ ] Schritt 3: UI ohne Chance-Spalte. Wahrscheinlichkeits-Anzeige aus dem
+  rollbaren Abschnitt entfernen (alle Pools einheitlich), Schätzwert-Hinweis
+  raus, Fußzeilen-Attribution auf repoe umstellen. Neue Pools (Otherworldly,
+  Genesis Tree) erscheinen automatisch als eigene Abschnitte. Changelog.
+- [ ] Schritt 4: Aufräumen + Doku. CoE-Reste entfernen (`import-coe.ts`,
+  `schema.coe.ts`, `data/_source/coe`, CoE-Bezüge), ADR 0011 schreiben, ADR 0008
+  als abgelöst markieren, `Architektur.md` auf repoe nachziehen.
 
 ### Phase 5 – optional/später
 - [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
