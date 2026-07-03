@@ -59,9 +59,14 @@ Suffixes — "+#% to Fire Resistance", "+# to Dexterity",
 "#% increased Rarity of Items found", "+#% to all Elemental Resistances".
 Show 3–4 tiers per group with plausible roll ranges and weights.
 
-Design tone: clean, modern, information-dense but readable, fast-feeling. A dark
-theme fits the Path of Exile aesthetic. Strong prefix/suffix separation, good
-typography, clear tier labeling.
+Design tone: very clean, minimal, modern — like a well-made productivity or
+developer tool, NOT a Path of Exile / gaming aesthetic. No dark gritty theme, no
+ornamental game styling, no textures or heavy borders. Use a light, neutral
+palette with generous whitespace, a modern sans-serif, subtle hairline dividers,
+soft rounded corners, and a single restrained accent color. Keep it flat and
+understated. The layout and arrangement described above stay as they are; only
+the visual styling should read modern and minimal. Priorities: clear prefix/suffix
+separation, strong typographic hierarchy, readable tables, clear tier labeling.
 ```
 
 ---
