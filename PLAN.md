@@ -48,8 +48,9 @@ tatsächlichen Typen kommen aus den geladenen Daten, Unbekanntes fällt nach
 „Other". Grouping-Entscheidungen: `Warstaff` zeigt „Quarterstaff",
 `FishingRod`/`TrapTool` laufen unter „Other".
 
-Als Nächstes in Phase 3: die Unique-Ansicht (Datenlage klären). Danach Phase 4
-(Facet-Search): Tag-Pills, Itemstufen-Slider, Fuzzy-Suche, Filter als URL-State.
+Als Nächstes: Phase 4 (Facet-Search) – Tag-Pills, Itemstufen-Slider, Fuzzy-Suche,
+Filter als URL-State. Die Unique-Ansicht ist zurückgestellt, weil der Export
+keine verknüpfbaren Unique-Mod-Daten liefert (ADR 0007).
 
 ---
 
@@ -61,7 +62,7 @@ Als Nächstes in Phase 3: die Unique-Ansicht (Datenlage klären). Danach Phase 4
 - [x] Screen 2: Modifier-Browser (Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht/Wahrscheinlichkeit)
 - [x] Basis-Varianten-Selektor (Attribut/Restriktion, datengetrieben) – ADR 0006
 - [x] Screen-2-Feinschliff (Tag-Highlight, View-Switcher Cards/Table/Bars, Collapse-all)
-- [ ] Unique-Ansicht – Datenlage klären
+- [~] Unique-Ansicht – zurückgestellt: keine verknüpfbaren Unique-Mod-Daten im Export (ADR 0007)
 
 ### Phase 4 – Facet-Search
 - [ ] Tag-Pills (Caster, Fire, Cold, Lightning, …)
