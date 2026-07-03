@@ -1,6 +1,13 @@
 {
-  "current": "0.9.0",
+  "current": "0.9.1",
   "entries": [
+    {
+      "version": "0.9.1",
+      "date": "2026-07-03",
+      "changes": [
+        "Kennzeichnung der Datenherkunft: Spawn-Gewichte, Tier und Chance sind Schätzwerte von Craft of Exile. Ein Hinweis steht direkt im Modifier-Browser, eine Fußzeile nennt Quelle und Datenstand (Spielversion und Liga)."
+      ]
+    },
     {
       "version": "0.9.0",
       "date": "2026-07-03",

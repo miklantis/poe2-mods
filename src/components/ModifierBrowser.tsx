@@ -146,6 +146,11 @@ export function ModifierBrowser({
         onItemLevel={(ilvl) => patchSearch({ ilvl })}
       />
 
+      <p className="mb-4 text-[12px] text-dim">
+        Gewicht und Chance beruhen auf geschätzten Spawn-Gewichten (Craft of
+        Exile).
+      </p>
+
       <div className="mb-5 flex items-center justify-end gap-2">
         <button
           type="button"

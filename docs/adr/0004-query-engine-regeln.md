@@ -1,6 +1,6 @@
 # ADR 0004 – Query-Engine: fachliche Regeln
 
-Status: akzeptiert
+Status: abgeloest durch ADR 0008 (Datenquelle Craft of Exile)
 Datum: 2026-07-03
 
 ## Kontext

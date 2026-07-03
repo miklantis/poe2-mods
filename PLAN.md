@@ -2,30 +2,23 @@
 
 ## Aktueller Stand
 
-Phase 6 (Datenquelle Craft of Exile) fast fertig: Schritte 1 bis 3 sind
-umgesetzt. Die App laeuft jetzt vollstaendig auf den CoE-Daten (Version 0.5.4).
-Grund fuer den Umbau: repoe-fork und der PoB-Export enthalten keine echten
-Spawn-Gewichte (alle Werte 1), PoE2 legt sie nicht offen; CoE rekonstruiert sie
-(Schaetzwerte).
+Phase 6 (Datenquelle Craft of Exile) abgeschlossen. Die App läuft vollständig
+auf den CoE-Daten (Version 0.5.4): basis-zentriertes Schema
+(`src/data/schema.coe.ts`), reine Engine `runBaseQuery`, beide Screens
+verdrahtet. Grund für den Umbau: repoe-fork und der PoB-Export enthalten keine
+echten Spawn-Gewichte (alle Werte 1), PoE2 legt sie nicht offen; CoE
+rekonstruiert sie (Schätzwerte). Der Schätzwert-Charakter ist in der Oberfläche
+kenntlich gemacht (Hinweis im Modifier-Browser, globale Fußzeile mit
+Attribution und Datenstand). Doku steht: ADR 0008 dokumentiert die
+Datenquelle, ADR 0003/0004/0006 sind als abgelöst markiert, `Architektur.md`
+ist auf CoE nachgezogen.
 
-Schritt 3 (erledigt): Datenschicht und beide Screens auf das basis-zentrierte
-CoE-Schema und `runBaseQuery` umgestellt. Manifest zeigt auf `0.5.4`; Loader
-laden `mods.json`, `item_types.json`, `base_mods.json` gegen `schema.coe.ts`
-(neuer Hook `useBaseMods`; `useBaseItems`/`useTags` entfallen). Screen 2 zieht
-die Basis-Varianten direkt aus `item_types.json`, rechnet je gewaehlter Basis
-ueber `base_mods` und zeigt die Rollen-Bereiche pro Tier (Text-Vorlage mit `#`
-wird aus den Tier-`values` gefuellt, neue Helfer `fillModText`/`formatRoll`).
-Screen 1 gruppiert datengetrieben nach `category` (poe2db-nahe Reihenfolge,
-Unbekanntes hinten). Aufgeraeumt: alte `engine.ts`, `schema.ts`,
-`baseVariants.ts`, der repoe-Importer `scripts/import.ts` samt Tests und
-npm-Script entfernt; das Deploy-Plugin liefert `data/_source` nicht mehr aus.
-Validiert: Typecheck, 48 Unit-Tests, Build; an den Ringen realdaten-gegengeprueft.
-
-Wichtig fuer die naechste Sitzung: Nur noch **Schritt 4** offen – die Gewichte
-in der Oberflaeche als CoE-Schaetzung kennzeichnen samt Attribution, dazu ADR,
-Doku (`Architektur.md`, ADR 0003 auf CoE aktualisieren) und Changelog. Hinweis:
-Die Gewichte im aktuellen Snapshot wirken teils wie Platzhalter (bei den Ringen
-durchweg 1000) – das ist Datenqualitaet des Snapshots, nicht der Verdrahtung.
+Als Nächstes: nur noch Phase 5 (optional/später) und der laufende Betrieb –
+Daten bei neuem Patch aktualisieren (neuen CoE-Snapshot nach `data/_source/coe/`,
+`npm run import:coe`, `data/<version>/` und `manifest.json` fortschreiben).
+Hinweis: Die Gewichte im aktuellen Snapshot wirken teils wie Platzhalter (bei
+den Ringen durchweg 1000) – das ist Datenqualität des Snapshots, nicht der
+Verdrahtung.
 
 --- Stand vor Phase 6 (weiter gueltig fuer die Oberflaeche): ---
 
@@ -92,20 +85,6 @@ neuem Patch aktualisieren.
 
 ## Offene Vorhaben
 
-### Phase 6 – Datenquelle Craft of Exile (echte Gewichte)
-Hintergrund: Der repoe-fork-Export (und der PoB-Export) enthalten keine echten
-Spawn-Gewichte – PoE2 legt sie nicht offen (alle Werte 1). Craft of Exile
-rekonstruiert Gewichte (Trade-Listings + Recombinator, normalisiert) und liefert
-sie pro Basis inkl. Tiers, Itemstufe und Rollen-Bereich. Wir bauen die
-Datenschicht darauf um. Die Werte sind Schätzungen und werden in der App als
-solche gekennzeichnet; Quelle Craft of Exile. Automatischer Abruf ist nicht
-möglich (privater Endpunkt, Org-Netzsperre) – die CoE-Dateien werden als
-versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
-- [x] Schritt 1: Import + basis-zentriertes Schema aus dem CoE-Snapshot, Zod-validiert, an den Ringen gegengeprüft (echte, variable Gewichte)
-- [x] Schritt 2: Query-Engine auf Basis-Gewichte umstellen (pro Basis Tiers → Wahrscheinlichkeit), Unit-Tests
-- [x] Schritt 3: Screens/Filter/Varianten neu verdrahtet (Datenschicht + beide Screens auf CoE-Schema und runBaseQuery, Manifest auf 0.5.4, aufgeraeumt)
-- [ ] Schritt 4: Gewichte als CoE-Schätzung kennzeichnen + Attribution, ADR, Doku, Changelog
-
 ### Phase 5 – optional/später
 - [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
 - [ ] Feinschliff Design/Designsystem
@@ -114,6 +93,15 @@ versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
 ---
 
 ## Abgeschlossene Vorhaben
+
+### Phase 6 – Datenquelle Craft of Exile (echte, geschätzte Gewichte)
+Umstieg von repoe (keine echten Gewichte, alle Werte 1) auf den
+CoE-Snapshot mit rekonstruierten Gewichten pro Basis (Schätzwerte). Details in
+ADR 0008.
+- [x] Schritt 1: Import + basis-zentriertes Schema aus dem CoE-Snapshot, Zod-validiert, an den Ringen gegengeprüft
+- [x] Schritt 2: Query-Engine auf Basis-Gewichte (`runBaseQuery`), Unit-Tests
+- [x] Schritt 3: Datenschicht + beide Screens auf CoE-Schema und `runBaseQuery`, Manifest auf 0.5.4, aufgeräumt
+- [x] Schritt 4: Schätzung in der Oberfläche gekennzeichnet + Attribution, ADR 0008, Doku, Changelog
 
 ### Phase 0 – Setup
 - [x] Vite + React 19 + TypeScript (strict) aufsetzen
@@ -157,6 +145,12 @@ versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
 
 ## Log
 
+- 2026-07-03, 0.9.1 – Phase 6, Schritt 4: CoE-Herkunft gekennzeichnet. Hinweis
+  im Modifier-Browser nahe den Werten, neue globale Fußzeile `AppFooter` mit
+  Attribution (Quelle Craft of Exile, Link) und Datenstand (Version/Liga aus
+  dem Manifest); Layout-Shell auf Spalten-Layout mit Footer. Doku: ADR 0008 neu
+  (Datenquelle CoE), ADR 0003/0004/0006 als abgelöst markiert, `Architektur.md`
+  auf CoE nachgezogen. Damit Phase 6 abgeschlossen.
 - 2026-07-03, 0.9.0 – Phase 6, Schritt 3: App auf die CoE-Datenquelle
   umgestellt. Manifest auf `0.5.4`; Loader/Hooks auf `schema.coe.ts` (neuer
   `useBaseMods`, `useBaseItems`/`useTags` entfallen). Screen 2 verdrahtet auf
@@ -203,11 +197,3 @@ versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
   Tag-Farben), drei self-hosted Schriften (Space Grotesk, Manrope, JetBrains
   Mono), Hintergrund-Glow, schlanke Layout-Shell ohne globalen Header. Grundlage
   für die Item-Ansichten.
-- 2026-07-03, 0.3.0 – Phase 2 (Query-Engine) abgeschlossen. Reines Modul
-  `src/lib/query/engine.ts`: Eignung nach „erster passender Tag gewinnt", Tier je
-  Gruppe plus Slot, Itemstufen-Filter, Wahrscheinlichkeit pro Slot. 11 Unit-Tests.
-- 2026-07-03, 0.2.0 – Phase 1 (Datenpipeline und Schema) abgeschlossen. Zod-Schema,
-  Import-Skript, normalisierte Daten (4.5.4.3), Loader-Hooks mit Validierung und
-  Datenstatus-Anzeige. An den Ringen gegen poe2db gegengeprüft.
-- 2026-07-03, 0.1.0 – Phase 0 (Setup) abgeschlossen. Grundgerüst, Routing,
-  Styling, Deploy-Pipeline und Docs-Struktur stehen; Basis für die Datenpipeline gelegt.

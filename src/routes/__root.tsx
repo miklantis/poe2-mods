@@ -1,4 +1,5 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { AppFooter } from '@/components/AppFooter'
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -6,8 +7,11 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   return (
-    <div className="min-h-svh">
-      <Outlet />
+    <div className="flex min-h-svh flex-col">
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <AppFooter />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 # 0006 – Basis-Varianten datengetrieben ableiten
 
 ## Status
-Angenommen (2026-07-03)
+Abgeloest durch ADR 0008 (Datenquelle Craft of Exile). Historie unten.
 
 ## Kontext
 Screen 2 (Modifier-Browser) braucht ein Tag-Set fuer `runQuery`. Manche
