@@ -66,3 +66,24 @@ Ausgelagerte, älteste Log-Einträge aus `PLAN.md`. Chronologisch, älteste zuer
   in `ModifierBrowser` von collapsed- auf expandedKeys umgestellt (Standard =
   eingeklappt, neue Gruppen ebenfalls); collapsedKeys/Toggle-Logik daraus
   abgeleitet, Kind-Schnittstelle unveraendert.
+- 2026-07-03, 0.9.3 – Itemstufe-Slider sichtbar gemacht. Neue Klasse
+  `.il-slider` (index.css) mit sichtbarer Schiene, bis zum Wert gefuelltem
+  Bereich (WebKit via `--il-pct`, Firefox via `::-moz-range-progress`) und
+  deutlichem Regler; FilterBar zeigt Min/Max unter dem Slider.
+- 2026-07-03, 0.9.4 – Phase 7, Schritt 1: Herkunft-Fundament. Import zieht neben
+  rollbaren Mods jetzt Corrupted (mgroup 1, affix corrupted) und Desecrated
+  (mgroup 10); `mods.json` trägt `origin` und nullable `slot`. Engine
+  `runBaseQuery` überspringt slot-lose Mods, neue reine `filterRowsByOrigin`
+  trennt die Herkünfte; der Browser filtert strikt auf rollbar (Ansicht
+  unverändert, an den Ringen gegengeprüft). ADR 0009 neu. 5 neue Tests (51 gesamt).
+- 2026-07-03, 0.10.0 – Phase 7, Schritt 2: Herkunft-Reiter im Browser. Reiter-
+  Leiste (nur vorhandene Herkünfte), aktiver Reiter im URL-State (`origin`);
+  rollbar mit Chance, Desecrated ohne, Corrupted flach ohne Slot/Chance. Anzeige-
+  Bausteine auf Akzent (`components/ui/accent.ts`) + `showProbability` umgestellt;
+  neue reine `runFlatQuery` und generisches `filterGroups`; Corrupted-Farbton im
+  Theme. 1 neuer Test (52 gesamt).
+- 2026-07-03, 0.11.0 – Phase 7: Herkünfte alle gleichzeitig statt Reiter. Rollbar
+  oben (Chance), Desecrated grün, Corrupted breite Tabelle rot; durchgehend
+  Tabelle (ViewSwitcher/Karten/Balken entfernt), gemeinsamer Filter. Akzent um
+  Grün erweitert, Tabellen-`keyNs` gegen Schlüssel-Kollision; tote View-Bausteine
+  gelöscht. ADR 0009 mit Nachtrag.

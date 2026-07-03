@@ -2,127 +2,22 @@
 
 ## Aktueller Stand
 
-Nächste Richtung beschlossen (noch nicht umgesetzt): Phase 8 – Rückkehr zu
-repoe als Datenquelle. Grund: Der CoE-Snapshot kennt die 0.5-Sonderpools
-Otherworldly und Genesis-Tree-Mods gar nicht (Datenlücke der Quelle, kein
-Import-Fehler), repoe deckt sie vollständig ab. Preis: repoe legt nur binäre
-Spawn-Gewichte offen (0/1, an den Belt-Mods verifiziert), also entfällt die
-Wahrscheinlichkeits-Anzeige im rollbaren Pool. Der Trade-off wurde bewusst
-zugunsten der Vollständigkeit entschieden; ADR 0008 (CoE) wird damit abgelöst.
-Bis Phase 8 umgesetzt ist, läuft die App unverändert auf CoE (0.5.4).
+Die App läuft (GitHub Pages), Datenquelle Craft of Exile, Version 0.5.4. Sie ist
+ein durchsuchbarer, read-only Modifier-Browser: Item-Typ-Auswahl auf der
+Startseite, je Typ ein Browser mit allen Herkünften gleichzeitig als Tabellen
+(rollbar mit Chance, darunter Desecrated, Essence und Corrupted ohne Chance),
+gemeinsamer Facet-Filter (Suche, Tags, Itemstufe) als teil-/bookmarkbarer
+URL-State. Phasen 0–7 abgeschlossen (Überblick unten, Detail in ADRs und
+Commits).
 
-Herkünfte stehen im Browser, alle gleichzeitig (Phase 7 abgeschlossen). Kein
-Reiter-Umschalten mehr: oben der rollbare Pool (Präfixe blau, Suffixe gelb, mit
-Chance), darunter Desecrated (Präfixe/Suffixe grün, ohne Chance), dann Essence
-(Präfixe/Suffixe violett, ohne Chance) und ganz unten Corrupted als breite
-Tabelle (rot, ohne Chance). Nur vorhandene Abschnitte erscheinen. Darstellung
-ist durchgehend die Tabelle; ein gemeinsamer Filter (Suche, Tags, Itemstufe)
-wirkt auf alle Abschnitte.
-
-Essence (Phase 7, Schritt 3) ist umgesetzt: Der Import zieht die Essences
-(mgroup 13) und schreibt `essences.json` je Basis; Essence-exklusive Mods stehen
-mit `origin: essence` in `mods.json`. Reine Engine `runEssenceQuery` liefert je
-Mod genau eine Zeile mit dem Wertebereich über alle Stufen und der kleinsten
-erreichbaren Itemstufe (keine Chance – gezielt gesetzt). Neue flache
-`EssenceColumn`, violetter Akzent, Loader `useEssences`. Snapshot 0.5.4: 59
-Basen mit Essence, 1086 Zeilen; keine Korruption-Essences (alle corrupt=0), daher
-keine Markierung nötig. Entscheidung/Nachtrag in ADR 0009.
-
-Damit ist Phase 7 vollständig abgeschlossen.
-
-Design-Feinschliff (0.12.1): Typ-Tags werden in den Tabellen nicht mehr
-angezeigt (Filter-Pills oben bleiben), Modifier-Text etwas größer,
-Herkunfts-Überschriften entfallen zugunsten sprechender Tabellennamen
-(„Desecrated Präfixe" usw.), Itemstufen-Regler kompakt links.
-
-Anzeige-Einheit (0.12.5): Der Browser zeigt jetzt je Zeile einen einzelnen
-Modifier statt einer internen Ausschluss-Gruppe. Modifier, die sich im Spiel
-nur eine Ausschluss-Gruppe teilen (z. B. Fire/Cold/Lightning/Chaos/Physical
-Spell Skills oder die elementaren Waffen-Schaden-Präfixe), stehen dadurch als
-eigene Zeilen mit eigenen Tier und eigener Chance – nicht mehr in einer Zeile
-mit vermischten, scheinbar mehrfach gleichen Tier. `runBaseQuery`/`runFlatQuery`/
-`runEssenceQuery` gruppieren nach Mod-ID; Entscheidung in ADR 0010.
-
---- Stand Phase 6 (weiter gueltig fuer Datenquelle und Oberflaeche): ---
-
-Phase 6 (Datenquelle Craft of Exile) abgeschlossen. Die App läuft vollständig
-auf den CoE-Daten (Version 0.5.4): basis-zentriertes Schema
-(`src/data/schema.coe.ts`), reine Engine `runBaseQuery`, beide Screens
-verdrahtet. Grund für den Umbau: repoe-fork und der PoB-Export enthalten keine
-echten Spawn-Gewichte (alle Werte 1), PoE2 legt sie nicht offen; CoE
-rekonstruiert sie (Schätzwerte). Der Schätzwert-Charakter ist in der Oberfläche
-kenntlich gemacht (Hinweis im Modifier-Browser, globale Fußzeile mit
-Attribution und Datenstand). Doku steht: ADR 0008 dokumentiert die
-Datenquelle, ADR 0003/0004/0006 sind als abgelöst markiert, `Architektur.md`
-ist auf CoE nachgezogen.
-
-Laufender Betrieb (unverändert): Daten bei neuem Patch aktualisieren (neuen
-CoE-Snapshot nach `data/_source/coe/`, `npm run import:coe`, `data/<version>/`
-und `manifest.json` fortschreiben).
-Hinweis: Die Gewichte im aktuellen Snapshot wirken teils wie Platzhalter (bei
-den Ringen durchweg 1000) – das ist Datenqualität des Snapshots, nicht der
-Verdrahtung.
-
---- Stand vor Phase 6 (weiter gueltig fuer die Oberflaeche): ---
-
-Phase 0 (Setup), Phase 1 (Datenpipeline und Schema) und Phase 2 (Query-Engine)
-umgesetzt. Die App lädt die normalisierten Spieldaten (Version 4.5.4.3) über
-TanStack Query, validiert sie beim Laden gegen die Zod-Schemas und zeigt einen
-Datenstatus auf der Startseite.
-
-Datenpipeline: `scripts/import.ts` zieht den poe2-Export von `repoe-fork/poe2`,
-slimt ihn aufs Schema, validiert und legt ihn unter `data/4.5.4.3/` ab;
-`data/manifest.json` zeigt auf die aktive Version. An den Ringen gegen poe2db
-gegengeprüft (203 rollbare Mods).
-
-Query-Engine (`src/lib/query/engine.ts`): reines, DOM-freies Modul. `runQuery`
-nimmt Item-Tags plus Itemstufe und liefert Präfixe und Suffixe je Gruppe mit
-Tier und Wahrscheinlichkeit. Regeln: Eignung nach „erster passender Tag
-gewinnt", Tier als stabile Rangfolge je Gruppe plus Slot (requiredLevel
-absteigend), Itemstufe filtert den Pool, Wahrscheinlichkeit pro Slot über den
-erreichbaren Rest. 11 Unit-Tests (Vitest).
-
-Phase 3 (UI-Grundgerüst) läuft. Design-Fundament, Screen 1 und Screen 2 stehen.
-Screen 2 ist der Modifier-Browser je Item-Typ: er leitet die Basis-Varianten aus
-den Daten ab (`src/lib/baseVariants.ts`, ADR 0006), lässt zwischen ihnen
-umschalten und zeigt Präfixe und Suffixe getrennt. Der Feinschliff ist drin: drei
-umschaltbare Darstellungen (Karten, Tabelle, Balken über `ViewSwitcher`), farbige
-Typ-Tag-Chips je Mod-Familie (`TagChip`, Quelle `implicitTags` gefiltert auf die
-Farb-Tags, `src/lib/modTags.ts`) und ein-/ausklappbare Familien samt globalem
-„Alle ein-/ausklappen".
-Wiederverwendbare Bausteine: `ModifierBrowser`, `ModColumn`, `ModGroupBlock`,
-`ModTable`, `TierRow`, `TierBar`, `VariantSelect`, `ViewSwitcher`, `Badge`,
-`TagChip`, `ProbabilityBar`; reine Helfer `baseVariants`, `modText`, `modTags`,
-`format` mit Tests.
-
-Phase 4 (Facet-Search) ist umgesetzt: eine `FilterBar` mit Volltextsuche über den
-Mod-Text, Tag-Pills (ODER-Verknüpfung) und einem Itemstufen-Slider, der `runQuery`
-live neu füttert. Die nachgelagerte Filterung ist ein reines Modul
-(`src/lib/query/filter.ts`, `filterResult`/`availableTags`, mit Tests). Der
-gesamte Filter-, Varianten- und View-Zustand liegt als URL-State auf der Route
-`/$type` (Zod-`validateSearch`), Ansichten sind damit teil- und bookmarkbar. Neue
-Bausteine: `FilterBar`, `TagFilterPill`, `Slider`, gemeinsames `ui/tagColors`.
-
-Das folgende beschreibt den Stand vor Screen 2:
-
-Design-Fundament und Screen 1 stehen: das
-dunkle Theme aus dem Handoff ist als Design-System eingezogen (Farb- und
-Text-Tokens, Präfix-/Suffix- und Tag-Farben, drei self-hosted Schriften,
-Hintergrund-Glow, schlanke Layout-Shell). Die Startseite ist die
-Item-Typ-Auswahl: alle Typen als Kacheln, nach Kategorien gruppiert, mit Suche;
-ein Klick navigiert auf die Browser-Route je Typ (`/$type`, aktuell noch
-Platzhalter). Doku in `docs/Designsystem.md`.
-
-Die Gruppierung leitet sich aus den Daten ab: eine Config in
-`src/lib/itemGroups.ts` liefert Reihenfolge, Anzeigenamen und Icons, die
-tatsächlichen Typen kommen aus den geladenen Daten, Unbekanntes fällt nach
-„Other". Grouping-Entscheidungen: `Warstaff` zeigt „Quarterstaff",
-`FishingRod`/`TrapTool` laufen unter „Other".
-
-Als Nächstes: Phase 5 (optional/später) – PWA-Hülle, Design-Feinschliff,
-`docs/Referenz.md`. Die Unique-Ansicht ist zurückgestellt, weil der Export keine
-verknüpfbaren Unique-Mod-Daten liefert (ADR 0007). Laufender Betrieb: Daten bei
-neuem Patch aktualisieren.
+Laufende und einzige aktive Arbeit: Phase 8 – Migration der Datenquelle zurück
+auf repoe. Grund: Der CoE-Snapshot kennt die 0.5-Sonderpools Otherworldly und
+Genesis-Tree-Mods nicht (Datenlücke der Quelle, kein Import-Fehler); repoe deckt
+alle Pools ab. Preis: repoe legt nur binäre Spawn-Gewichte offen (0/1, an den
+Belt-Mods verifiziert), also entfällt die Wahrscheinlichkeits-Anzeige im
+rollbaren Pool. Trade-off bewusst zugunsten der Vollständigkeit; ADR 0008 (CoE)
+wird damit abgelöst. Bis Phase 8 umgesetzt ist, läuft die App unverändert auf
+CoE.
 
 ---
 
@@ -164,67 +59,33 @@ UX-/Abgleich-Vorbild, wird nicht gescrapt.
 
 ## Abgeschlossene Vorhaben
 
-### Phase 7 – Herkünfte (rollbar / Corrupted / Desecrated / Essence)
-Alle Herkünfte gleichzeitig im Browser (Tabelle). Entscheidungen in ADR 0009.
-Socket-Mods ausgeschlossen; Augment/Bonded zurückgestellt (im Snapshot 0.5.4
-nicht als eigene Herkunft vorhanden).
-- [x] Schritt 1: Datenfundament – Import zieht Corrupted + Desecrated, `origin`
-  und nullable `slot` im Schema, Engine überspringt slot-lose Mods,
-  `filterRowsByOrigin`, rollbare Ansicht unverändert. Tests, ADR 0009.
-- [x] Schritt 2: Herkünfte im Browser sichtbar – zunächst als Reiter, dann auf
-  Wunsch zu „alles gleichzeitig" umgebaut (rollbar oben mit Chance, Desecrated
-  grün, Corrupted breite Tabelle rot; durchgehend Tabelle, gemeinsamer Filter).
-- [x] Schritt 3: Essence als eigener, item-typ-bezogener Datenweg + Abschnitt.
-  Import zieht mgroup 13, `essences.json` je Basis, Essence-Mods mit
-  `origin: essence`; reine `runEssenceQuery`, flache `EssenceColumn` (je Mod eine
-  Zeile, Bereich über alle Stufen), violetter Akzent. ADR 0009 (Nachtrag).
+Überblick; die Schritt-Details stehen in den Commits und den ADRs.
 
-### Phase 6 – Datenquelle Craft of Exile (echte, geschätzte Gewichte)
-Umstieg von repoe (keine echten Gewichte, alle Werte 1) auf den
-CoE-Snapshot mit rekonstruierten Gewichten pro Basis (Schätzwerte). Details in
-ADR 0008.
-- [x] Schritt 1: Import + basis-zentriertes Schema aus dem CoE-Snapshot, Zod-validiert, an den Ringen gegengeprüft
-- [x] Schritt 2: Query-Engine auf Basis-Gewichte (`runBaseQuery`), Unit-Tests
-- [x] Schritt 3: Datenschicht + beide Screens auf CoE-Schema und `runBaseQuery`, Manifest auf 0.5.4, aufgeräumt
-- [x] Schritt 4: Schätzung in der Oberfläche gekennzeichnet + Attribution, ADR 0008, Doku, Changelog
-
-### Phase 0 – Setup
-- [x] Vite + React 19 + TypeScript (strict) aufsetzen
-- [x] Tailwind v4 einrichten
-- [x] shadcn/ui initialisieren (Primitives in `src/components/ui`)
-- [x] TanStack Router (file-based) + TanStack Query einbinden
-- [x] Vite `base` auf `/poe2-mods/` setzen, SPA-Fallback für Pages
-- [x] GitHub-Actions-Workflow für Build + Deploy auf GitHub Pages
-- [x] `public/changelog.json` anlegen (Startversion 0.1.0)
-- [x] `docs/Architektur.md`, `docs/adr/` und `docs/archive/` anlegen
-
-### Phase 1 – Datenpipeline und Schema
-- [x] Ziel-Schema festlegen: `mods`, `base_items`, `tags`, `item_types` (nur benötigte Felder)
-- [x] Zod-Schemas als Quelle der Wahrheit, TS-Typen ableiten
-- [x] Import-Skript: repoe-fork-Export → normalisiertes Schema
-- [x] Daten unter `data/<spielversion>/` ablegen, `data/manifest.json` mit aktueller Version
-- [x] Loader-Hooks (`useManifest`, `useMods`, `useBaseItems`, `useItemTypes`, `useTags`) über TanStack Query
-- [x] Zod-Validierung beim Laden
-
-### Phase 2 – Query-Engine (reines Modul)
-- [x] Filter: Domain (Item-Tags), Slot (Präfix/Suffix), Itemstufe, Tag-Gewicht > 0
-- [x] Dedup nach Mod-Group, Sortierung nach Tier
-- [x] Gewichte → Wahrscheinlichkeiten (pro Slot, über erreichbaren Pool)
-- [x] Unit-Tests (Vitest)
-
-### Phase 3 – UI-Grundgerüst
-- [x] Design-Vorlage einarbeiten (Design-System: Tokens, Schriften, Layout-Shell)
-- [x] Screen 1: Item-Typ-Auswahl (gruppiertes Kachel-Grid, Suche, Navigation)
-- [x] Screen 2: Modifier-Browser (Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht/Wahrscheinlichkeit)
-- [x] Basis-Varianten-Selektor (Attribut/Restriktion, datengetrieben) – ADR 0006
-- [x] Screen-2-Feinschliff (Tag-Highlight, View-Switcher Cards/Table/Bars, Collapse-all)
-- [~] Unique-Ansicht – zurückgestellt: keine verknüpfbaren Unique-Mod-Daten im Export (ADR 0007)
-
-### Phase 4 – Facet-Search
-- [x] Tag-Pills (Caster, Fire, Cold, Lightning, …), mehrere als ODER
-- [x] Slider für Itemstufe mit Live-Neuberechnung
-- [x] Textsuche (Substring/Token) über Mod-Text
-- [x] Filter-Zustand als URL-State (teil- und bookmarkbar)
+- **Phase 0 – Setup.** Vite + React 19 + TypeScript (strict), Tailwind v4,
+  shadcn/ui, TanStack Router (file-based) + Query, Base `/poe2-mods/` mit
+  SPA-Fallback, GitHub-Actions-Deploy, `changelog.json`, Doku-Gerüst. ADR 0001,
+  0002.
+- **Phase 1 – Datenpipeline und Schema.** Import → normalisiertes Schema,
+  Zod als Quelle der Wahrheit, versionierte Daten unter `data/<version>/` mit
+  Manifest, Loader-Hooks über TanStack Query, Validierung beim Laden. ADR 0003
+  (durch ADR 0008 abgelöst).
+- **Phase 2 – Query-Engine.** Reines, DOM-freies Modul: Filter nach Item-Tags,
+  Slot, Itemstufe; Dedup nach Gruppe; Tier-Rangfolge; Gewichte →
+  Wahrscheinlichkeiten. Unit-Tests. ADR 0004 (durch ADR 0008 abgelöst).
+- **Phase 3 – UI-Grundgerüst.** Design-System (Tokens, Schriften, Shell),
+  Screen 1 (gruppierte Item-Typ-Auswahl), Screen 2 (Modifier-Browser),
+  datengetriebene Basis-Varianten. ADR 0005, 0006. Unique-Ansicht
+  zurückgestellt (ADR 0007).
+- **Phase 4 – Facet-Search.** Tag-Pills (ODER), Itemstufen-Slider mit
+  Live-Neuberechnung, Textsuche, Filter-/Varianten-/View-Zustand als URL-State.
+- **Phase 6 – Datenquelle Craft of Exile.** Umstieg von repoe (nur Gewicht 0/1)
+  auf den CoE-Snapshot mit rekonstruierten, geschätzten Gewichten; Schätzwert in
+  der Oberfläche gekennzeichnet, Attribution in der Fußzeile. ADR 0008. Wird mit
+  Phase 8 wieder abgelöst.
+- **Phase 7 – Herkünfte.** Rollbar, Corrupted, Desecrated und Essence
+  gleichzeitig im Browser (durchgehend Tabelle, gemeinsamer Filter);
+  Anzeige-Einheit auf den einzelnen Modifier statt Ausschluss-Gruppe. ADR 0009,
+  0010.
 
 ---
 
@@ -274,29 +135,9 @@ ADR 0008.
   (`--color-essence`), Loader `useEssences`, Browser-Abschnitt zwischen Desecrated
   und Corrupted. Snapshot 0.5.4: 59 Basen mit Essence, 1086 Zeilen; keine
   Korruption-Essences. ADR 0009 (Nachtrag). Typecheck, 57 Tests, Build grün.
-- 2026-07-03, 0.11.0 – Phase 7: Herkünfte alle gleichzeitig statt Reiter. Rollbar
-  oben (Chance), Desecrated grün, Corrupted breite Tabelle rot; durchgehend
-  Tabelle (ViewSwitcher/Karten/Balken entfernt), gemeinsamer Filter. Akzent um
-  Grün erweitert, Tabellen-`keyNs` gegen Schlüssel-Kollision; tote View-Bausteine
-  gelöscht. ADR 0009 mit Nachtrag.
-- 2026-07-03, 0.10.0 – Phase 7, Schritt 2: Herkunft-Reiter im Browser. Reiter-
-  Leiste (nur vorhandene Herkünfte), aktiver Reiter im URL-State (`origin`);
-  rollbar mit Chance, Desecrated ohne, Corrupted flach ohne Slot/Chance. Anzeige-
-  Bausteine auf Akzent (`components/ui/accent.ts`) + `showProbability` umgestellt;
-  neue reine `runFlatQuery` und generisches `filterGroups`; Corrupted-Farbton im
-  Theme. 1 neuer Test (52 gesamt).
-- 2026-07-03, 0.9.4 – Phase 7, Schritt 1: Herkunft-Fundament. Import zieht neben
-  rollbaren Mods jetzt Corrupted (mgroup 1, affix corrupted) und Desecrated
-  (mgroup 10); `mods.json` trägt `origin` und nullable `slot`. Engine
-  `runBaseQuery` überspringt slot-lose Mods, neue reine `filterRowsByOrigin`
-  trennt die Herkünfte; der Browser filtert strikt auf rollbar (Ansicht
-  unverändert, an den Ringen gegengeprüft). ADR 0009 neu. 5 neue Tests (51 gesamt).
-- 2026-07-03, 0.9.3 – Itemstufe-Slider sichtbar gemacht. Neue Klasse
-  `.il-slider` (index.css) mit sichtbarer Schiene, bis zum Wert gefuelltem
-  Bereich (WebKit via `--il-pct`, Firefox via `::-moz-range-progress`) und
-  deutlichem Regler; FilterBar zeigt Min/Max unter dem Slider.
-- 2026-07-03, 0.9.2 – Modifier-Browser startet vollständig eingeklappt. State
-  in `ModifierBrowser` von collapsed- auf expandedKeys umgestellt (Standard =
-  eingeklappt, neue Gruppen ebenfalls); collapsedKeys/Toggle-Logik daraus
-  abgeleitet, Kind-Schnittstelle unveraendert.
-Ältere Einträge (0.1.0–0.9.2) im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
+- 2026-07-03 – PLAN aufgeräumt: „Aktueller Stand" auf den Ist-Zustand plus
+  Phase-8-Richtung eingedampft, abgeschlossene Phasen 0–7 zu einem Überblick
+  verdichtet (Detail in Commits/ADRs), Log-Einträge 0.9.2–0.11.0 ins Archiv
+  verschoben.
+
+Ältere Einträge (0.1.0–0.11.0) im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
