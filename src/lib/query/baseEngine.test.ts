@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { BaseMod, Mod, Tier } from '@/data/schema.coe'
-import { runBaseQuery, filterRowsByOrigin } from './baseEngine'
+import { runBaseQuery, runFlatQuery, filterRowsByOrigin } from './baseEngine'
 
 /** Baut einen Mod mit sinnvollen Vorgaben; nur Relevantes wird ueberschrieben. */
 function makeMod(partial: Partial<Mod> & Pick<Mod, 'id'>): Mod {
@@ -200,5 +200,25 @@ describe('Herkunft-Trennung', () => {
     const res = runBaseQuery(rollable, map, { itemLevel: 100 })
     expect(res.prefixWeightTotal).toBe(100)
     expect(res.prefixes[0].mods[0].probability).toBe(1)
+  })
+})
+
+describe('runFlatQuery – Corrupted (slot-los)', () => {
+  it('gruppiert nach Mod-Group, ohne Chance, respektiert die Itemstufe', () => {
+    const mods = [
+      makeMod({ id: 'a', slot: null, origin: 'corrupted', group: 'GA', text: 'Alpha' }),
+      makeMod({ id: 'b', slot: null, origin: 'corrupted', group: 'GB', text: 'Beta' }),
+    ]
+    const rows: BaseMod[] = [
+      { mod: 'a', tiers: [tier(1, 1), tier(80, 1)] },
+      { mod: 'b', tiers: [tier(90, 1)] },
+    ]
+    const res = runFlatQuery(rows, modMap(mods), { itemLevel: 60 })
+    // Beta (ilvl 90) faellt bei Itemstufe 60 heraus.
+    expect(res.map((g) => g.group)).toEqual(['GA'])
+    // Alpha behaelt nur den erreichbaren Tier (ilvl 1); Chance bleibt 0.
+    expect(res[0].mods).toHaveLength(1)
+    expect(res[0].probability).toBe(0)
+    expect(res[0].mods[0].probability).toBe(0)
   })
 })

@@ -1,25 +1,31 @@
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import type { ModGroup } from '@/lib/query/baseEngine'
+import type { DisplayGroup } from '@/lib/query/baseEngine'
 import { modFamilyLabel } from '@/lib/modText'
 import { displayTags } from '@/lib/modTags'
 import { formatPercent } from '@/lib/format'
 import { TierRow } from '@/components/TierRow'
 import { TierBar } from '@/components/TierBar'
 import { TagChipRow } from '@/components/ui/TagChip'
+import type { Accent } from '@/components/ui/accent'
 
 /**
  * Ein Block je Mod-Gruppe: Familien-Kopf (Text mit `#` statt Rollen, Typ-Chips,
  * kombinierte Chance im Slot) und darunter die Tiers. Der Kopf klappt den Block
- * ein/aus. Darstellung als Karten- oder Balken-Tiers.
+ * ein/aus. Darstellung als Karten- oder Balken-Tiers. `showProbability` blendet
+ * alle Chance-Angaben aus (Corrupted/Desecrated).
  */
 export function ModGroupBlock({
   group,
+  accent,
+  showProbability,
   view,
   collapsed,
   onToggle,
   slotMaxTierProbability,
 }: {
-  group: ModGroup
+  group: DisplayGroup
+  accent: Accent
+  showProbability: boolean
   view: 'cards' | 'bars'
   collapsed: boolean
   onToggle: () => void
@@ -51,9 +57,11 @@ export function ModGroupBlock({
             <TagChipRow tags={tags} />
           </span>
         </span>
-        <span className="shrink-0 font-mono text-[12px] tabular-nums text-secondary-text">
-          {formatPercent(group.probability)}
-        </span>
+        {showProbability && (
+          <span className="shrink-0 font-mono text-[12px] tabular-nums text-secondary-text">
+            {formatPercent(group.probability)}
+          </span>
+        )}
       </button>
       {!collapsed && (
         <div className="divide-y divide-border-subtle">
@@ -62,11 +70,17 @@ export function ModGroupBlock({
               <TierBar
                 key={`${m.mod.id}-${m.tier}`}
                 item={m}
-                slot={group.slot}
+                accent={accent}
                 max={slotMaxTierProbability}
+                showProbability={showProbability}
               />
             ) : (
-              <TierRow key={`${m.mod.id}-${m.tier}`} item={m} slot={group.slot} />
+              <TierRow
+                key={`${m.mod.id}-${m.tier}`}
+                item={m}
+                accent={accent}
+                showProbability={showProbability}
+              />
             ),
           )}
         </div>

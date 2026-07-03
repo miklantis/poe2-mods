@@ -37,7 +37,7 @@ const life = group('suffix', 'Life', mod('# to maximum Life', ['life']))
 
 describe('availableTags', () => {
   it('sammelt Farb-Tags aus Praefixen und Suffixen, sortiert', () => {
-    expect(availableTags(result([cold, fire], [life]))).toEqual([
+    expect(availableTags([cold, fire, life])).toEqual([
       'fire',
       'cold',
       'life',

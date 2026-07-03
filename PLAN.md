@@ -2,19 +2,18 @@
 
 ## Aktueller Stand
 
-Herkunft-Dimension begonnen (Phase 7). Schritt 1 (Datenfundament) steht: der
-Import zieht jetzt neben den rollbaren Mods auch Corrupted und Desecrated aus
-dem CoE-Snapshot; `mods.json` trägt eine Herkunft (`origin`) und einen nullable
-`slot` (Corrupted belegt keinen Präfix/Suffix-Slot). Die Rechen-Engine bleibt
-herkunftsagnostisch, überspringt aber slot-lose Mods; die Trennung der Reiter
-läuft über die reine Funktion `filterRowsByOrigin`. Der bestehende Browser-Screen
-filtert strikt auf `origin: rollable` – die rollbare Ansicht ist unverändert (an
-den Ringen gegengeprüft: gleiche Mod-/Zeilenmenge). Entscheidung dokumentiert in
-ADR 0009. Datenstand 0.5.4: 491 rollbar, 100 Corrupted, 204 Desecrated.
+Herkunft-Reiter stehen (Phase 7, Schritt 2). Der Modifier-Browser hat eine
+Reiter-Leiste über den Spalten; je Item-Typ erscheinen nur die vorhandenen
+Herkünfte. Rollbar unverändert (Präfix/Suffix mit Chance), Desecrated als
+Präfix/Suffix ohne Chance, Corrupted als flache Liste ohne Slot und ohne Chance.
+Der aktive Reiter liegt im URL-State (`origin`); ein Wechsel setzt die Tags
+zurück. Die Anzeige-Bausteine (ModColumn, ModGroupBlock, TierRow, TierBar,
+ModTable) laufen jetzt über einen Akzent (`prefix`/`suffix`/`corrupted`, zentral
+in `components/ui/accent.ts`) und einen `showProbability`-Schalter statt fest über
+den Slot; neue reine `runFlatQuery` (Engine) und generisches `filterGroups`
+(Filter) tragen den Corrupted-Fall. Corrupted-Farbton im Theme ergänzt.
 
-Als Nächstes: Schritt 2 – die Herkunft-Reiter im Browser sichtbar machen (rollbar
-und Desecrated als Präfix/Suffix, Corrupted flach; Chance nur bei rollbar).
-Danach Essence als eigener, item-typ-bezogener Datenweg.
+Als Nächstes: Schritt 3 – Essence als eigener, item-typ-bezogener Datenweg + Reiter.
 
 --- Stand Phase 6 (weiter gueltig fuer Datenquelle und Oberflaeche): ---
 
@@ -108,7 +107,7 @@ nicht als eigene Herkunft vorhanden).
 - [x] Schritt 1: Datenfundament – Import zieht Corrupted + Desecrated, `origin`
   und nullable `slot` im Schema, Engine überspringt slot-lose Mods,
   `filterRowsByOrigin`, rollbare Ansicht unverändert. Tests, ADR 0009.
-- [ ] Schritt 2: Herkunft-Reiter im Browser (rollbar/Desecrated als Präfix/
+- [x] Schritt 2: Herkunft-Reiter im Browser (rollbar/Desecrated als Präfix/
   Suffix, Corrupted flach; Chance nur bei rollbar)
 - [ ] Schritt 3: Essence als eigener, item-typ-bezogener Datenweg + Reiter
 
@@ -172,6 +171,12 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.10.0 – Phase 7, Schritt 2: Herkunft-Reiter im Browser. Reiter-
+  Leiste (nur vorhandene Herkünfte), aktiver Reiter im URL-State (`origin`);
+  rollbar mit Chance, Desecrated ohne, Corrupted flach ohne Slot/Chance. Anzeige-
+  Bausteine auf Akzent (`components/ui/accent.ts`) + `showProbability` umgestellt;
+  neue reine `runFlatQuery` und generisches `filterGroups`; Corrupted-Farbton im
+  Theme. 1 neuer Test (52 gesamt).
 - 2026-07-03, 0.9.4 – Phase 7, Schritt 1: Herkunft-Fundament. Import zieht neben
   rollbaren Mods jetzt Corrupted (mgroup 1, affix corrupted) und Desecrated
   (mgroup 10); `mods.json` trägt `origin` und nullable `slot`. Engine

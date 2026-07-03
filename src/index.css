@@ -84,6 +84,8 @@
   /* Praefix-/Suffix-Akzent */
   --color-prefix: #6ea8ff;
   --color-suffix: #e8b45a;
+  /* Herkunft Corrupted (rot) */
+  --color-corrupted: #d05a52;
 
   /* Tag-Farben */
   --color-tag-caster: #8aa2ff;

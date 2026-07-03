@@ -1,11 +1,13 @@
-import type { ModGroup, QueryResult } from './baseEngine'
+import type { DisplayGroup, QueryResult } from './baseEngine'
 import { displayTags, COLOR_TAG_ORDER } from '@/lib/modTags'
 import type { ColorTag } from '@/lib/modTags'
 import { cleanModText, modFamilyLabel } from '@/lib/modText'
 
 /**
- * Nachgelagerte Filter auf das Query-Ergebnis. DOM-frei und testbar; getrennt
- * von `runQuery`, das nur Domain/Slot/Itemstufe/Gewicht kennt.
+ * Nachgelagerte Filter auf Anzeige-Gruppen. DOM-frei und testbar; getrennt von
+ * der Engine, die nur Domain/Slot/Itemstufe/Gewicht kennt. Arbeitet auf dem
+ * gemeinsamen `DisplayGroup` – gilt damit fuer Praefix/Suffix (rollbar,
+ * Desecrated) wie fuer die flache Corrupted-Liste.
  *
  * - Tags: ODER-Verknuepfung. Eine Gruppe bleibt, wenn ihre Typ-Tags mindestens
  *   einen der aktiven Tags enthalten. Ohne aktive Tags kein Tag-Filter.
@@ -22,19 +24,24 @@ const ORDER_INDEX = new Map<string, number>(
   COLOR_TAG_ORDER.map((t, i) => [t, i]),
 )
 
-/** Alle im Ergebnis vorkommenden Farb-Tags, in fester Reihenfolge. */
-export function availableTags(result: QueryResult): ColorTag[] {
+/** Alle in den Gruppen vorkommenden Farb-Tags, in fester Reihenfolge. */
+export function availableTags(groups: readonly DisplayGroup[]): ColorTag[] {
   const present = new Set<ColorTag>()
-  for (const g of [...result.prefixes, ...result.suffixes]) {
+  for (const g of groups) {
     const top = g.mods[0]
     if (top) for (const t of displayTags(top.mod)) present.add(t)
   }
-  return [...present].sort(
-    (a, b) => ORDER_INDEX.get(a)! - ORDER_INDEX.get(b)!,
-  )
+  return [...present].sort((a, b) => ORDER_INDEX.get(a)! - ORDER_INDEX.get(b)!)
 }
 
-function matchesTags(group: ModGroup, tags: readonly string[]): boolean {
+function tokensOf(search: string): string[] {
+  return search
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((t) => t.length > 0)
+}
+
+function matchesTags(group: DisplayGroup, tags: readonly string[]): boolean {
   if (tags.length === 0) return true
   const top = group.mods[0]
   if (!top) return false
@@ -42,7 +49,7 @@ function matchesTags(group: ModGroup, tags: readonly string[]): boolean {
   return tags.some((t) => groupTags.has(t))
 }
 
-function matchesSearch(group: ModGroup, tokens: readonly string[]): boolean {
+function matchesSearch(group: DisplayGroup, tokens: readonly string[]): boolean {
   if (tokens.length === 0) return true
   const top = group.mods[0]
   const parts: string[] = top ? [modFamilyLabel(top.mod.text)] : [group.group]
@@ -51,27 +58,24 @@ function matchesSearch(group: ModGroup, tokens: readonly string[]): boolean {
   return tokens.every((tok) => haystack.includes(tok))
 }
 
-function filterGroups(
-  groups: readonly ModGroup[],
-  tags: readonly string[],
-  tokens: readonly string[],
-): ModGroup[] {
+/** Filtert eine Gruppenliste nach den Kriterien; Typ bleibt erhalten. */
+export function filterGroups<T extends DisplayGroup>(
+  groups: readonly T[],
+  criteria: FilterCriteria,
+): T[] {
+  const tokens = tokensOf(criteria.search)
   return groups.filter(
-    (g) => matchesTags(g, tags) && matchesSearch(g, tokens),
+    (g) => matchesTags(g, criteria.tags) && matchesSearch(g, tokens),
   )
 }
 
-/** Filtert Praefixe und Suffixe nach den Kriterien. */
+/** Filtert Praefixe und Suffixe (rollbar/Desecrated) nach den Kriterien. */
 export function filterResult(
   result: QueryResult,
   criteria: FilterCriteria,
-): { prefixes: ModGroup[]; suffixes: ModGroup[] } {
-  const tokens = criteria.search
-    .toLowerCase()
-    .split(/\s+/)
-    .filter((t) => t.length > 0)
+): { prefixes: QueryResult['prefixes']; suffixes: QueryResult['suffixes'] } {
   return {
-    prefixes: filterGroups(result.prefixes, criteria.tags, tokens),
-    suffixes: filterGroups(result.suffixes, criteria.tags, tokens),
+    prefixes: filterGroups(result.prefixes, criteria),
+    suffixes: filterGroups(result.suffixes, criteria),
   }
 }

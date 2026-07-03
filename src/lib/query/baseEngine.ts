@@ -1,4 +1,5 @@
 import type { BaseMod, Mod, Origin, Slot } from '@/data/schema.coe'
+import { modFamilyLabel } from '@/lib/modText'
 
 /**
  * Reine, DOM-freie Query-Engine fuer das basis-zentrierte CoE-Schema. Sie
@@ -50,6 +51,18 @@ export interface ModGroup {
   /** Anteil der Gruppe am Slot-Pool (0..1). */
   probability: number
   /** Tiers der Gruppe, aufsteigend nach Tier sortiert. */
+  mods: ComputedMod[]
+}
+
+/**
+ * Gemeinsamer Nenner fuer die Anzeige: alles, was die Mod-Spalten-Bausteine von
+ * einer Gruppe brauchen. `ModGroup` (rollbar/Desecrated) erfuellt ihn ebenso wie
+ * die flachen Corrupted-Gruppen aus `runFlatQuery`. Die Farbe/Beschriftung einer
+ * Spalte kommt ueber einen Akzent von aussen, nicht aus der Gruppe.
+ */
+export interface DisplayGroup {
+  group: string
+  probability: number
   mods: ComputedMod[]
 }
 
@@ -206,4 +219,51 @@ export function runBaseQuery(
   suffixes.sort(sortGroups)
 
   return { prefixes, suffixes, prefixWeightTotal, suffixWeightTotal }
+}
+
+/**
+ * Flache Query fuer slot-lose Herkuenfte (Corrupted): keine Praefix/Suffix-
+ * Trennung, keine Wahrscheinlichkeit (probability 0). Loest je Zeile die bei der
+ * Itemstufe erreichbaren Tiers auf, gruppiert nach Mod-Group und sortiert die
+ * Gruppen nach ihrem Familien-Label. Zeilen mit unbekannter Mod-ID fallen weg.
+ */
+export function runFlatQuery(
+  rows: readonly BaseMod[],
+  modsById: ReadonlyMap<string, Mod>,
+  ctx: BaseQueryContext,
+): DisplayGroup[] {
+  const groups = new Map<string, { group: string; mods: ComputedMod[] }>()
+  for (const row of rows) {
+    const mod = modsById.get(row.mod)
+    if (!mod) continue
+    // Slot ist hier bedeutungslos; 'prefix' dient nur der Tier-Aufloesung.
+    for (const r of reachableTiers(mod, 'prefix', row.tiers, ctx.itemLevel)) {
+      const computed: ComputedMod = {
+        mod: r.mod,
+        tier: r.tier,
+        tierCount: r.tierCount,
+        ilvl: r.ilvl,
+        weight: r.weight,
+        values: r.values,
+        probability: 0,
+      }
+      const existing = groups.get(r.mod.group)
+      if (existing) existing.mods.push(computed)
+      else groups.set(r.mod.group, { group: r.mod.group, mods: [computed] })
+    }
+  }
+
+  const out: DisplayGroup[] = []
+  for (const g of groups.values()) {
+    g.mods.sort(
+      (a, b) => a.tier - b.tier || b.ilvl - a.ilvl || a.mod.id.localeCompare(b.mod.id),
+    )
+    out.push({ group: g.group, probability: 0, mods: g.mods })
+  }
+  out.sort((a, b) => {
+    const fa = modFamilyLabel(a.mods[0]?.mod.text ?? a.group)
+    const fb = modFamilyLabel(b.mods[0]?.mod.text ?? b.group)
+    return fa.localeCompare(fb)
+  })
+  return out
 }

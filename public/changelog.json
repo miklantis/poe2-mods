@@ -1,6 +1,15 @@
 {
-  "current": "0.9.4",
+  "current": "0.10.0",
   "entries": [
+    {
+      "version": "0.10.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Herkunft-Reiter im Modifier-Browser: je Item-Typ lassen sich die vorhandenen Herkünfte umschalten – Rollbar, Desecrated und Corrupted. Der gewählte Reiter bleibt in der URL erhalten (teil- und bookmarkbar).",
+        "Rollbar zeigt wie gewohnt Präfixe und Suffixe mit Chance. Desecrated zeigt Präfixe und Suffixe ohne Chance (über Well of Souls gesetzt). Corrupted ist eine flache Liste ohne Präfix/Suffix und ohne Chance (per Vaal-Corruption gesetzt).",
+        "Ein Reiter-Wechsel setzt die Tag-Auswahl zurück, da die Typ-Filter je Herkunft unterschiedlich sind."
+      ]
+    },
     {
       "version": "0.9.4",
       "date": "2026-07-03",

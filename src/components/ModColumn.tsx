@@ -1,37 +1,37 @@
 import { useMemo } from 'react'
-import type { ModGroup } from '@/lib/query/baseEngine'
-import type { Slot } from '@/data/schema.coe'
+import type { DisplayGroup } from '@/lib/query/baseEngine'
 import type { ModView } from '@/components/ViewSwitcher'
 import { ModGroupBlock } from '@/components/ModGroupBlock'
 import { ModTable } from '@/components/ModTable'
+import type { Accent } from '@/components/ui/accent'
+import { ACCENT_DOT, ACCENT_TEXT } from '@/components/ui/accent'
 import { cn } from '@/lib/utils'
 
-const TITLE: Record<Slot, string> = { prefix: 'Präfixe', suffix: 'Suffixe' }
-const DOT: Record<Slot, string> = { prefix: 'bg-prefix', suffix: 'bg-suffix' }
-const TITLE_TEXT: Record<Slot, string> = {
-  prefix: 'text-prefix',
-  suffix: 'text-suffix',
-}
-
-function groupKey(g: ModGroup): string {
-  return `${g.slot}-${g.group}`
-}
-
-/** Eine Slot-Spalte mit Kopfzeile und der gewaehlten Darstellung. */
+/**
+ * Eine Mod-Spalte mit Kopfzeile und der gewaehlten Darstellung. Titel und Akzent
+ * (Farbe) kommen von aussen, damit dieselbe Spalte fuer Praefixe, Suffixe und
+ * die flache Corrupted-Liste dient. `showProbability` blendet die Chance aus.
+ */
 export function ModColumn({
-  slot,
+  title,
+  accent,
+  showProbability,
   groups,
   view,
   collapsedKeys,
   onToggle,
 }: {
-  slot: Slot
-  groups: readonly ModGroup[]
+  title: string
+  accent: Accent
+  showProbability: boolean
+  groups: readonly DisplayGroup[]
   view: ModView
   collapsedKeys: ReadonlySet<string>
   onToggle: (key: string) => void
 }) {
-  // Groesste Tier-Chance im Slot fuer die Balken-Skalierung.
+  const keyOf = (g: DisplayGroup): string => `${accent}-${g.group}`
+
+  // Groesste Tier-Chance in der Spalte fuer die Balken-Skalierung.
   const maxTierProbability = useMemo(() => {
     let max = 0
     for (const g of groups)
@@ -42,9 +42,9 @@ export function ModColumn({
   return (
     <div>
       <div className="mb-3 flex items-center gap-2">
-        <span className={cn('size-2 rounded-full', DOT[slot])} aria-hidden />
-        <h2 className={cn('font-display text-[15px] font-bold', TITLE_TEXT[slot])}>
-          {TITLE[slot]}
+        <span className={cn('size-2 rounded-full', ACCENT_DOT[accent])} aria-hidden />
+        <h2 className={cn('font-display text-[15px] font-bold', ACCENT_TEXT[accent])}>
+          {title}
         </h2>
         <span className="font-mono text-[12px] tabular-nums text-muted-text">
           {groups.length}
@@ -52,13 +52,12 @@ export function ModColumn({
       </div>
 
       {groups.length === 0 ? (
-        <p className="text-sm text-secondary-text">
-          Keine Modifier in diesem Slot.
-        </p>
+        <p className="text-sm text-secondary-text">Keine Modifier.</p>
       ) : view === 'table' ? (
         <ModTable
-          slot={slot}
+          accent={accent}
           groups={groups}
+          showProbability={showProbability}
           isCollapsed={(k) => collapsedKeys.has(k)}
           onToggle={onToggle}
         />
@@ -66,11 +65,13 @@ export function ModColumn({
         <div className="flex flex-col gap-2.5">
           {groups.map((g) => (
             <ModGroupBlock
-              key={groupKey(g)}
+              key={keyOf(g)}
               group={g}
+              accent={accent}
+              showProbability={showProbability}
               view={view === 'bars' ? 'bars' : 'cards'}
-              collapsed={collapsedKeys.has(groupKey(g))}
-              onToggle={() => onToggle(groupKey(g))}
+              collapsed={collapsedKeys.has(keyOf(g))}
+              onToggle={() => onToggle(keyOf(g))}
               slotMaxTierProbability={maxTierProbability}
             />
           ))}
