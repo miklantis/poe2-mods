@@ -1,12 +1,15 @@
 import { useManifest } from '@/hooks/useManifest'
+import { useChangelog } from '@/hooks/useChangelog'
 
 /**
  * Schlanke globale Fusszeile. Nennt die Herkunft der Daten (repoe-Export aus den
- * Spieldateien; Essence aus Craft of Exile aufbereitet) und den aktuellen
- * Datenstand (Export-Version und Liga) aus dem Manifest.
+ * Spieldateien; Essence aus Craft of Exile aufbereitet), den aktuellen
+ * Datenstand (Export-Version und Liga) aus dem Manifest sowie die App-Version
+ * aus dem Changelog.
  */
 export function AppFooter() {
   const { data: manifest } = useManifest()
+  const { data: changelog } = useChangelog()
 
   return (
     <footer className="mt-auto border-t border-border-subtle">
@@ -28,6 +31,7 @@ export function AppFooter() {
           <p className="mt-1">
             Datenstand: repoe-Export {manifest.current}
             {manifest.leagueLabel ? ` · ${manifest.leagueLabel}` : ''}
+            {changelog ? ` · App ${changelog.current}` : ''}
           </p>
         )}
       </div>

@@ -117,12 +117,15 @@ export default defineConfig({
             },
           },
           {
-            // Versionierte Spieldaten sind unveraenderlich: einmal geladen,
-            // dauerhaft offline gueltig (neuer Patch = neuer Ordner).
+            // Versionierte Spieldaten: offline sofort aus dem Cache, zugleich
+            // im Hintergrund revalidiert. So werden auch In-Place-Aktualisierun-
+            // gen unter derselben Version beim naechsten Laden uebernommen
+            // (frueher CacheFirst -> blieb stale). Cache-Name erhoeht, damit
+            // bestehende Installationen einmalig frisch ziehen.
             urlPattern: ({ url }) => /\/data\/[^/]+\/[^/]+\.json$/.test(url.pathname),
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'poe2-data',
+              cacheName: 'poe2-data-v2',
               expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 180 },
             },
           },

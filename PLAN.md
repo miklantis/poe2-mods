@@ -49,6 +49,10 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-03, 0.15.1 – Cache-Fix: Spieldaten von CacheFirst auf
+  StaleWhileRevalidate (Cache-Name erhoeht), damit In-Place-Updates unter
+  gleicher Version beim naechsten Laden greifen (Symptom: fehlende Jewels aus
+  dem Offline-Cache). App-Version in der Fusszeile ergaenzt. ADR 0014.
 - 2026-07-03, 0.15.0 – Weitere Basis-Welten aufgenommen: Jewels, Flasks/Charms,
   Waystones, Tablets, Relics. Import um die Domains misc/flask/area/tablet/
   sanctum_relic erweitert; Domain-Marker isoliert die Welten gegen den

@@ -1,6 +1,14 @@
 {
-  "current": "0.15.0",
+  "current": "0.15.1",
   "entries": [
+    {
+      "version": "0.15.1",
+      "date": "2026-07-03",
+      "changes": [
+        "Behoben: Nach einem Daten-Update unter gleicher Spielversion zeigte eine bereits geöffnete oder installierte App teils noch die alten Daten aus dem Offline-Speicher – dadurch fehlten z. B. die neuen Kategorien wie Jewels. Die Spieldaten werden jetzt beim Öffnen im Hintergrund aktualisiert; offline bleibt der zuletzt geladene Stand nutzbar. Einmal neu laden genügt, um die neuen Daten zu sehen.",
+        "Die App-Version steht jetzt in der Fußzeile (neben Datenstand und Liga), damit sich erkennen lässt, ob ein Update angekommen ist."
+      ]
+    },
     {
       "version": "0.15.0",
       "date": "2026-07-03",

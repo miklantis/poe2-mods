@@ -140,6 +140,19 @@ export const manifestSchema = z.object({
 })
 export type Manifest = z.infer<typeof manifestSchema>
 
+/** public/changelog.json: App-Version und Eintraege (nur `current` genutzt). */
+export const changelogSchema = z.object({
+  current: z.string(),
+  entries: z.array(
+    z.object({
+      version: z.string(),
+      date: z.string(),
+      changes: z.array(z.string()),
+    }),
+  ),
+})
+export type Changelog = z.infer<typeof changelogSchema>
+
 export const modsFileSchema = z.array(modSchema)
 export const itemTypesFileSchema = z.array(itemTypeSchema)
 export const baseItemsFileSchema = z.array(baseItemSchema)
