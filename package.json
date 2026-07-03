@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "oxlint",
-    "import:coe": "tsx scripts/import-coe.ts"
+    "import:coe": "tsx scripts/import-coe.ts",
+    "import:repoe": "tsx scripts/import-repoe.ts"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
