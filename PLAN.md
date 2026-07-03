@@ -65,6 +65,20 @@ neuem Patch aktualisieren.
 
 ## Offene Vorhaben
 
+### Phase 6 – Datenquelle Craft of Exile (echte Gewichte)
+Hintergrund: Der repoe-fork-Export (und der PoB-Export) enthalten keine echten
+Spawn-Gewichte – PoE2 legt sie nicht offen (alle Werte 1). Craft of Exile
+rekonstruiert Gewichte (Trade-Listings + Recombinator, normalisiert) und liefert
+sie pro Basis inkl. Tiers, Itemstufe und Rollen-Bereich. Wir bauen die
+Datenschicht darauf um. Die Werte sind Schätzungen und werden in der App als
+solche gekennzeichnet; Quelle Craft of Exile. Automatischer Abruf ist nicht
+möglich (privater Endpunkt, Org-Netzsperre) – die CoE-Dateien werden als
+versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
+- [ ] Schritt 1: Import + basis-zentriertes Schema aus dem CoE-Snapshot, Zod-validiert, an den Ringen gegengeprüft (echte, variable Gewichte)
+- [ ] Schritt 2: Query-Engine auf Basis-Gewichte umstellen (pro Basis Tiers → Wahrscheinlichkeit), Unit-Tests
+- [ ] Schritt 3: Screens/Filter/Varianten neu verdrahten (Ausgabe-Formen bleiben, nur Datenquelle wechselt)
+- [ ] Schritt 4: Gewichte als CoE-Schätzung kennzeichnen + Attribution, ADR, Doku, Changelog
+
 ### Phase 5 – optional/später
 - [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
 - [ ] Feinschliff Design/Designsystem
