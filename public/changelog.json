@@ -1,0 +1,13 @@
+{
+  "current": "0.1.0",
+  "entries": [
+    {
+      "version": "0.1.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Projekt-Grundgerüst steht: Die App startet als leere Seite unter GitHub Pages.",
+        "Technische Basis eingerichtet (React, Vite, Routing, Styling). Inhalte folgen."
+      ]
+    }
+  ]
+}
