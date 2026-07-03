@@ -87,6 +87,8 @@
   /* Herkunft Desecrated (grün) / Corrupted (rot) */
   --color-desecrated: #63c088;
   --color-corrupted: #d05a52;
+  /* Herkunft Essence (violett) */
+  --color-essence: #b28bf0;
 
   /* Tag-Farben */
   --color-tag-caster: #8aa2ff;

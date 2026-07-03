@@ -5,6 +5,7 @@ import {
   modsFileSchema,
   itemTypesFileSchema,
   baseModsFileSchema,
+  essencesFileSchema,
 } from '@/data/schema.coe'
 
 /**
@@ -16,6 +17,7 @@ import {
  *  - mods.json       schlanke Mod-Metadaten (Text, Slot, Gruppe, Tags),
  *  - item_types.json Item-Typen mit ihren Basis-Varianten,
  *  - base_mods.json  je Basis die rollbaren Mods mit Tiers (ilvl/Gewicht/Werte).
+ *  - essences.json   je Basis die per Essence garantierten Mods (Bereich, ilvl).
  */
 export function useMods() {
   const { data: manifest } = useManifest()
@@ -43,6 +45,16 @@ export function useBaseMods() {
   return useQuery({
     queryKey: ['base_mods', version],
     queryFn: () => loadJson(`data/${version}/base_mods.json`, baseModsFileSchema),
+    enabled: Boolean(version),
+  })
+}
+
+export function useEssences() {
+  const { data: manifest } = useManifest()
+  const version = manifest?.current
+  return useQuery({
+    queryKey: ['essences', version],
+    queryFn: () => loadJson(`data/${version}/essences.json`, essencesFileSchema),
     enabled: Boolean(version),
   })
 }

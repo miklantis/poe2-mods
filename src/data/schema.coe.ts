@@ -21,13 +21,22 @@ export type Slot = z.infer<typeof slotSchema>
 
 /**
  * Herkunft eines Mods – der Weg, auf dem er aufs Item kommt. Bestimmt, in
- * welchem Reiter der Browser ihn zeigt:
+ * welchem Abschnitt der Browser ihn zeigt:
  * - rollable:   normaler, gewichteter Basis-Pool (Präfix/Suffix mit Chance).
  * - corrupted:  über Corruption (Vaal) gesetzt; kein Präfix/Suffix-Slot.
  * - desecrated: über Desecration (Well of Souls) gesetzte Präfixe/Suffixe.
- * Weitere Herkünfte (z. B. Essence) kommen als eigener Datenweg dazu.
+ * - essence:    über Essence garantiert gesetzt; eigener, item-typ-bezogener
+ *   Datenweg (essences.json). Der Wert steht in mods.json nur bei Mods, die
+ *   ausschließlich über Essence kommen – Mods, die auch rollbar sind, behalten
+ *   `rollable`. Essence-Zeilen greifen daher unabhängig vom Origin über
+ *   essences.json auf die Mod-Metadaten zu.
  */
-export const originSchema = z.enum(['rollable', 'corrupted', 'desecrated'])
+export const originSchema = z.enum([
+  'rollable',
+  'corrupted',
+  'desecrated',
+  'essence',
+])
 export type Origin = z.infer<typeof originSchema>
 
 /**
@@ -68,6 +77,31 @@ export type BaseMod = z.infer<typeof baseModSchema>
 /** base_mods.json: Basis-ID -> Liste der rollbaren Mods mit ihren Tiers. */
 export const baseModsFileSchema = z.record(z.string(), z.array(baseModSchema))
 export type BaseModsFile = z.infer<typeof baseModsFileSchema>
+
+/**
+ * Ein über Essence garantierter Mod auf einer Basis. Anders als der rollbare
+ * Pool gibt es hier kein Spawn-Gewicht: eine Essence setzt den Mod gezielt. Weil
+ * derselbe Mod von mehreren Essence-Stufen (Lesser/Essence/Greater/…) mit
+ * unterschiedlichen Werten kommt, sind die Stufen zu einer Zeile
+ * zusammengefasst: `values` ist der Bereich über alle Stufen (elementweise
+ * kleinstes Min bis größtes Max), `ilvl` die kleinste Itemstufe, ab der der Mod
+ * per Essence erreichbar ist. Wertlose Flag-Mods haben `values: []`. Slot,
+ * Text, Gruppe und Tags stehen in mods.json und werden per `mod`-ID
+ * nachgeschlagen.
+ */
+export const essenceModSchema = z.object({
+  mod: z.string(),
+  ilvl: z.number().int(),
+  values: z.array(z.tuple([z.number(), z.number()])),
+})
+export type EssenceMod = z.infer<typeof essenceModSchema>
+
+/** essences.json: Basis-ID -> Liste der per Essence garantierten Mods. */
+export const essencesFileSchema = z.record(
+  z.string(),
+  z.array(essenceModSchema),
+)
+export type EssencesFile = z.infer<typeof essencesFileSchema>
 
 /** Eine Basis-Variante eines Item-Typs (z. B. Attribut-Auspraegung). */
 export const variantSchema = z.object({ base: z.string(), label: z.string() })

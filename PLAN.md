@@ -4,17 +4,22 @@
 
 Herkünfte stehen im Browser, alle gleichzeitig (Phase 7 abgeschlossen). Kein
 Reiter-Umschalten mehr: oben der rollbare Pool (Präfixe blau, Suffixe gelb, mit
-Chance), darunter Desecrated (Präfixe/Suffixe grün, ohne Chance), ganz unten
-Corrupted als breite Tabelle (rot, ohne Chance). Nur vorhandene Abschnitte
-erscheinen. Darstellung ist durchgehend die Tabelle (Karten/Balken entfallen,
-ViewSwitcher entfernt); ein gemeinsamer Filter (Suche, Tags, Itemstufe) wirkt auf
-alle Abschnitte. Akzent-Achse um Grün (Desecrated) erweitert; Tabellen haben einen
-Ausklapp-Namensraum (`keyNs`), damit die zwei grünen Spalten nicht kollidieren.
-Nicht mehr genutzte Bausteine gelöscht (ViewSwitcher, ModGroupBlock, TierRow,
-TierBar, ProbabilityBar). Entscheidung/Nachtrag in ADR 0009.
+Chance), darunter Desecrated (Präfixe/Suffixe grün, ohne Chance), dann Essence
+(Präfixe/Suffixe violett, ohne Chance) und ganz unten Corrupted als breite
+Tabelle (rot, ohne Chance). Nur vorhandene Abschnitte erscheinen. Darstellung
+ist durchgehend die Tabelle; ein gemeinsamer Filter (Suche, Tags, Itemstufe)
+wirkt auf alle Abschnitte.
 
-Essence (ursprünglich Schritt 3) ist noch offen und kommt als eigener,
-item-typ-bezogener Datenweg dazu, sobald gewünscht.
+Essence (Phase 7, Schritt 3) ist umgesetzt: Der Import zieht die Essences
+(mgroup 13) und schreibt `essences.json` je Basis; Essence-exklusive Mods stehen
+mit `origin: essence` in `mods.json`. Reine Engine `runEssenceQuery` liefert je
+Mod genau eine Zeile mit dem Wertebereich über alle Stufen und der kleinsten
+erreichbaren Itemstufe (keine Chance – gezielt gesetzt). Neue flache
+`EssenceColumn`, violetter Akzent, Loader `useEssences`. Snapshot 0.5.4: 59
+Basen mit Essence, 1086 Zeilen; keine Korruption-Essences (alle corrupt=0), daher
+keine Markierung nötig. Entscheidung/Nachtrag in ADR 0009.
+
+Damit ist Phase 7 vollständig abgeschlossen.
 
 --- Stand Phase 6 (weiter gueltig fuer Datenquelle und Oberflaeche): ---
 
@@ -101,6 +106,15 @@ neuem Patch aktualisieren.
 
 ## Offene Vorhaben
 
+### Phase 5 – optional/später
+- [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
+- [ ] Feinschliff Design/Designsystem
+- [ ] `docs/Referenz.md` (Kategorie-Liste, Notizen je poe2db-Ansicht)
+
+---
+
+## Abgeschlossene Vorhaben
+
 ### Phase 7 – Herkünfte (rollbar / Corrupted / Desecrated / Essence)
 Alle Herkünfte gleichzeitig im Browser (Tabelle). Entscheidungen in ADR 0009.
 Socket-Mods ausgeschlossen; Augment/Bonded zurückgestellt (im Snapshot 0.5.4
@@ -111,16 +125,10 @@ nicht als eigene Herkunft vorhanden).
 - [x] Schritt 2: Herkünfte im Browser sichtbar – zunächst als Reiter, dann auf
   Wunsch zu „alles gleichzeitig" umgebaut (rollbar oben mit Chance, Desecrated
   grün, Corrupted breite Tabelle rot; durchgehend Tabelle, gemeinsamer Filter).
-- [ ] Schritt 3: Essence als eigener, item-typ-bezogener Datenweg + Abschnitt
-
-### Phase 5 – optional/später
-- [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
-- [ ] Feinschliff Design/Designsystem
-- [ ] `docs/Referenz.md` (Kategorie-Liste, Notizen je poe2db-Ansicht)
-
----
-
-## Abgeschlossene Vorhaben
+- [x] Schritt 3: Essence als eigener, item-typ-bezogener Datenweg + Abschnitt.
+  Import zieht mgroup 13, `essences.json` je Basis, Essence-Mods mit
+  `origin: essence`; reine `runEssenceQuery`, flache `EssenceColumn` (je Mod eine
+  Zeile, Bereich über alle Stufen), violetter Akzent. ADR 0009 (Nachtrag).
 
 ### Phase 6 – Datenquelle Craft of Exile (echte, geschätzte Gewichte)
 Umstieg von repoe (keine echten Gewichte, alle Werte 1) auf den
@@ -173,6 +181,14 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.12.0 – Phase 7, Schritt 3: Essence-Abschnitt (Phase 7 komplett).
+  Import zieht mgroup 13 und schreibt `essences.json` je Basis (Stufen je Mod zu
+  einem Bereich verdichtet, kleinste Itemstufe); Essence-exklusive Mods mit
+  `origin: essence` in `mods.json`. Neue reine `runEssenceQuery` (je Mod eine
+  Zeile, keine Chance) + 5 Tests; flache `EssenceColumn`, violetter Akzent
+  (`--color-essence`), Loader `useEssences`, Browser-Abschnitt zwischen Desecrated
+  und Corrupted. Snapshot 0.5.4: 59 Basen mit Essence, 1086 Zeilen; keine
+  Korruption-Essences. ADR 0009 (Nachtrag). Typecheck, 57 Tests, Build grün.
 - 2026-07-03, 0.11.0 – Phase 7: Herkünfte alle gleichzeitig statt Reiter. Rollbar
   oben (Chance), Desecrated grün, Corrupted breite Tabelle rot; durchgehend
   Tabelle (ViewSwitcher/Karten/Balken entfernt), gemeinsamer Filter. Akzent um
@@ -228,16 +244,5 @@ ADR 0008.
   Varianten- und View-Zustand als URL-State auf `/$type` (Zod-`validateSearch`),
   teil- und bookmarkbar. Neue Bausteine `FilterBar`, `TagFilterPill`, `Slider`,
   gemeinsames `ui/tagColors`; itemLevel jetzt live statt fest.
-- 2026-07-03, 0.7.0 – Phase 3, Screen-2-Feinschliff. Drei umschaltbare
-  Darstellungen (Karten/Tabelle/Balken, `ViewSwitcher`), farbige Typ-Tag-Chips
-  je Familie (`TagChip`, Quelle `implicitTags`, `modTags.ts`), ein-/ausklappbare
-  Familien plus globaler Schalter. Neue Bausteine `ViewSwitcher`, `TagChip`,
-  `ProbabilityBar`, `ModTable`, `TierBar`. 4 neue Tests.
-- 2026-07-03, 0.6.0 – Phase 3, Screen 2: Modifier-Browser je Item-Typ. Präfixe
-  und Suffixe getrennt, je Mod-Familie die Tiers mit Rollen-Bereich, Itemstufe,
-  Gewicht und Chance über `runQuery` (Itemstufe fest 100). Basis-Varianten
-  datengetrieben abgeleitet (`baseVariants.ts`, ADR 0006) mit Umschalter bei
-  mehreren Basen. Neue Bausteine `ModifierBrowser`, `ModColumn`, `ModGroupBlock`,
-  `TierRow`, `VariantSelect`, `Badge`; Helfer `modText`, `format`. 12 neue Tests.
 
 Ältere Einträge (0.1.0–0.7.0) im Archiv: `docs/archive/PLAN-Log-Archiv.md`.

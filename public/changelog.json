@@ -1,6 +1,15 @@
 {
-  "current": "0.11.0",
+  "current": "0.12.0",
   "entries": [
+    {
+      "version": "0.12.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Neuer Abschnitt Essence im Modifier-Browser: zeigt je Item-Typ die per Essence garantiert setzbaren Modifier, getrennt in Präfixe und Suffixe (violett), zwischen Desecrated und Corrupted.",
+        "Je Modifier eine Zeile mit dem Wertebereich über alle Essence-Stufen (Lesser/Essence/Greater/…) und der kleinsten dafür nötigen Itemstufe. Keine Chance, da Essences den Modifier gezielt setzen.",
+        "Der gemeinsame Filter (Suche, Tags, Itemstufe) wirkt auch auf den Essence-Abschnitt; gezeigt wird er nur, wenn die gewählte Basis Essence-Modifier hat."
+      ]
+    },
     {
       "version": "0.11.0",
       "date": "2026-07-03",

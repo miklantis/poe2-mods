@@ -2,16 +2,18 @@ import { useMemo, useState } from 'react'
 import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 import type { ItemType, Mod } from '@/data/schema.coe'
 import type { BrowserSearch } from '@/routes/$type'
-import { useMods, useBaseMods } from '@/hooks/useGameData'
+import { useMods, useBaseMods, useEssences } from '@/hooks/useGameData'
 import {
   runBaseQuery,
   runFlatQuery,
   filterRowsByOrigin,
 } from '@/lib/query/baseEngine'
+import { runEssenceQuery } from '@/lib/query/essenceEngine'
 import { filterGroups, availableTags } from '@/lib/query/filter'
 import type { ColorTag } from '@/lib/modTags'
 import { VariantSelect } from '@/components/VariantSelect'
 import { ModColumn } from '@/components/ModColumn'
+import { EssenceColumn } from '@/components/EssenceColumn'
 import { FilterBar } from '@/components/FilterBar'
 
 const MIN_ITEM_LEVEL = 1
@@ -20,11 +22,13 @@ const MAX_ITEM_LEVEL = 100
 /**
  * Modifier-Browser je Item-Typ (Screen 2). Alle Herkünfte gleichzeitig, ohne
  * Umschalten: oben der rollbare Pool (Präfixe blau, Suffixe gelb, mit Chance),
- * darunter Desecrated (Präfixe/Suffixe, grün, ohne Chance) und ganz unten
- * Corrupted (eine breite Tabelle, rot, ohne Chance). Ein gemeinsamer Filter
- * (Suche, Tags, Itemstufe) wirkt auf alle Abschnitte; Darstellung ist stets die
- * Tabelle. Filterzustand liegt im URL-State, nur das Ein-/Ausklappen ist lokal.
- * Query- und Filter-Logik bleiben in den reinen Modulen.
+ * darunter Desecrated (Präfixe/Suffixe, grün, ohne Chance), dann Essence
+ * (Präfixe/Suffixe, violett, je Mod eine Zeile mit Bereich über alle Stufen,
+ * ohne Chance) und ganz unten Corrupted (eine breite Tabelle, rot, ohne
+ * Chance). Ein gemeinsamer Filter (Suche, Tags, Itemstufe) wirkt auf alle
+ * Abschnitte; Darstellung ist stets die Tabelle. Filterzustand liegt im
+ * URL-State, nur das Ein-/Ausklappen ist lokal. Query- und Filter-Logik bleiben
+ * in den reinen Modulen.
  */
 export function ModifierBrowser({
   itemType,
@@ -37,6 +41,7 @@ export function ModifierBrowser({
 }) {
   const mods = useMods()
   const baseMods = useBaseMods()
+  const essences = useEssences()
 
   const variants = itemType.variants
   const selected =
@@ -58,17 +63,25 @@ export function ModifierBrowser({
     [baseMods.data, selected],
   )
 
+  const essenceRows = useMemo(
+    () =>
+      essences.data && selected ? (essences.data[selected.base] ?? []) : [],
+    [essences.data, selected],
+  )
+
   // Rohe Gruppen je Herkunft (vor dem Suchfilter, nach Itemstufe).
   const raw = useMemo(() => {
     const ctx = { itemLevel: search.ilvl }
     return {
       roll: runBaseQuery(filterRowsByOrigin(rows, modsById, 'rollable'), modsById, ctx),
       des: runBaseQuery(filterRowsByOrigin(rows, modsById, 'desecrated'), modsById, ctx),
+      ess: runEssenceQuery(essenceRows, modsById, ctx),
       cor: runFlatQuery(filterRowsByOrigin(rows, modsById, 'corrupted'), modsById, ctx),
     }
-  }, [rows, modsById, search.ilvl])
+  }, [rows, essenceRows, modsById, search.ilvl])
 
   const hasDesecrated = raw.des.prefixes.length + raw.des.suffixes.length > 0
+  const hasEssence = raw.ess.prefixes.length + raw.ess.suffixes.length > 0
   const hasCorrupted = raw.cor.length > 0
 
   const tags = useMemo(
@@ -78,6 +91,8 @@ export function ModifierBrowser({
         ...raw.roll.suffixes,
         ...raw.des.prefixes,
         ...raw.des.suffixes,
+        ...raw.ess.prefixes,
+        ...raw.ess.suffixes,
         ...raw.cor,
       ]),
     [raw],
@@ -91,6 +106,8 @@ export function ModifierBrowser({
       rollSuf: filterGroups(raw.roll.suffixes, c),
       desPre: filterGroups(raw.des.prefixes, c),
       desSuf: filterGroups(raw.des.suffixes, c),
+      essPre: filterGroups(raw.ess.prefixes, c),
+      essSuf: filterGroups(raw.ess.suffixes, c),
       cor: filterGroups(raw.cor, c),
     }
   }, [raw, search.tags, search.q])
@@ -133,8 +150,8 @@ export function ModifierBrowser({
     patchSearch({ tags: [...active] })
   }
 
-  const isPending = mods.isPending || baseMods.isPending
-  const error = mods.error ?? baseMods.error
+  const isPending = mods.isPending || baseMods.isPending || essences.isPending
+  const error = mods.error ?? baseMods.error ?? essences.error
 
   if (error) {
     return (
@@ -186,7 +203,7 @@ export function ModifierBrowser({
       <div className="mb-6 flex items-center justify-between gap-3">
         <p className="text-[12px] text-dim">
           Chance nur im rollbaren Pool (geschätzte Spawn-Gewichte, Craft of
-          Exile). Desecrated und Corrupted werden gezielt gesetzt.
+          Exile). Desecrated, Essence und Corrupted werden gezielt gesetzt.
         </p>
         <button
           type="button"
@@ -252,6 +269,19 @@ export function ModifierBrowser({
               collapsedKeys={collapsedKeys}
               onToggle={toggleKey}
             />
+          </div>
+        </section>
+      )}
+
+      {/* Essence */}
+      {hasEssence && (
+        <section className="mt-10">
+          <h2 className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-essence">
+            Essence
+          </h2>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
+            <EssenceColumn title="Präfixe" accent="essence" groups={f.essPre} />
+            <EssenceColumn title="Suffixe" accent="essence" groups={f.essSuf} />
           </div>
         </section>
       )}

@@ -36,14 +36,20 @@ Quelle der Wahrheit für die Datenformen sind die Zod-Schemas in
 abgeleitet. Import-Skript und App validieren gegen dieselben Schemas.
 
 Das Schema ist basis-zentriert: die Spawn-Gewichte hängen an der Basis, nicht am
-Mod. Drei normalisierte Dateien je Version:
+Mod. Vier normalisierte Dateien je Version:
 
 - `item_types.json` – Item-Typen mit ihren Basis-Varianten (id, Name, Kategorie,
   `variants` je mit Basis-Id und Label). Grundlage für Kategorien und Routen.
 - `mods.json` – schlanke Mod-Metadaten (id, Text als Vorlage mit `#`, Slot
-  Präfix/Suffix, Gruppe, Tags). Der lesbare Text stammt aus dem Export.
-- `base_mods.json` – je Basis-Id die rollbaren Mods mit ihren Tiers: Itemstufe
-  (`ilvl`), Gewicht und Rollen-Bereiche (`values` als `[min, max]`-Paare).
+  Präfix/Suffix oder `null`, Herkunft `origin`, Gruppe, Tags). `origin` ist
+  `rollable | corrupted | desecrated | essence`; `slot` ist `null` bei Mods ohne
+  Präfix/Suffix-Belegung (Corrupted). Der lesbare Text stammt aus dem Export.
+- `base_mods.json` – je Basis-Id die rollbaren, Corrupted- und Desecrated-Mods
+  mit ihren Tiers: Itemstufe (`ilvl`), Gewicht und Rollen-Bereiche (`values` als
+  `[min, max]`-Paare). Die Herkunft-Trennung passiert über `origin` am Mod.
+- `essences.json` – je Basis-Id die per Essence garantierten Mods, je Mod eine
+  Zeile `{ mod, ilvl, values }`: der Wertebereich über alle Essence-Stufen und
+  die kleinste dafür nötige Itemstufe. Eigener Datenweg, ohne Gewicht/Chance.
 - Dazu `data/manifest.json` – aktive Version, verfügbare Versionen, Quelle,
   Liga, Zeitstempel.
 
@@ -62,6 +68,14 @@ Chance je Tier = Tier-Gewicht / Slot-Pool; höchstes `ilvl` = Tier 1. Die
 nachgelagerte Facet-Filterung (Suche, Tags) liegt getrennt in
 `src/lib/query/filter.ts`.
 
+Für die slot-losen und gezielt gesetzten Herkünfte gibt es zwei weitere reine
+Module: `runFlatQuery` (im selben `baseEngine.ts`) für Corrupted – flach, ohne
+Präfix/Suffix und ohne Chance – und `src/lib/query/essenceEngine.ts`
+(`runEssenceQuery`) für Essence: je Mod genau eine `DisplayGroup`, nach Slot
+getrennt, mit dem Bereich über alle Stufen und der kleinsten Itemstufe, ebenfalls
+ohne Chance. Alle drei liefern den gemeinsamen `DisplayGroup`, sodass Filter und
+Tag-Sammlung einheitlich greifen.
+
 ## Datenpipeline
 
 Quelle der Wahrheit für die Gewichte ist ein versionierter Craft-of-Exile-
@@ -71,7 +85,7 @@ ihn auf das Schema, validiert mit Zod und legt das Ergebnis unter
 `data/<version>/` ab; das Manifest wird fortgeschrieben.
 
 Datenzugriff in der App läuft über Hooks (`useManifest`, `useMods`,
-`useItemTypes`, `useBaseMods`) via TanStack Query; sie validieren beim Laden
+`useItemTypes`, `useBaseMods`, `useEssences`) via TanStack Query; sie validieren beim Laden
 erneut gegen die Schemas.
 
 ## Deployment

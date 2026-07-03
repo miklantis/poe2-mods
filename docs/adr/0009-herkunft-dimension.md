@@ -83,3 +83,39 @@ Farb-Achse (`components/ui/accent.ts`) trägt jetzt `prefix`/`suffix`/`desecrate
 zwei gleichfarbigen Desecrated-Spalten nicht kollidieren. Die reine Engine/Filter-
 Trennung (`runBaseQuery`, `runFlatQuery`, `filterGroups`, `filterRowsByOrigin`)
 bleibt unverändert.
+
+## Nachtrag (2026-07-03): Essence als eigener Datenweg umgesetzt
+
+Der ursprünglich offene Schritt (Essence) ist umgesetzt. Essence ist – anders
+als rollbar/Corrupted/Desecrated – nicht basis-gebunden über Gewichte, sondern
+setzt einen Mod gezielt je Basis. Umsetzung:
+
+- **Datenweg getrennt.** Der Import zieht die Modifier-Gruppe `Essence`
+  (mgroup 13) und schreibt eine eigene Datei `data/<version>/essences.json`:
+  Basis-ID -> Liste `{ mod, ilvl, values }`. Die Essence-Stufen (Lesser/Essence/
+  Greater/…) desselben Mods sind je Basis zu **einer** Zeile verdichtet –
+  `values` ist der Bereich über alle Stufen (elementweise kleinstes Min bis
+  größtes Max), `ilvl` die kleinste per Essence erreichbare Itemstufe. So bleibt
+  der Abschnitt kurz und nachschlagbar (Entscheidung mit dem Auftraggeber: eine
+  Zeile je Mod, nicht je Stufe).
+- **Nur ausgelieferte Basen.** essences.json enthält nur Basen, die als Variante
+  eines Item-Typs erscheinen; Essence erzeugt keine neuen Item-Typen.
+- **Mod-Metadaten.** `origin` am Mod bekommt den Wert `essence`. Ihn tragen nur
+  Essence-exklusive Mods; Mods, die auch rollbar/Desecrated sind, behalten ihre
+  basis-gebundene Herkunft. Der Essence-Abschnitt liest die Metadaten unabhängig
+  vom `origin` über die Mod-ID aus `mods.json`.
+- **Reine Logik.** Neue DOM-freie `runEssenceQuery` (eigene Datei
+  `src/lib/query/essenceEngine.ts`) liefert je Mod genau eine `DisplayGroup` mit
+  einem `ComputedMod` und trennt nach Slot; Suchfilter (`filterGroups`) und
+  Tag-Sammlung (`availableTags`) greifen unverändert. Keine Chance – gezielt
+  gesetzt (wie Desecrated/Corrupted).
+- **Darstellung.** Neuer Abschnitt zwischen Desecrated und Corrupted, violetter
+  Akzent (`--color-essence`, Achse `accent.ts` um `essence` erweitert). Eigene
+  flache `EssenceColumn` (Präfixe/Suffixe), je Mod eine Zeile mit Text (Bereich
+  eingesetzt), Typ-Tags und kleinster Itemstufe – ohne Klapp-Ebene und ohne
+  Chance-Spalte, daher nicht `ModTable`.
+
+Snapshot 0.5.4: 59 Basen mit Essence, 1086 Essence-Zeilen, 75 Essence-exklusive
+Mods. Keine Korruption-Essences im Snapshot (alle `corrupt = 0`); die früher
+erwogene Markierung entfällt daher und wird erst bei einem Snapshot mit solchen
+Essences nachgezogen. Damit ist Phase 7 vollständig abgeschlossen.
