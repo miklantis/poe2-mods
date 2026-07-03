@@ -11,13 +11,20 @@ URL-State. Phasen 0–7 abgeschlossen (Überblick unten, Detail in ADRs und
 Commits).
 
 Laufende und einzige aktive Arbeit: Phase 8 – Migration der Datenquelle zurück
-auf repoe. Grund: Der CoE-Snapshot kennt die 0.5-Sonderpools Otherworldly und
-Genesis-Tree-Mods nicht (Datenlücke der Quelle, kein Import-Fehler); repoe deckt
-alle Pools ab. Preis: repoe legt nur binäre Spawn-Gewichte offen (0/1, an den
-Belt-Mods verifiziert), also entfällt die Wahrscheinlichkeits-Anzeige im
-rollbaren Pool. Trade-off bewusst zugunsten der Vollständigkeit; ADR 0008 (CoE)
-wird damit abgelöst. Bis Phase 8 umgesetzt ist, läuft die App unverändert auf
-CoE.
+auf repoe. Grund: Der CoE-Snapshot kennt die Genesis-Tree-Mods nicht (Datenlücke
+der Quelle, kein Import-Fehler); repoe deckt sie ab. Preis: repoe legt nur
+binäre Spawn-Gewichte offen (0/1), also entfällt die Wahrscheinlichkeits-Anzeige
+im rollbaren Pool. Trade-off bewusst zugunsten der Vollständigkeit; ADR 0008
+(CoE) wird damit abgelöst. Bis Phase 8 umgesetzt ist, läuft die App unverändert
+auf CoE.
+
+Schritt 1 ist umgesetzt: mod-zentriertes Schema und Import-Skript stehen, die
+repoe-Daten liegen unter `data/4.5.4.3/` (rollbar inkl. Genesis-Tree, Corrupted,
+Desecrated; 669 Familien, 1829 Basen, 30 Item-Typen). Zwei Punkte offen: (a)
+Essence – repoe-poe2 führt keine Essence→Mod-Zuordnung, der Essence-Abschnitt
+lässt sich daraus nicht rekonstruieren; zu klären, ob er unter repoe entfällt
+oder aus anderer Quelle kommt. (b) „Otherworldly" ist kein Ausrüstungs-Pool
+(nur Karten/Tablets), damit hinfällig. Nächster Schritt: Schritt 2 (Engine).
 
 ---
 
@@ -34,20 +41,21 @@ Wertebereich gezeigt. Entscheidung/Begründung in ADR 0011 (neu); ADR 0008 wird
 als abgelöst markiert. poe2db bleibt nur UX-/Abgleich-Vorbild, wird nicht
 gescrapt. Bis Schritt 3 zeigt `manifest.json` weiter auf die CoE-Version, damit
 die App während der Migration lauffähig bleibt.
-- [ ] Schritt 1: Datenfundament. Neues `import-repoe.ts` zieht den
-  repoe-poe2-Export (`mods.json`, `mods_by_base.json`, `base_items.json`,
-  `tags.json`, `tag_details.json`, `item_classes.json`), normalisiert auf ein
-  mod-zentriertes Schema (`origin` je Pool, `slot`, Eignung über
-  `spawn_weight > 0` je Tag, kein Gewichtsfeld), Zod-validiert, unter
-  `data/<version>/` abgelegt. Essence ist keine eigene Datei: die
-  Essence-Modifier stecken in `mods.json` (`generation_type: essence` bzw.
-  `is_essence_only`), Corrupted (`generation_type: corrupted`) und Desecrated
-  (`domain: desecrated`) ebenso. Gegenprobe an Ringen und Gürteln gegen poe2db
-  (Otherworldly muss erscheinen). `manifest.json` noch nicht umschalten.
+- [x] Schritt 1: Datenfundament. `import-repoe.ts` zieht den repoe-poe2-Export
+  (`mods.json`, `base_items.json`, `tags.json`, `tag_details.json`,
+  `item_classes.json`), normalisiert auf ein mod-zentriertes Schema
+  (`schema.repoe.ts`: `origin` je Pool, `slot`, Tiers am Mod, Eignung über
+  Tags, kein Gewichtsfeld), Zod-validiert, unter `data/4.5.4.3/` abgelegt;
+  `manifest.json` unangetastet. Erledigt für rollbar (inkl. Genesis-Tree über
+  `genesis_tree_caster/-minion`), Corrupted (`generation_type corrupted`),
+  Desecrated (`domain desecrated`). Offen: Essence (keine Zuordnung in repoe,
+  siehe Aktueller Stand) und Variant-Feinschliff (doppelte Anzeigenamen, z. B.
+  Two-Stone Ring) – letzterer bei der Loader-Anbindung in Schritt 2/3.
 - [ ] Schritt 2: Query-Engine ohne Wahrscheinlichkeit. `baseEngine` auf reine
   Eignung + Tier (requiredLevel-Rangfolge) + Wertebereich umstellen,
   Chance-Berechnung entfernen; Herkünfte über eine einheitliche Flat-Logik;
-  `essenceEngine` auf die Essence-Mods aus `mods.json`. Unit-Tests anpassen.
+  Loader/Hooks auf das repoe-Schema. Essence-Behandlung abhängig von der
+  Entscheidung oben. Unit-Tests anpassen.
 - [ ] Schritt 3: UI ohne Chance-Spalte. Wahrscheinlichkeits-Anzeige aus dem
   rollbaren Abschnitt entfernen (alle Pools einheitlich), Schätzwert-Hinweis
   raus, Fußzeilen-Attribution auf repoe umstellen. Neue Pools (Otherworldly,
@@ -97,6 +105,15 @@ die App während der Migration lauffähig bleibt.
 
 ## Log
 
+- 2026-07-03 – Phase 8, Schritt 1: Datenfundament repoe. Neues mod-zentriertes
+  Schema (`schema.repoe.ts`) und Import (`import-repoe.ts`, `npm run
+  import:repoe`) aus `repoe-fork/poe2` v4.5.4.3; Daten unter `data/4.5.4.3/`
+  (669 Familien: rollbar 290 inkl. 29 Genesis-Tree, corrupted 97, desecrated
+  282; 1829 Basen, 30 Item-Typen, 1327 Tags). `manifest.json` bewusst nicht
+  umgeschaltet – App bleibt bis Schritt 3 auf CoE. Quelle korrigiert
+  (`repoe-fork/poe2` statt `repoe-fork/repoe`). Offen: Essence (keine
+  Mod-Zuordnung in repoe), Variant-Feinschliff. Typecheck, 62 Tests, Build
+  gruen; Genesis-Tree an Ringen/Gürteln gegengeprueft.
 - 2026-07-03, 0.12.5 – Anzeige-Einheit auf den einzelnen Modifier umgestellt
   statt auf die interne Ausschluss-Gruppe. `runBaseQuery`/`runFlatQuery`
   gruppieren nach Mod-ID (auch `runEssenceQuery` konsistent); das `group`-Feld
