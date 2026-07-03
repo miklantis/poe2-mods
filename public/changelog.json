@@ -1,6 +1,15 @@
 {
-  "current": "0.13.3",
+  "current": "0.14.0",
   "entries": [
+    {
+      "version": "0.14.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Die App ist jetzt installierbar: über „Zum Startbildschirm hinzufügen“ (Handy) bzw. das Installieren-Symbol in der Adressleiste (Desktop) läuft sie als eigenständige App mit eigenem Icon.",
+        "Offline nutzbar: Die Oberfläche lädt auch ohne Netz. Ein einmal geöffneter Item-Typ ist danach offline verfügbar; seine Daten werden beim ersten Aufruf gespeichert.",
+        "Neue Versionen werden still im Hintergrund geladen und beim nächsten Öffnen aktiv."
+      ]
+    },
     {
       "version": "0.13.3",
       "date": "2026-07-03",

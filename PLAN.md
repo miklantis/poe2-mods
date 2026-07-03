@@ -25,6 +25,9 @@ CoE-Reste, Doku). Es sind keine Phase-8-Punkte mehr offen; nur noch die
 optionalen Vorhaben aus Phase 5 (PWA, Design-Feinschliff, Referenz-Doku) sowie
 der laufende Betrieb (Daten bei neuem Patch aktualisieren).
 
+Die App ist seit 0.14.0 eine PWA: installierbar und offline nutzbar (App-Hülle
+vorgeladen, Spieldaten beim Benutzen gecacht, stille Hintergrund-Updates).
+
 ---
 
 ## Offene Vorhaben
@@ -70,7 +73,12 @@ die App während der Migration lauffähig bleibt.
   einer Variante, 0.13.1). ADR 0011 und Ablösung von ADR 0008 geschrieben.
 
 ### Phase 5 – optional/später
-- [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
+- [x] PWA-Hülle (`vite-plugin-pwa`): installierbar (Web-App-Manifest, Icons
+  aus `favicon.svg`, dunkle Theme-Farbe) und offline. Service Worker mit
+  `autoUpdate` (still im Hintergrund). App-Hülle vorgeladen; versionierte
+  Spieldaten beim Benutzen gecacht (Manifest NetworkFirst, `data/<version>/`
+  CacheFirst, Changelog StaleWhileRevalidate) statt Voll-Vorladen. Offener
+  Rest optional: kleiner Offline-Indikator in der Oberfläche. ADR 0012.
 - [ ] Feinschliff Design/Designsystem
 - [ ] `docs/Referenz.md` (Kategorie-Liste, Notizen je poe2db-Ansicht)
 
@@ -110,7 +118,14 @@ die App während der Migration lauffähig bleibt.
 
 ## Log
 
-- 2026-07-03 – Phase 8, Schritt 4: CoE-Reste entfernt (import-coe, schema.coe,
+- 2026-07-03, 0.14.0 – Phase 5: PWA. `vite-plugin-pwa` (autoUpdate) erzeugt
+  Service Worker + Web-App-Manifest; Icons aus `favicon.svg` abgeleitet
+  (192/512/maskable, apple-touch), Theme-Farbe `#14171d`, `index.html` mit
+  Icon-Links/theme-color. App-Hülle vorgeladen (34 Einträge/877 KiB), Daten
+  bewusst nicht: Manifest NetworkFirst, `data/<version>/*.json` CacheFirst,
+  Changelog StaleWhileRevalidate; SPA-Fallback offline über `navigateFallback`
+  (data ausgenommen). `sharp` nur einmalig zum Icon-Rastern, nicht im Repo.
+  Typecheck, 51 Tests, Build (SW erzeugt), Lint grün. CoE-Reste entfernt (import-coe, schema.coe,
   baseEngine/essenceEngine + Tests, format.ts, data/0.5.4, roher _source/coe,
   import:coe-Skript). CoE-Essence-Quelle nach data/_source/coe-essence/
   archiviert (Aufbereitung reproduzierbar, Ergebnis identisch). Architektur.md
@@ -180,9 +195,5 @@ die App während der Migration lauffähig bleibt.
   (`--color-essence`), Loader `useEssences`, Browser-Abschnitt zwischen Desecrated
   und Corrupted. Snapshot 0.5.4: 59 Basen mit Essence, 1086 Zeilen; keine
   Korruption-Essences. ADR 0009 (Nachtrag). Typecheck, 57 Tests, Build grün.
-- 2026-07-03 – PLAN aufgeräumt: „Aktueller Stand" auf den Ist-Zustand plus
-  Phase-8-Richtung eingedampft, abgeschlossene Phasen 0–7 zu einem Überblick
-  verdichtet (Detail in Commits/ADRs), Log-Einträge 0.9.2–0.11.0 ins Archiv
-  verschoben.
 
 Ältere Einträge (0.1.0–0.11.0) im Archiv: `docs/archive/PLAN-Log-Archiv.md`.

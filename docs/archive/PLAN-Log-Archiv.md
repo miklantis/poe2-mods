@@ -87,3 +87,7 @@ Ausgelagerte, älteste Log-Einträge aus `PLAN.md`. Chronologisch, älteste zuer
   Tabelle (ViewSwitcher/Karten/Balken entfernt), gemeinsamer Filter. Akzent um
   Grün erweitert, Tabellen-`keyNs` gegen Schlüssel-Kollision; tote View-Bausteine
   gelöscht. ADR 0009 mit Nachtrag.
+- 2026-07-03 – PLAN aufgeräumt: „Aktueller Stand" auf den Ist-Zustand plus
+  Phase-8-Richtung eingedampft, abgeschlossene Phasen 0–7 zu einem Überblick
+  verdichtet (Detail in Commits/ADRs), Log-Einträge 0.9.2–0.11.0 ins Archiv
+  verschoben.
