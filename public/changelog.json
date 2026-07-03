@@ -1,6 +1,13 @@
 {
-  "current": "0.9.1",
+  "current": "0.9.2",
   "entries": [
+    {
+      "version": "0.9.2",
+      "date": "2026-07-03",
+      "changes": [
+        "Der Modifier-Browser startet jetzt vollständig eingeklappt: alle Mod-Familien sind zunächst zugeklappt, einzelne lassen sich per Klick öffnen (oder alle über „Alle ausklappen“)."
+      ]
+    },
     {
       "version": "0.9.1",
       "date": "2026-07-03",

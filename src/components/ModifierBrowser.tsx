@@ -44,7 +44,7 @@ export function ModifierBrowser({
   const selected =
     variants.find((v) => v.base === search.v) ?? variants[0] ?? null
 
-  const [collapsedKeys, setCollapsedKeys] = useState<ReadonlySet<string>>(
+  const [expandedKeys, setExpandedKeys] = useState<ReadonlySet<string>>(
     new Set(),
   )
 
@@ -75,11 +75,20 @@ export function ModifierBrowser({
     return [...filtered.prefixes, ...filtered.suffixes].map(keyOf)
   }, [filtered])
 
+  // Standard: alles eingeklappt. Gefuehrt wird die Menge der ausgeklappten
+  // Gruppen; nicht enthaltene (auch neu durch Filter entstandene) gelten als
+  // eingeklappt. Nach aussen weiterhin ein collapsedKeys-Set.
+  const collapsedKeys = useMemo(() => {
+    const s = new Set<string>()
+    for (const k of allKeys) if (!expandedKeys.has(k)) s.add(k)
+    return s
+  }, [allKeys, expandedKeys])
+
   const allCollapsed =
-    allKeys.length > 0 && allKeys.every((k) => collapsedKeys.has(k))
+    allKeys.length === 0 || !allKeys.some((k) => expandedKeys.has(k))
 
   const toggleKey = (key: string) =>
-    setCollapsedKeys((prev) => {
+    setExpandedKeys((prev) => {
       const next = new Set(prev)
       if (next.has(key)) next.delete(key)
       else next.add(key)
@@ -87,7 +96,7 @@ export function ModifierBrowser({
     })
 
   const toggleAll = () =>
-    setCollapsedKeys(allCollapsed ? new Set() : new Set(allKeys))
+    setExpandedKeys(allCollapsed ? new Set(allKeys) : new Set())
 
   const toggleTag = (tag: ColorTag) => {
     const active = new Set(search.tags)

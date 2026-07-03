@@ -145,6 +145,10 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.9.2 – Modifier-Browser startet vollständig eingeklappt. State
+  in `ModifierBrowser` von collapsed- auf expandedKeys umgestellt (Standard =
+  eingeklappt, neue Gruppen ebenfalls); collapsedKeys/Toggle-Logik daraus
+  abgeleitet, Kind-Schnittstelle unveraendert.
 - 2026-07-03, 0.9.1 – Phase 6, Schritt 4: CoE-Herkunft gekennzeichnet. Hinweis
   im Modifier-Browser nahe den Werten, neue globale Fußzeile `AppFooter` mit
   Attribution (Quelle Craft of Exile, Link) und Datenstand (Version/Liga aus
