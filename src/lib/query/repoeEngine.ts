@@ -56,8 +56,10 @@ export interface RepoeGroup {
   origin: Origin
   /** Anzeige-Text der Familie (Text des hoechsten Tiers). */
   text: string
-  /** Eignungs-Tags der Familie. */
+  /** Eignungs-Tags der Familie (Basis-Abgleich). */
   tags: string[]
+  /** Beschreibende Tags fuer die Filter-Pills (fire, cold, caster …). */
+  filterTags: string[]
   /** Erreichbare Tiers, nach Tier aufsteigend (Tier 1 zuerst). */
   tiers: RepoeTier[]
 }
@@ -122,6 +124,7 @@ export function runRepoeQuery(
       origin: mod.origin,
       text: mod.text,
       tags: mod.tags,
+      filterTags: mod.filterTags,
       tiers,
     })
   }
@@ -152,6 +155,7 @@ export function essenceGroups(
       origin: 'essence',
       text: e.text,
       tags: [],
+      filterTags: [],
       tiers: [
         {
           id: e.id,

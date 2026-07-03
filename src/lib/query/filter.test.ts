@@ -6,14 +6,15 @@ function group(
   id: string,
   slot: 'prefix' | 'suffix' | null,
   text: string,
-  tags: string[],
+  filterTags: string[],
 ): RepoeGroup {
   return {
     id,
     slot,
     origin: 'rollable',
     text,
-    tags,
+    tags: ['ring'],
+    filterTags,
     tiers: [{ id: `${id}-1`, tier: 1, tierCount: 1, ilvl: 1, name: '', text, values: [[1, 2]] }],
   }
 }

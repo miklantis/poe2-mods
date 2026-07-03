@@ -28,7 +28,7 @@ const ORDER_INDEX = new Map<string, number>(
 export function availableTags(groups: readonly RepoeGroup[]): ColorTag[] {
   const present = new Set<ColorTag>()
   for (const g of groups) {
-    for (const t of displayTags(g.tags)) present.add(t)
+    for (const t of displayTags(g.filterTags)) present.add(t)
   }
   return [...present].sort((a, b) => ORDER_INDEX.get(a)! - ORDER_INDEX.get(b)!)
 }
@@ -42,7 +42,7 @@ function tokensOf(search: string): string[] {
 
 function matchesTags(group: RepoeGroup, tags: readonly string[]): boolean {
   if (tags.length === 0) return true
-  const groupTags = new Set<string>(displayTags(group.tags))
+  const groupTags = new Set<string>(displayTags(group.filterTags))
   return tags.some((t) => groupTags.has(t))
 }
 

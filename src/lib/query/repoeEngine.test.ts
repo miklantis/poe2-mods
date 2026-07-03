@@ -19,6 +19,7 @@ function makeMod(partial: Partial<Mod> & Pick<Mod, 'id'>): Mod {
     slot: partial.slot === undefined ? 'prefix' : partial.slot,
     origin: partial.origin ?? 'rollable',
     tags: partial.tags ?? ['ring'],
+    filterTags: partial.filterTags ?? [],
     tiers: partial.tiers ?? [tier(`${partial.id}-1`, 1)],
   }
 }

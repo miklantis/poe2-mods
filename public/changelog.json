@@ -1,6 +1,14 @@
 {
-  "current": "0.13.2",
+  "current": "0.13.3",
   "entries": [
+    {
+      "version": "0.13.3",
+      "date": "2026-07-03",
+      "changes": [
+        "Die Filter-Tags sind wieder vollständig da (Fire, Cold, Lightning, Chaos, Physical, Elemental, Attack, Caster, Damage, Critical, Speed, Minion, Life, Mana, Energy Shield, Armour, Evasion, Resistance, Ailment, Curse, Aura, Attribute, Gem sowie Ulaman, Amanamu, Kurgal). Nach der repoe-Umstellung fehlten sie, weil nur die Basistyp-Eignung als Tag geführt wurde.",
+        "Die Schadensarten sind wieder eingefärbt (Fire rot, Cold blau, Lightning, Chaos, Physical); die übrigen Tags bleiben neutral."
+      ]
+    },
     {
       "version": "0.13.2",
       "date": "2026-07-03",

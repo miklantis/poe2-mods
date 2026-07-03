@@ -76,6 +76,7 @@ interface RawMod {
   stats: RawStat[]
   text: string | null
   spawn_weights: RawSpawnWeight[]
+  implicit_tags: string[]
 }
 interface RawTagDetail {
   name: string
@@ -155,6 +156,7 @@ async function main(): Promise<void> {
     slot: Slot | null
     origin: Origin
     tags: Set<string>
+    filterTags: Set<string>
     rows: { row: RawMod; id: string }[]
   }
   const fams = new Map<string, FamAcc>()
@@ -170,10 +172,18 @@ async function main(): Promise<void> {
     const key = `${origin}:${slot ?? 'x'}:${v.type}`
     let fam = fams.get(key)
     if (!fam) {
-      fam = { id: key, slot, origin, tags: new Set(), rows: [] }
+      fam = {
+        id: key,
+        slot,
+        origin,
+        tags: new Set(),
+        filterTags: new Set(),
+        rows: [],
+      }
       fams.set(key, fam)
     }
     for (const w of positive) fam.tags.add(w.tag)
+    for (const t of v.implicit_tags ?? []) fam.filterTags.add(t)
     fam.rows.push({ row: v, id })
     if (origin === 'rollable') {
       for (const w of positive) craftableTags.add(w.tag)
@@ -200,6 +210,7 @@ async function main(): Promise<void> {
       slot: fam.slot,
       origin: fam.origin,
       tags: Array.from(fam.tags).sort(),
+      filterTags: Array.from(fam.filterTags).sort(),
       tiers,
     })
   }

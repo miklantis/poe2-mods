@@ -67,7 +67,10 @@ export const modSchema = z.object({
   text: z.string(),
   slot: slotSchema.nullable(),
   origin: originSchema,
+  /** Eignungs-Tags (spawn): Abgleich gegen die Basis-Tags. */
   tags: z.array(z.string()),
+  /** Beschreibende Tags (implicit) fuer die Filter-Pills: fire, cold, caster … */
+  filterTags: z.array(z.string()),
   tiers: z.array(tierSchema).min(1),
 })
 export type Mod = z.infer<typeof modSchema>
