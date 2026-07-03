@@ -11,20 +11,18 @@ URL-State. Phasen 0–7 abgeschlossen (Überblick unten, Detail in ADRs und
 Commits).
 
 Laufende und einzige aktive Arbeit: Phase 8 – Migration der Datenquelle zurück
-auf repoe. Grund: Der CoE-Snapshot kennt die Genesis-Tree-Mods nicht (Datenlücke
-der Quelle, kein Import-Fehler); repoe deckt sie ab. Preis: repoe legt nur
-binäre Spawn-Gewichte offen (0/1), also entfällt die Wahrscheinlichkeits-Anzeige
-im rollbaren Pool. Trade-off bewusst zugunsten der Vollständigkeit; ADR 0008
-(CoE) wird damit abgelöst. Bis Phase 8 umgesetzt ist, läuft die App unverändert
-auf CoE.
+auf repoe. Grund: Der CoE-Snapshot kannte die Genesis-Tree-Mods nicht
+(Datenlücke der Quelle); repoe deckt sie ab. Preis: repoe legt nur binäre
+Spawn-Gewichte offen (0/1), also entfällt die Wahrscheinlichkeits-Anzeige.
+Trade-off bewusst zugunsten der Vollständigkeit; ADR 0011 löst ADR 0008 (CoE) ab.
 
-Schritt 1 ist umgesetzt: mod-zentriertes Schema und Import-Skript stehen, die
-repoe-Daten liegen unter `data/4.5.4.3/` (rollbar inkl. Genesis-Tree, Corrupted,
-Desecrated; 669 Familien, 1829 Basen, 30 Item-Typen). Zwei Punkte offen: (a)
-Essence – repoe-poe2 führt keine Essence→Mod-Zuordnung, der Essence-Abschnitt
-lässt sich daraus nicht rekonstruieren; zu klären, ob er unter repoe entfällt
-oder aus anderer Quelle kommt. (b) „Otherworldly" ist kein Ausrüstungs-Pool
-(nur Karten/Tablets), damit hinfällig. Nächster Schritt: Schritt 2 (Engine).
+Die Migration ist live: die App läuft auf dem repoe-Schema (manifest 4.5.4.3),
+alle Herkünfte einheitlich mit Tier und Wertebereich, ohne Chance. Essence bleibt
+erhalten, aus den CoE-Daten aufbereitet. Schritte 1–3 sind umgesetzt (Schema +
+Import, reine Engine, Essence-Aufbereitung, Verdrahtung/Umschaltung, Changelog
+0.13.0, ADR 0011). Offen ist nur noch Schritt 4: Aufräumen (CoE-Reste entfernen,
+Architektur.md nachziehen) und der Variant-Feinschliff (doppelte Anzeigenamen
+wie Two-Stone Ring).
 
 ---
 
@@ -51,18 +49,24 @@ die App während der Migration lauffähig bleibt.
   Desecrated (`domain desecrated`). Offen: Essence (keine Zuordnung in repoe,
   siehe Aktueller Stand) und Variant-Feinschliff (doppelte Anzeigenamen, z. B.
   Two-Stone Ring) – letzterer bei der Loader-Anbindung in Schritt 2/3.
-- [ ] Schritt 2: Query-Engine ohne Wahrscheinlichkeit. `baseEngine` auf reine
-  Eignung + Tier (requiredLevel-Rangfolge) + Wertebereich umstellen,
-  Chance-Berechnung entfernen; Herkünfte über eine einheitliche Flat-Logik;
-  Loader/Hooks auf das repoe-Schema. Essence-Behandlung abhängig von der
-  Entscheidung oben. Unit-Tests anpassen.
-- [ ] Schritt 3: UI ohne Chance-Spalte. Wahrscheinlichkeits-Anzeige aus dem
-  rollbaren Abschnitt entfernen (alle Pools einheitlich), Schätzwert-Hinweis
-  raus, Fußzeilen-Attribution auf repoe umstellen. Neue Pools (Otherworldly,
-  Genesis Tree) erscheinen automatisch als eigene Abschnitte. Changelog.
+- [x] Schritt 2: Query-Engine ohne Wahrscheinlichkeit. Reine `repoeEngine.ts`
+  (`runRepoeQuery`: Eignung über Basis-Tags + Tier-Rangfolge, keine Chance;
+  einheitliche Flat-Logik für alle Herkünfte). Essence aus den CoE-Daten je
+  Item-Klasse aufbereitet (`import-essences-coe.ts` → `essences.json`,
+  `essenceGroups`). Loader/Hooks (`useManifest`/`useGameData`) auf schema.repoe.
+  Unit-Tests angepasst.
+- [x] Schritt 3: UI ohne Chance-Spalte. `ModifierBrowser` auf `runRepoeQuery` +
+  `essenceGroups`; `ModTable`/`ModColumn`/`EssenceColumn`/`filter` auf
+  `RepoeGroup`, Gewicht/Chance entfernt, Schätzwert-Hinweis raus, Fußzeile auf
+  repoe. Genesis-Tree erscheint automatisch im rollbaren Pool. `manifest.json`
+  auf 4.5.4.3 umgeschaltet (App live auf repoe). Changelog 0.13.0.
 - [ ] Schritt 4: Aufräumen + Doku. CoE-Reste entfernen (`import-coe.ts`,
-  `schema.coe.ts`, `data/_source/coe`, CoE-Bezüge), ADR 0011 schreiben, ADR 0008
-  als abgelöst markieren, `Architektur.md` auf repoe nachziehen.
+  `schema.coe.ts`, `baseEngine`/`essenceEngine` samt Tests, `data/0.5.4`,
+  `data/_source/coe`), `Architektur.md` auf repoe nachziehen. Variant-Feinschliff
+  (doppelte Anzeigenamen wie Two-Stone Ring). ADR 0011 und die Ablösung von ADR
+  0008 sind bereits geschrieben. Achtung: `import-essences-coe.ts` liest
+  `data/0.5.4`; vor dessen Entfernung entscheiden, ob die CoE-Essence-Quelle
+  archiviert wird (sonst ist `essences.json` ein eingefrorenes Artefakt).
 
 ### Phase 5 – optional/später
 - [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
@@ -105,6 +109,12 @@ die App während der Migration lauffähig bleibt.
 
 ## Log
 
+- 2026-07-03 – Phase 8, Schritt 2+3 live: App auf repoe umgeschaltet
+  (manifest 4.5.4.3). Essence aus CoE je Item-Klasse aufbereitet
+  (`import-essences-coe.ts`, 26 Klassen/530 Einträge); `essenceGroups`.
+  ModifierBrowser/Filter/Tabellen auf `RepoeGroup`, Chance/Gewicht entfernt,
+  Fußzeile auf repoe. ADR 0011 (löst ADR 0008 ab). Changelog 0.13.0. Typecheck,
+  74 Tests, Build grün. Offen: Schritt 4 (Aufräumen, Variant-Feinschliff).
 - 2026-07-03 – Phase 8, Schritt 2 (Teil): reine repoe-Query-Engine
   (`repoeEngine.ts`) mit Eignung-über-Tags + Tier-Rangfolge, ohne
   Gewicht/Chance; alle Herkünfte über eine flache Logik. Additiv, App

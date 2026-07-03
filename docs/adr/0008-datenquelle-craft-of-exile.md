@@ -1,6 +1,6 @@
 # ADR 0008 – Datenquelle Craft of Exile (echte, geschätzte Gewichte)
 
-Status: akzeptiert (2026-07-03)
+Status: abgelöst durch ADR 0011 (2026-07-03)
 Datum: 2026-07-03
 
 Löst ab: ADR 0003 (repoe-Pipeline/Schema), ADR 0004 (Query-Engine-Regeln über
