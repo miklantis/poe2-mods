@@ -2,6 +2,28 @@
 
 ## Aktueller Stand
 
+Phase 6 (Datenquelle Craft of Exile) läuft, Schritt 1 ist umgesetzt. Grund für
+den Umbau: repoe-fork und der PoB-Export enthalten keine echten Spawn-Gewichte
+(alle Werte 1), PoE2 legt sie nicht offen; CoE rekonstruiert sie (Schätzwerte).
+
+Schritt 1 (erledigt): `scripts/import-coe.ts` (`npm run import:coe`) verarbeitet
+den versionierten CoE-Snapshot unter `data/_source/coe/` zu einem
+basis-zentrierten Schema unter `data/0.5.4/` (`item_types.json` mit Varianten,
+`mods.json` mit Text/Slot/Gruppe/Tags, `base_mods.json` mit je Basis den Tiers:
+Itemstufe, Gewicht, Rollen-Bereiche). Zod-validiert im Import, an den Ringen
+gegengeprüft (variable Gewichte). Der Import ist allein aus dem Repo
+reproduzierbar (kein Abruf, keine Uploads nötig).
+
+Wichtig für die nächste Sitzung: `data/manifest.json` zeigt noch auf die alte
+repoe-Version `4.5.4.3`, die App läuft unverändert auf den alten Daten und dem
+alten Schema (`src/data/schema.ts`). Erst Schritt 3 stellt die App auf das neue
+Schema und das Manifest auf `0.5.4` um. Als Nächstes: **Schritt 2** – die
+Query-Engine auf die Basis-Gewichte umstellen (pro Basis Tiers →
+Wahrscheinlichkeit, Ausgabe-Formen `ModGroup`/`ComputedMod` beibehalten) mit
+Unit-Tests, ohne die App-Verdrahtung anzufassen.
+
+--- Stand vor Phase 6 (weiter gültig für die Oberfläche): ---
+
 Phase 0 (Setup), Phase 1 (Datenpipeline und Schema) und Phase 2 (Query-Engine)
 umgesetzt. Die App lädt die normalisierten Spieldaten (Version 4.5.4.3) über
 TanStack Query, validiert sie beim Laden gegen die Zod-Schemas und zeigt einen
@@ -74,7 +96,7 @@ Datenschicht darauf um. Die Werte sind Schätzungen und werden in der App als
 solche gekennzeichnet; Quelle Craft of Exile. Automatischer Abruf ist nicht
 möglich (privater Endpunkt, Org-Netzsperre) – die CoE-Dateien werden als
 versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
-- [ ] Schritt 1: Import + basis-zentriertes Schema aus dem CoE-Snapshot, Zod-validiert, an den Ringen gegengeprüft (echte, variable Gewichte)
+- [x] Schritt 1: Import + basis-zentriertes Schema aus dem CoE-Snapshot, Zod-validiert, an den Ringen gegengeprüft (echte, variable Gewichte)
 - [ ] Schritt 2: Query-Engine auf Basis-Gewichte umstellen (pro Basis Tiers → Wahrscheinlichkeit), Unit-Tests
 - [ ] Schritt 3: Screens/Filter/Varianten neu verdrahten (Ausgabe-Formen bleiben, nur Datenquelle wechselt)
 - [ ] Schritt 4: Gewichte als CoE-Schätzung kennzeichnen + Attribution, ADR, Doku, Changelog
