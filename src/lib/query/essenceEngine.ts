@@ -53,7 +53,7 @@ export function runEssenceQuery(
       probability: 0,
     }
     const group: DisplayGroup = {
-      group: mod.group,
+      group: mod.id,
       probability: 0,
       mods: [computed],
     }

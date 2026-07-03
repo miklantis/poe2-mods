@@ -8,6 +8,10 @@ import { modFamilyLabel } from '@/lib/modText'
  * kein Fetch – vollstaendig mit Vitest testbar.
  *
  * Fachliche Regeln:
+ * - Anzeige-Einheit: eine Zeile je Modifier (Mod-ID). Modifier, die sich im
+ *   Spiel nur eine interne Ausschluss-Gruppe teilen (z.B. Fire/Cold/Lightning
+ *   Spell Skills), bleiben getrennte Zeilen mit eigenen Tiers und eigener
+ *   Chance – so wie poe2db sie zeigt.
  * - Pool: Jeder Tier eines Mods, dessen Itemstufe erreicht ist (ilvl <=
  *   Itemstufe), ist ein eigener gewichteter Eintrag. Mehrere Tiers desselben
  *   Mods konkurrieren gleichzeitig – so wie im Spiel auch niedrigere Tiers bei
@@ -17,8 +21,8 @@ import { modFamilyLabel } from '@/lib/modText'
  *   Tier 1). Die Rangfolge und tierCount beziehen sich auf die volle Tier-Liste
  *   des Mods und sind damit unabhaengig vom Itemstufen-Filter stabil.
  * - Wahrscheinlichkeit: pro Slot ein eigener Pool aus den erreichbaren Tier-
- *   Gewichten. Chance je Tier = Tier-Gewicht / Slot-Pool; Chance je Gruppe =
- *   Summe der erreichbaren Tier-Gewichte der Gruppe / Slot-Pool.
+ *   Gewichten. Chance je Tier = Tier-Gewicht / Slot-Pool; Chance je Zeile =
+ *   Summe der erreichbaren Tier-Gewichte des Modifiers / Slot-Pool.
  */
 
 export interface BaseQueryContext {
@@ -44,13 +48,18 @@ export interface ComputedMod {
 }
 
 export interface ModGroup {
+  /**
+   * Eindeutiger Schluessel der Anzeige-Zeile: die Mod-ID. Eine Zeile
+   * entspricht genau einem Modifier (einem Mod-Text), nicht der internen
+   * Ausschluss-Gruppe. Dient zugleich als stabiler React-Key.
+   */
   group: string
   slot: Slot
-  /** Summe der erreichbaren Gewichte dieser Gruppe. */
+  /** Summe der erreichbaren Gewichte dieser Zeile ueber ihre Tiers. */
   weight: number
-  /** Anteil der Gruppe am Slot-Pool (0..1). */
+  /** Anteil der Zeile am Slot-Pool (0..1). */
   probability: number
-  /** Tiers der Gruppe, aufsteigend nach Tier sortiert. */
+  /** Tiers des Modifiers, aufsteigend nach Tier sortiert. */
   mods: ComputedMod[]
 }
 
@@ -61,6 +70,7 @@ export interface ModGroup {
  * Spalte kommt ueber einen Akzent von aussen, nicht aus der Gruppe.
  */
 export interface DisplayGroup {
+  /** Eindeutiger Schluessel der Anzeige-Zeile: die Mod-ID (auch React-Key). */
   group: string
   probability: number
   mods: ComputedMod[]
@@ -85,7 +95,13 @@ interface ReachableTier {
 }
 
 function groupKey(mod: Mod, slot: Slot): string {
-  return `${mod.group}|${slot}`
+  // Anzeige-Einheit ist der einzelne Modifier, nicht die interne
+  // Ausschluss-Gruppe. Wuerde nach `mod.group` gebuendelt, fielen mehrere
+  // eigenstaendige Modifier derselben Ausschluss-Gruppe (z.B. Fire/Cold/
+  // Lightning Spell Skills) in eine Zeile und ihre Tiers wuerden vermischt –
+  // man saehe scheinbar mehrfach denselben Tier. Die Mod-ID ist je Basis
+  // eindeutig; der Slot bleibt als defensiver Namespace.
+  return `${mod.id}|${slot}`
 }
 
 /**
@@ -185,7 +201,7 @@ export function runBaseQuery(
       existing.mods.push(computed)
     } else {
       groups.set(key, {
-        group: r.mod.group,
+        group: r.mod.id,
         slot: r.slot,
         weight: r.weight,
         mods: [computed],
@@ -196,8 +212,8 @@ export function runBaseQuery(
   const prefixes: ModGroup[] = []
   const suffixes: ModGroup[] = []
   for (const g of groups.values()) {
-    // Innerhalb einer Gruppe nach Tier aufsteigend; stabiler Tiebreak fuer den
-    // seltenen Fall mehrerer Mods je Gruppe (nach Itemstufe, dann Mod-ID).
+    // Tiers der Zeile nach Tier aufsteigend; stabiler Tiebreak (Itemstufe,
+    // dann Mod-ID) fuer deterministische Reihenfolge.
     g.mods.sort(
       (a, b) => a.tier - b.tier || b.ilvl - a.ilvl || a.mod.id.localeCompare(b.mod.id),
     )
@@ -247,9 +263,9 @@ export function runFlatQuery(
         values: r.values,
         probability: 0,
       }
-      const existing = groups.get(r.mod.group)
+      const existing = groups.get(r.mod.id)
       if (existing) existing.mods.push(computed)
-      else groups.set(r.mod.group, { group: r.mod.group, mods: [computed] })
+      else groups.set(r.mod.id, { group: r.mod.id, mods: [computed] })
     }
   }
 

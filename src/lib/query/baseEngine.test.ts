@@ -73,7 +73,7 @@ describe('runBaseQuery – Wahrscheinlichkeit', () => {
     ]
     const res = runBaseQuery(rows, modMap(mods), { itemLevel: 100 })
     expect(res.prefixWeightTotal).toBe(400)
-    const ga = res.prefixes.find((g) => g.group === 'GA')
+    const ga = res.prefixes.find((g) => g.group === 'a')
     expect(ga?.mods[0].probability).toBeCloseTo(0.75)
     expect(ga?.probability).toBeCloseTo(0.75)
   })
@@ -120,7 +120,7 @@ describe('runBaseQuery – Gruppierung und Sortierung', () => {
     expect(res.prefixes[0].mods).toHaveLength(3)
   })
 
-  it('fasst mehrere Mods derselben Gruppe zusammen', () => {
+  it('trennt mehrere Modifier derselben Ausschluss-Gruppe in eigene Zeilen', () => {
     const mods = [
       makeMod({ id: 'a', group: 'Shared', slot: 'prefix' }),
       makeMod({ id: 'b', group: 'Shared', slot: 'prefix' }),
@@ -130,9 +130,28 @@ describe('runBaseQuery – Gruppierung und Sortierung', () => {
       { mod: 'b', tiers: [tier(1, 100)] },
     ]
     const res = runBaseQuery(rows, modMap(mods), { itemLevel: 100 })
-    expect(res.prefixes).toHaveLength(1)
-    expect(res.prefixes[0].weight).toBe(200)
-    expect(res.prefixes[0].mods).toHaveLength(2)
+    expect(res.prefixes).toHaveLength(2)
+    for (const g of res.prefixes) {
+      expect(g.weight).toBe(100)
+      expect(g.mods).toHaveLength(1)
+    }
+    expect(res.prefixes.map((g) => g.group).sort()).toEqual(['a', 'b'])
+  })
+
+  it('vermischt Tiers gleicher Ausschluss-Gruppe nicht (Regression Spell Skills)', () => {
+    // Zwei eigenstaendige Modifier mit identischer Tier-Struktur, aber
+    // gleicher Ausschluss-Gruppe: jeder behaelt seine eigenen Tiers.
+    const mods = [
+      makeMod({ id: 'fire', text: 'Fire Skills', group: 'Gem', slot: 'suffix' }),
+      makeMod({ id: 'cold', text: 'Cold Skills', group: 'Gem', slot: 'suffix' }),
+    ]
+    const rows: BaseMod[] = [
+      { mod: 'fire', tiers: [tier(81, 100), tier(55, 100)] },
+      { mod: 'cold', tiers: [tier(81, 100), tier(55, 100)] },
+    ]
+    const res = runBaseQuery(rows, modMap(mods), { itemLevel: 100 })
+    expect(res.suffixes).toHaveLength(2)
+    for (const g of res.suffixes) expect(g.mods).toHaveLength(2)
   })
 
   it('sortiert Gruppen nach Gewicht absteigend', () => {
@@ -145,7 +164,7 @@ describe('runBaseQuery – Gruppierung und Sortierung', () => {
       { mod: 'gross', tiers: [tier(1, 900)] },
     ]
     const res = runBaseQuery(rows, modMap(mods), { itemLevel: 100 })
-    expect(res.prefixes.map((g) => g.group)).toEqual(['Gross', 'Klein'])
+    expect(res.prefixes.map((g) => g.group)).toEqual(['gross', 'klein'])
   })
 
   it('sortiert Tiers innerhalb der Gruppe aufsteigend nach Tier', () => {
@@ -204,7 +223,7 @@ describe('Herkunft-Trennung', () => {
 })
 
 describe('runFlatQuery – Corrupted (slot-los)', () => {
-  it('gruppiert nach Mod-Group, ohne Chance, respektiert die Itemstufe', () => {
+  it('bildet eine Zeile je Modifier, ohne Chance, respektiert die Itemstufe', () => {
     const mods = [
       makeMod({ id: 'a', slot: null, origin: 'corrupted', group: 'GA', text: 'Alpha' }),
       makeMod({ id: 'b', slot: null, origin: 'corrupted', group: 'GB', text: 'Beta' }),
@@ -215,7 +234,7 @@ describe('runFlatQuery – Corrupted (slot-los)', () => {
     ]
     const res = runFlatQuery(rows, modMap(mods), { itemLevel: 60 })
     // Beta (ilvl 90) faellt bei Itemstufe 60 heraus.
-    expect(res.map((g) => g.group)).toEqual(['GA'])
+    expect(res.map((g) => g.group)).toEqual(['a'])
     // Alpha behaelt nur den erreichbaren Tier (ilvl 1); Chance bleibt 0.
     expect(res[0].mods).toHaveLength(1)
     expect(res[0].probability).toBe(0)

@@ -32,3 +32,37 @@ Ausgelagerte, älteste Log-Einträge aus `PLAN.md`. Chronologisch, älteste zuer
   Familie (TagChip, Quelle implicitTags, modTags.ts), ein-/ausklappbare Familien
   plus globaler Schalter. Neue Bausteine ViewSwitcher, TagChip, ProbabilityBar,
   ModTable, TierBar. 4 neue Tests.
+- 2026-07-03, 0.8.0 – Phase 4 (Facet-Search) abgeschlossen. `FilterBar` mit
+  Textsuche, Tag-Pills (ODER) und Itemstufen-Slider; nachgelagerte Filterung als
+  reines Modul `filter.ts` (`filterResult`/`availableTags`, 7 Tests). Filter-,
+  Varianten- und View-Zustand als URL-State auf `/$type` (Zod-`validateSearch`),
+  teil- und bookmarkbar. Neue Bausteine `FilterBar`, `TagFilterPill`, `Slider`,
+  gemeinsames `ui/tagColors`; itemLevel jetzt live statt fest.
+- 2026-07-03, 0.8.1 – Phase 6, Schritt 2: Query-Engine auf Basis-Gewichte.
+  Neue reine Engine `src/lib/query/baseEngine.ts` (`runBaseQuery`) rechnet je
+  Basis plus Itemstufe die Präfix-/Suffix-Gruppen mit Tier und Chance; jeder
+  erreichbare Tier ist ein eigener gewichteter, konkurrierender Eintrag.
+  Ausgabe-Formen `ModGroup`/`ComputedMod` beibehalten (nun mit `ilvl`/`values`
+  je Tier). Neues CoE-Zod-Schema `src/data/schema.coe.ts` als Typ-Grundlage.
+  13 Unit-Tests. Alte `engine.ts`/`schema.ts` und App-Verdrahtung unberührt –
+  Umstellung folgt in Schritt 3.
+- 2026-07-03, 0.9.0 – Phase 6, Schritt 3: App auf die CoE-Datenquelle
+  umgestellt. Manifest auf `0.5.4`; Loader/Hooks auf `schema.coe.ts` (neuer
+  `useBaseMods`, `useBaseItems`/`useTags` entfallen). Screen 2 verdrahtet auf
+  `runBaseQuery`: Varianten direkt aus `item_types.json`, Rechnung je Basis
+  ueber `base_mods`, Rollen-Bereiche pro Tier via `fillModText`/`formatRoll`.
+  Screen 1 gruppiert datengetrieben nach `category`. Aufgeraeumt: alte
+  `engine.ts`/`schema.ts`/`baseVariants.ts`, repoe-Importer und dessen
+  npm-Script entfernt, `data/4.5.4.3` geloescht, `data/_source` aus dem Deploy
+  ausgeschlossen. VariantSelect/Filter/modTags/modText/itemGroups mitgezogen.
+  Typecheck, 48 Tests, Build gruen; an den Ringen realdaten-gegengeprueft.
+- 2026-07-03, 0.9.1 – Phase 6, Schritt 4: CoE-Herkunft gekennzeichnet. Hinweis
+  im Modifier-Browser nahe den Werten, neue globale Fußzeile `AppFooter` mit
+  Attribution (Quelle Craft of Exile, Link) und Datenstand (Version/Liga aus
+  dem Manifest); Layout-Shell auf Spalten-Layout mit Footer. Doku: ADR 0008 neu
+  (Datenquelle CoE), ADR 0003/0004/0006 als abgelöst markiert, `Architektur.md`
+  auf CoE nachgezogen. Damit Phase 6 abgeschlossen.
+- 2026-07-03, 0.9.2 – Modifier-Browser startet vollständig eingeklappt. State
+  in `ModifierBrowser` von collapsed- auf expandedKeys umgestellt (Standard =
+  eingeklappt, neue Gruppen ebenfalls); collapsedKeys/Toggle-Logik daraus
+  abgeleitet, Kind-Schnittstelle unveraendert.

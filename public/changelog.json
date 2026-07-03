@@ -1,6 +1,14 @@
 {
-  "current": "0.12.4",
+  "current": "0.12.5",
   "entries": [
+    {
+      "version": "0.12.5",
+      "date": "2026-07-03",
+      "changes": [
+        "Modifier, die sich im Spiel nur eine interne Ausschluss-Gruppe teilen (z. B. +# to Level of all Fire/Cold/Lightning/Chaos/Physical Spell Skills oder die elementaren Waffen-Schaden-Präfixe), erscheinen jetzt als eigene Zeilen statt in einer zusammengefassten Zeile. Damit verschwinden die scheinbar mehrfach gleichen Tier.",
+        "Die Chance steht jetzt je einzelnem Modifier statt als Sammelwert über die ganze Gruppe. Beispiel Wand: statt 7 Präfixe / 13 Suffixe werden 11 / 18 gezeigt, jeder mit seinen eigenen Tier."
+      ]
+    },
     {
       "version": "0.12.4",
       "date": "2026-07-03",

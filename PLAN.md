@@ -26,6 +26,14 @@ angezeigt (Filter-Pills oben bleiben), Modifier-Text etwas größer,
 Herkunfts-Überschriften entfallen zugunsten sprechender Tabellennamen
 („Desecrated Präfixe" usw.), Itemstufen-Regler kompakt links.
 
+Anzeige-Einheit (0.12.5): Der Browser zeigt jetzt je Zeile einen einzelnen
+Modifier statt einer internen Ausschluss-Gruppe. Modifier, die sich im Spiel
+nur eine Ausschluss-Gruppe teilen (z. B. Fire/Cold/Lightning/Chaos/Physical
+Spell Skills oder die elementaren Waffen-Schaden-Präfixe), stehen dadurch als
+eigene Zeilen mit eigenen Tier und eigener Chance – nicht mehr in einer Zeile
+mit vermischten, scheinbar mehrfach gleichen Tier. `runBaseQuery`/`runFlatQuery`/
+`runEssenceQuery` gruppieren nach Mod-ID; Entscheidung in ADR 0010.
+
 --- Stand Phase 6 (weiter gueltig fuer Datenquelle und Oberflaeche): ---
 
 Phase 6 (Datenquelle Craft of Exile) abgeschlossen. Die App läuft vollständig
@@ -186,6 +194,15 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.12.5 – Anzeige-Einheit auf den einzelnen Modifier umgestellt
+  statt auf die interne Ausschluss-Gruppe. `runBaseQuery`/`runFlatQuery`
+  gruppieren nach Mod-ID (auch `runEssenceQuery` konsistent); das `group`-Feld
+  von `ModGroup`/`DisplayGroup` traegt jetzt die Mod-ID als eindeutigen
+  Anzeige-/React-Key. Behebt vermischte Tier bei Modifiern, die sich nur eine
+  Ausschluss-Gruppe teilen (Wand: Fire/Cold/Lightning/Chaos/Physical Spell
+  Skills, elementare Waffen-Schaden-Praefixe). Chance jetzt je Modifier statt
+  Gruppen-Summe; Wand 11 Praefixe / 18 Suffixe (vorher 7 / 13). ADR 0010 neu.
+  Typecheck, 62 Tests, Build gruen; an der Wand realdaten-gegengeprueft.
 - 2026-07-03, 0.12.4 – Phase 5: Aufgeklappte Tier-Zeilen zeigen nur noch die
   Wertespanne statt den ganzen Mod-Satz (neuer `tierValueText` in modText.ts,
   mehrere Werte per ` / `, Fallback auf Text ohne Zahlen; +4 Tests). ModTable
@@ -246,35 +263,4 @@ ADR 0008.
   in `ModifierBrowser` von collapsed- auf expandedKeys umgestellt (Standard =
   eingeklappt, neue Gruppen ebenfalls); collapsedKeys/Toggle-Logik daraus
   abgeleitet, Kind-Schnittstelle unveraendert.
-- 2026-07-03, 0.9.1 – Phase 6, Schritt 4: CoE-Herkunft gekennzeichnet. Hinweis
-  im Modifier-Browser nahe den Werten, neue globale Fußzeile `AppFooter` mit
-  Attribution (Quelle Craft of Exile, Link) und Datenstand (Version/Liga aus
-  dem Manifest); Layout-Shell auf Spalten-Layout mit Footer. Doku: ADR 0008 neu
-  (Datenquelle CoE), ADR 0003/0004/0006 als abgelöst markiert, `Architektur.md`
-  auf CoE nachgezogen. Damit Phase 6 abgeschlossen.
-- 2026-07-03, 0.9.0 – Phase 6, Schritt 3: App auf die CoE-Datenquelle
-  umgestellt. Manifest auf `0.5.4`; Loader/Hooks auf `schema.coe.ts` (neuer
-  `useBaseMods`, `useBaseItems`/`useTags` entfallen). Screen 2 verdrahtet auf
-  `runBaseQuery`: Varianten direkt aus `item_types.json`, Rechnung je Basis
-  ueber `base_mods`, Rollen-Bereiche pro Tier via `fillModText`/`formatRoll`.
-  Screen 1 gruppiert datengetrieben nach `category`. Aufgeraeumt: alte
-  `engine.ts`/`schema.ts`/`baseVariants.ts`, repoe-Importer und dessen
-  npm-Script entfernt, `data/4.5.4.3` geloescht, `data/_source` aus dem Deploy
-  ausgeschlossen. VariantSelect/Filter/modTags/modText/itemGroups mitgezogen.
-  Typecheck, 48 Tests, Build gruen; an den Ringen realdaten-gegengeprueft.
-- 2026-07-03, 0.8.1 – Phase 6, Schritt 2: Query-Engine auf Basis-Gewichte.
-  Neue reine Engine `src/lib/query/baseEngine.ts` (`runBaseQuery`) rechnet je
-  Basis plus Itemstufe die Präfix-/Suffix-Gruppen mit Tier und Chance; jeder
-  erreichbare Tier ist ein eigener gewichteter, konkurrierender Eintrag.
-  Ausgabe-Formen `ModGroup`/`ComputedMod` beibehalten (nun mit `ilvl`/`values`
-  je Tier). Neues CoE-Zod-Schema `src/data/schema.coe.ts` als Typ-Grundlage.
-  13 Unit-Tests. Alte `engine.ts`/`schema.ts` und App-Verdrahtung unberührt –
-  Umstellung folgt in Schritt 3.
-- 2026-07-03, 0.8.0 – Phase 4 (Facet-Search) abgeschlossen. `FilterBar` mit
-  Textsuche, Tag-Pills (ODER) und Itemstufen-Slider; nachgelagerte Filterung als
-  reines Modul `filter.ts` (`filterResult`/`availableTags`, 7 Tests). Filter-,
-  Varianten- und View-Zustand als URL-State auf `/$type` (Zod-`validateSearch`),
-  teil- und bookmarkbar. Neue Bausteine `FilterBar`, `TagFilterPill`, `Slider`,
-  gemeinsames `ui/tagColors`; itemLevel jetzt live statt fest.
-
-Ältere Einträge (0.1.0–0.7.0) im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
+Ältere Einträge (0.1.0–0.9.2) im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
