@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import type { ComputedMod } from '@/lib/query/engine'
-import type { Slot } from '@/data/schema'
-import { cleanModText } from '@/lib/modText'
+import type { ComputedMod } from '@/lib/query/baseEngine'
+import type { Slot } from '@/data/schema.coe'
+import { fillModText } from '@/lib/modText'
 import { formatPercent, formatWeight } from '@/lib/format'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -38,7 +38,7 @@ export function TierRow({ item, slot }: { item: ComputedMod; slot: Slot }) {
           T{item.tier}
         </Badge>
         <span className="flex-1 text-[13.5px] leading-snug text-body">
-          {renderText(cleanModText(item.mod.text))}
+          {renderText(fillModText(item.mod.text, item.values))}
         </span>
         <span
           className={cn(
@@ -50,7 +50,7 @@ export function TierRow({ item, slot }: { item: ComputedMod; slot: Slot }) {
         </span>
       </div>
       <div className="mt-1 flex gap-4 pl-[3rem] font-mono text-[11px] tabular-nums text-muted-text">
-        <span>Stufe {item.mod.requiredLevel}</span>
+        <span>Stufe {item.ilvl}</span>
         <span>Gewicht {formatWeight(item.weight)}</span>
       </div>
     </div>

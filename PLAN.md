@@ -2,36 +2,32 @@
 
 ## Aktueller Stand
 
-Phase 6 (Datenquelle Craft of Exile) läuft, Schritte 1 und 2 sind umgesetzt.
-Grund für den Umbau: repoe-fork und der PoB-Export enthalten keine echten
+Phase 6 (Datenquelle Craft of Exile) fast fertig: Schritte 1 bis 3 sind
+umgesetzt. Die App laeuft jetzt vollstaendig auf den CoE-Daten (Version 0.5.4).
+Grund fuer den Umbau: repoe-fork und der PoB-Export enthalten keine echten
 Spawn-Gewichte (alle Werte 1), PoE2 legt sie nicht offen; CoE rekonstruiert sie
-(Schätzwerte).
+(Schaetzwerte).
 
-Schritt 1 (erledigt): `scripts/import-coe.ts` (`npm run import:coe`) verarbeitet
-den versionierten CoE-Snapshot unter `data/_source/coe/` zu einem
-basis-zentrierten Schema unter `data/0.5.4/` (`item_types.json` mit Varianten,
-`mods.json` mit Text/Slot/Gruppe/Tags, `base_mods.json` mit je Basis den Tiers:
-Itemstufe, Gewicht, Rollen-Bereiche). Zod-validiert im Import, an den Ringen
-gegengeprüft (variable Gewichte).
+Schritt 3 (erledigt): Datenschicht und beide Screens auf das basis-zentrierte
+CoE-Schema und `runBaseQuery` umgestellt. Manifest zeigt auf `0.5.4`; Loader
+laden `mods.json`, `item_types.json`, `base_mods.json` gegen `schema.coe.ts`
+(neuer Hook `useBaseMods`; `useBaseItems`/`useTags` entfallen). Screen 2 zieht
+die Basis-Varianten direkt aus `item_types.json`, rechnet je gewaehlter Basis
+ueber `base_mods` und zeigt die Rollen-Bereiche pro Tier (Text-Vorlage mit `#`
+wird aus den Tier-`values` gefuellt, neue Helfer `fillModText`/`formatRoll`).
+Screen 1 gruppiert datengetrieben nach `category` (poe2db-nahe Reihenfolge,
+Unbekanntes hinten). Aufgeraeumt: alte `engine.ts`, `schema.ts`,
+`baseVariants.ts`, der repoe-Importer `scripts/import.ts` samt Tests und
+npm-Script entfernt; das Deploy-Plugin liefert `data/_source` nicht mehr aus.
+Validiert: Typecheck, 48 Unit-Tests, Build; an den Ringen realdaten-gegengeprueft.
 
-Schritt 2 (erledigt): neue reine Engine `src/lib/query/baseEngine.ts`
-(`runBaseQuery`) rechnet aus den Mod-Zeilen einer Basis plus Itemstufe die
-Präfix-/Suffix-Gruppen mit Tier und Wahrscheinlichkeit. Modell: jeder erreichbare
-Tier (ilvl ≤ Itemstufe) ist ein eigener gewichteter, konkurrierender Eintrag;
-Chance je Tier = Tier-Gewicht / Slot-Pool, Gruppe = Summe der erreichbaren
-Tier-Gewichte / Slot-Pool; höchstes ilvl = Tier 1, tierCount über die volle
-Tier-Liste. Ausgabe-Formen `ModGroup`/`ComputedMod` bleiben (mit `ilvl`/`values`
-je Tier). Neues CoE-Zod-Schema `src/data/schema.coe.ts` als Typ-Grundlage
-(Engine + Tests nutzen es; Loader zieht in Schritt 3 nach). 13 Unit-Tests.
+Wichtig fuer die naechste Sitzung: Nur noch **Schritt 4** offen – die Gewichte
+in der Oberflaeche als CoE-Schaetzung kennzeichnen samt Attribution, dazu ADR,
+Doku (`Architektur.md`, ADR 0003 auf CoE aktualisieren) und Changelog. Hinweis:
+Die Gewichte im aktuellen Snapshot wirken teils wie Platzhalter (bei den Ringen
+durchweg 1000) – das ist Datenqualitaet des Snapshots, nicht der Verdrahtung.
 
-Wichtig für die nächste Sitzung: `data/manifest.json` zeigt noch auf die alte
-repoe-Version `4.5.4.3`, die App läuft unverändert auf den alten Daten, dem
-alten Schema (`src/data/schema.ts`) und der alten `engine.ts`. Erst **Schritt 3**
-stellt die App um: Loader/Hooks auf `schema.coe.ts`, Screens/Filter/Varianten auf
-`runBaseQuery`, Manifest auf `0.5.4`. Ausgabe-Formen bleiben, nur Datenquelle und
-Engine-Aufruf wechseln.
-
---- Stand vor Phase 6 (weiter gültig für die Oberfläche): ---
+--- Stand vor Phase 6 (weiter gueltig fuer die Oberflaeche): ---
 
 Phase 0 (Setup), Phase 1 (Datenpipeline und Schema) und Phase 2 (Query-Engine)
 umgesetzt. Die App lädt die normalisierten Spieldaten (Version 4.5.4.3) über
@@ -107,7 +103,7 @@ möglich (privater Endpunkt, Org-Netzsperre) – die CoE-Dateien werden als
 versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
 - [x] Schritt 1: Import + basis-zentriertes Schema aus dem CoE-Snapshot, Zod-validiert, an den Ringen gegengeprüft (echte, variable Gewichte)
 - [x] Schritt 2: Query-Engine auf Basis-Gewichte umstellen (pro Basis Tiers → Wahrscheinlichkeit), Unit-Tests
-- [ ] Schritt 3: Screens/Filter/Varianten neu verdrahten (Ausgabe-Formen bleiben, nur Datenquelle wechselt)
+- [x] Schritt 3: Screens/Filter/Varianten neu verdrahtet (Datenschicht + beide Screens auf CoE-Schema und runBaseQuery, Manifest auf 0.5.4, aufgeraeumt)
 - [ ] Schritt 4: Gewichte als CoE-Schätzung kennzeichnen + Attribution, ADR, Doku, Changelog
 
 ### Phase 5 – optional/später
@@ -161,6 +157,16 @@ versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
 
 ## Log
 
+- 2026-07-03, 0.9.0 – Phase 6, Schritt 3: App auf die CoE-Datenquelle
+  umgestellt. Manifest auf `0.5.4`; Loader/Hooks auf `schema.coe.ts` (neuer
+  `useBaseMods`, `useBaseItems`/`useTags` entfallen). Screen 2 verdrahtet auf
+  `runBaseQuery`: Varianten direkt aus `item_types.json`, Rechnung je Basis
+  ueber `base_mods`, Rollen-Bereiche pro Tier via `fillModText`/`formatRoll`.
+  Screen 1 gruppiert datengetrieben nach `category`. Aufgeraeumt: alte
+  `engine.ts`/`schema.ts`/`baseVariants.ts`, repoe-Importer und dessen
+  npm-Script entfernt, `data/4.5.4.3` geloescht, `data/_source` aus dem Deploy
+  ausgeschlossen. VariantSelect/Filter/modTags/modText/itemGroups mitgezogen.
+  Typecheck, 48 Tests, Build gruen; an den Ringen realdaten-gegengeprueft.
 - 2026-07-03, 0.8.1 – Phase 6, Schritt 2: Query-Engine auf Basis-Gewichte.
   Neue reine Engine `src/lib/query/baseEngine.ts` (`runBaseQuery`) rechnet je
   Basis plus Itemstufe die Präfix-/Suffix-Gruppen mit Tier und Chance; jeder

@@ -3,15 +3,19 @@ import { loadJson } from '@/data/client'
 import { useManifest } from '@/hooks/useManifest'
 import {
   modsFileSchema,
-  baseItemsFileSchema,
   itemTypesFileSchema,
-  tagsFileSchema,
-} from '@/data/schema'
+  baseModsFileSchema,
+} from '@/data/schema.coe'
 
 /**
  * Version-spezifische Loader. Sie warten auf das Manifest und laden dann die
  * Dateien der aktuell gueltigen Version. Komponenten kennen die JSON-Struktur
  * nicht direkt, sondern gehen ueber diese Hooks.
+ *
+ * Datenform (basis-zentriertes CoE-Schema, `src/data/schema.coe.ts`):
+ *  - mods.json       schlanke Mod-Metadaten (Text, Slot, Gruppe, Tags),
+ *  - item_types.json Item-Typen mit ihren Basis-Varianten,
+ *  - base_mods.json  je Basis die rollbaren Mods mit Tiers (ilvl/Gewicht/Werte).
  */
 export function useMods() {
   const { data: manifest } = useManifest()
@@ -19,16 +23,6 @@ export function useMods() {
   return useQuery({
     queryKey: ['mods', version],
     queryFn: () => loadJson(`data/${version}/mods.json`, modsFileSchema),
-    enabled: Boolean(version),
-  })
-}
-
-export function useBaseItems() {
-  const { data: manifest } = useManifest()
-  const version = manifest?.current
-  return useQuery({
-    queryKey: ['base_items', version],
-    queryFn: () => loadJson(`data/${version}/base_items.json`, baseItemsFileSchema),
     enabled: Boolean(version),
   })
 }
@@ -43,12 +37,12 @@ export function useItemTypes() {
   })
 }
 
-export function useTags() {
+export function useBaseMods() {
   const { data: manifest } = useManifest()
   const version = manifest?.current
   return useQuery({
-    queryKey: ['tags', version],
-    queryFn: () => loadJson(`data/${version}/tags.json`, tagsFileSchema),
+    queryKey: ['base_mods', version],
+    queryFn: () => loadJson(`data/${version}/base_mods.json`, baseModsFileSchema),
     enabled: Boolean(version),
   })
 }

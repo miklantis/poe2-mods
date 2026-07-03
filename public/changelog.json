@@ -1,6 +1,15 @@
 {
-  "current": "0.8.1",
+  "current": "0.9.0",
   "entries": [
+    {
+      "version": "0.9.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Modifier-Browser läuft jetzt auf der neuen Datenquelle (Craft of Exile, Version 0.5.4): je Item-Typ und Basis-Variante die rollbaren Präfixe und Suffixe mit Tier, Itemstufe, geschätztem Spawn-Gewicht und Chance.",
+        "Rollen-Bereiche werden pro Tier angezeigt (z. B. „+(165-179) to maximum Mana“), statt eines festen Werts je Modifier.",
+        "Startseite gruppiert die Item-Typen jetzt direkt nach den Kategorien aus den Daten; dadurch erscheinen auch neue Typen wie Juwelen, Flacons, Charms, Tablets und Waystones."
+      ]
+    },
     {
       "version": "0.8.1",
       "date": "2026-07-03",

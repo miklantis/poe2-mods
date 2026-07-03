@@ -1,8 +1,8 @@
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import type { ReactNode } from 'react'
-import type { ModGroup } from '@/lib/query/engine'
-import type { Slot } from '@/data/schema'
-import { cleanModText, modFamilyLabel } from '@/lib/modText'
+import type { ModGroup } from '@/lib/query/baseEngine'
+import type { Slot } from '@/data/schema.coe'
+import { modFamilyLabel, fillModText } from '@/lib/modText'
 import { displayTags } from '@/lib/modTags'
 import { formatPercent, formatWeight } from '@/lib/format'
 import { TagChipRow } from '@/components/ui/TagChip'
@@ -77,17 +77,17 @@ export function ModTable({
                 {!collapsed &&
                   group.mods.map((m) => (
                     <tr
-                      key={m.mod.id}
+                      key={`${m.mod.id}-${m.tier}`}
                       className="border-t border-border-subtle"
                     >
                       <td className="px-2 py-1.5 font-mono text-[11.5px] tabular-nums text-muted-text">
                         T{m.tier}
                       </td>
                       <td className="px-2 py-1.5 text-[13px] text-body">
-                        {cleanModText(m.mod.text)}
+                        {fillModText(m.mod.text, m.values)}
                       </td>
                       <td className="px-2 py-1.5 text-right font-mono text-[11.5px] tabular-nums text-muted-text">
-                        {m.mod.requiredLevel}
+                        {m.ilvl}
                       </td>
                       <td className="px-2 py-1.5 text-right font-mono text-[11.5px] tabular-nums text-muted-text">
                         {formatWeight(m.weight)}

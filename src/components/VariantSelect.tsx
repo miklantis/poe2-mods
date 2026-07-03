@@ -1,19 +1,19 @@
-import type { BaseVariant } from '@/lib/baseVariants'
+import type { Variant } from '@/data/schema.coe'
 import { cn } from '@/lib/utils'
 
 /**
  * Umschalter fuer die Basis-Varianten eines Item-Typs. Wird nur gerendert, wenn
  * es mehr als eine Variante gibt (Aufruferseite entscheidet). Pill-Reihe, die
- * auf schmalen Screens umbricht.
+ * auf schmalen Screens umbricht. Die Auswahl laeuft ueber die Basis-Id.
  */
 export function VariantSelect({
   variants,
-  selectedId,
+  selectedBase,
   onSelect,
 }: {
-  variants: readonly BaseVariant[]
-  selectedId: string
-  onSelect: (id: string) => void
+  variants: readonly Variant[]
+  selectedBase: string
+  onSelect: (base: string) => void
 }) {
   return (
     <div
@@ -22,15 +22,14 @@ export function VariantSelect({
       className="flex flex-wrap gap-2"
     >
       {variants.map((v) => {
-        const active = v.id === selectedId
+        const active = v.base === selectedBase
         return (
           <button
-            key={v.id}
+            key={v.base}
             role="tab"
             aria-selected={active}
             type="button"
-            onClick={() => onSelect(v.id)}
-            title={`z. B. ${v.sampleBase}`}
+            onClick={() => onSelect(v.base)}
             className={cn(
               'rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors',
               active

@@ -66,6 +66,16 @@ export const itemTypeSchema = z.object({
 })
 export type ItemType = z.infer<typeof itemTypeSchema>
 
+/** data/manifest.json: aktive Version, verfuegbare Versionen, Herkunft. */
+export const manifestSchema = z.object({
+  current: z.string(),
+  versions: z.array(z.string()),
+  leagueLabel: z.string().nullable(),
+  source: z.string(),
+  generatedAt: z.string(),
+})
+export type Manifest = z.infer<typeof manifestSchema>
+
 export const modsFileSchema = z.array(modSchema)
 export const itemTypesFileSchema = z.array(itemTypeSchema)
 export type ModsFile = z.infer<typeof modsFileSchema>

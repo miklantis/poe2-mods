@@ -1,6 +1,6 @@
-import type { ComputedMod } from '@/lib/query/engine'
-import type { Slot } from '@/data/schema'
-import { cleanModText } from '@/lib/modText'
+import type { ComputedMod } from '@/lib/query/baseEngine'
+import type { Slot } from '@/data/schema.coe'
+import { fillModText } from '@/lib/modText'
 import { formatPercent } from '@/lib/format'
 import { Badge } from '@/components/ui/badge'
 import { ProbabilityBar } from '@/components/ui/ProbabilityBar'
@@ -30,7 +30,7 @@ export function TierBar({
       <div className="flex items-baseline gap-3">
         <Badge className={cn('shrink-0', SLOT_BADGE[slot])}>T{item.tier}</Badge>
         <span className="flex-1 truncate text-[13px] text-body">
-          {cleanModText(item.mod.text)}
+          {fillModText(item.mod.text, item.values)}
         </span>
         <span
           className={cn(

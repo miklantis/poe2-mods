@@ -2,9 +2,13 @@
  * Aufbereitung der originalen Mod-Texte (englischer Spieltext) fuer die Anzeige.
  * DOM-frei und testbar.
  *
- * Die Rohtexte enthalten poe2db-/Wiki-Link-Markup der Form `[Anzeige|Ziel]`
- * oder `[Text]`. Fuer die Anzeige interessiert nur der sichtbare Teil.
- * Rollen-Bereiche stehen als `(min-max)` bereits im Text.
+ * Im basis-zentrierten CoE-Schema ist der Mod-Text eine Vorlage mit `#`-
+ * Platzhaltern (z. B. `# to maximum Life`); die konkreten Rollen-Bereiche
+ * stehen pro Tier separat in dessen `values`. Fuer die Anzeige einer Tier-Zeile
+ * werden die Platzhalter der Reihe nach mit den Tier-Werten gefuellt.
+ *
+ * Etwaiges poe2db-/Wiki-Link-Markup der Form `[Anzeige|Ziel]` oder `[Text]`
+ * wird auf den sichtbaren Teil reduziert.
  */
 
 const LINK_WITH_TARGET = /\[([^\]|]+)\|[^\]]*\]/g
@@ -19,10 +23,39 @@ const RANGE = /\((\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)\)/g
 const SINGLE = /\((\d+(?:\.\d+)?)\)/g
 
 /**
- * Familien-Label: der aufbereitete Text mit durch `#` ersetzten Rollen-Werten,
- * z. B. `+(5-8) to Strength` -> `+# to Strength`. Dient als Ueberschrift ueber
- * die Tiers einer Mod-Gruppe.
+ * Familien-Label: der aufbereitete Vorlagentext mit `#`-Platzhaltern, wie er
+ * als Ueberschrift ueber die Tiers einer Mod-Gruppe dient. Etwaige bereits im
+ * Text stehende Rollen-Bereiche `(min-max)` werden ebenfalls zu `#`
+ * vereinheitlicht, damit das Label unabhaengig von der Textquelle stabil ist.
  */
 export function modFamilyLabel(raw: string): string {
   return cleanModText(raw).replace(RANGE, '#').replace(SINGLE, '#')
+}
+
+/** Formatiert eine Zahl ohne ueberfluessige Nachkommastellen (2.10 -> 2.1). */
+function formatNum(n: number): string {
+  return Number(n.toFixed(2)).toString()
+}
+
+/**
+ * Formatiert einen Rollen-Bereich: `(min-max)`, bei gleichem Min und Max nur
+ * die einzelne Zahl (ohne Klammer).
+ */
+export function formatRoll(min: number, max: number): string {
+  return min === max ? formatNum(min) : `(${formatNum(min)}-${formatNum(max)})`
+}
+
+/**
+ * Fuellt die `#`-Platzhalter der Vorlage der Reihe nach mit den Rollen-Bereichen
+ * eines Tiers. Fehlt zu einem Platzhalter ein Wert, bleibt `#` stehen.
+ */
+export function fillModText(
+  template: string,
+  values: readonly (readonly [number, number])[],
+): string {
+  let i = 0
+  return cleanModText(template).replace(/#/g, () => {
+    const v = values[i++]
+    return v ? formatRoll(v[0], v[1]) : '#'
+  })
 }

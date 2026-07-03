@@ -1,22 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { displayTags } from './modTags'
-import type { Mod } from '@/data/schema'
+import type { Mod } from '@/data/schema.coe'
 
-function mod(implicitTags: string[]): Mod {
-  return {
-    id: 'x',
-    name: 'x',
-    type: 'x',
-    groups: [],
-    slot: 'prefix',
-    requiredLevel: 1,
-    stats: [],
-    text: '',
-    spawnWeights: [],
-    implicitTags,
-    addsTags: [],
-    isEssenceOnly: false,
-  }
+function mod(tags: string[]): Mod {
+  return { id: 'x', text: '', slot: 'prefix', group: 'g', tags }
 }
 
 describe('displayTags', () => {

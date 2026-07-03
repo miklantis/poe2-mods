@@ -1,9 +1,9 @@
 {
-  "current": "4.5.4.3",
+  "current": "0.5.4",
   "versions": [
-    "4.5.4.3"
+    "0.5.4"
   ],
-  "leagueLabel": null,
-  "source": "https://raw.githubusercontent.com/repoe-fork/poe2/master/data (repoe-fork/poe2)",
-  "generatedAt": "2026-07-03T08:50:20.535Z"
+  "leagueLabel": "Return of the Ancients",
+  "source": "Craft of Exile (Schätzwerte), Snapshot data/_source/coe",
+  "generatedAt": "2026-07-03T13:19:36.000Z"
 }

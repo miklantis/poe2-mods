@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import type { ModGroup } from '@/lib/query/engine'
-import type { Slot } from '@/data/schema'
+import type { ModGroup } from '@/lib/query/baseEngine'
+import type { Slot } from '@/data/schema.coe'
 import type { ModView } from '@/components/ViewSwitcher'
 import { ModGroupBlock } from '@/components/ModGroupBlock'
 import { ModTable } from '@/components/ModTable'

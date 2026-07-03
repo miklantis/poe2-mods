@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react'
 import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
-import type { ItemType } from '@/data/schema'
+import type { ItemType, Mod } from '@/data/schema.coe'
 import type { BrowserSearch } from '@/routes/$type'
-import { useMods, useBaseItems } from '@/hooks/useGameData'
-import { deriveVariants } from '@/lib/baseVariants'
-import { runQuery } from '@/lib/query/engine'
-import type { ModGroup } from '@/lib/query/engine'
+import { useMods, useBaseMods } from '@/hooks/useGameData'
+import { runBaseQuery } from '@/lib/query/baseEngine'
+import type { ModGroup } from '@/lib/query/baseEngine'
 import { filterResult, availableTags } from '@/lib/query/filter'
 import type { ColorTag } from '@/lib/modTags'
 import { VariantSelect } from '@/components/VariantSelect'
@@ -21,11 +20,13 @@ function keyOf(g: ModGroup): string {
 }
 
 /**
- * Modifier-Browser je Item-Typ (Screen 2). Basis-Varianten aus den Daten,
- * Umschalter, Praefixe/Suffixe getrennt, drei Darstellungen, Facet-Filter
- * (Suche, Tag-Pills, Itemstufe). Filterzustand liegt im URL-State (Props
- * `search`/`patchSearch`); nur das Ein-/Ausklappen ist lokal. Query- und
- * Filter-Logik bleiben in den reinen Modulen `runQuery`/`filterResult`.
+ * Modifier-Browser je Item-Typ (Screen 2). Die Basis-Varianten kommen direkt
+ * aus dem Item-Typ (item_types.json); die gewaehlte Variante liefert ihre
+ * Basis-Id, ueber die base_mods die rollbaren Mods samt Tiers bereitstellt.
+ * Praefixe/Suffixe getrennt, drei Darstellungen, Facet-Filter (Suche, Tag-Pills,
+ * Itemstufe). Filterzustand liegt im URL-State (Props `search`/`patchSearch`);
+ * nur das Ein-/Ausklappen ist lokal. Query- und Filter-Logik bleiben in den
+ * reinen Modulen `runBaseQuery`/`filterResult`.
  */
 export function ModifierBrowser({
   itemType,
@@ -37,27 +38,29 @@ export function ModifierBrowser({
   patchSearch: (patch: Partial<BrowserSearch>) => void
 }) {
   const mods = useMods()
-  const baseItems = useBaseItems()
+  const baseMods = useBaseMods()
 
-  const variants = useMemo(
-    () => deriveVariants(baseItems.data ?? [], itemType.id),
-    [baseItems.data, itemType.id],
-  )
+  const variants = itemType.variants
+  const selected =
+    variants.find((v) => v.base === search.v) ?? variants[0] ?? null
 
-  const selected = variants.find((v) => v.id === search.v) ?? variants[0] ?? null
   const [collapsedKeys, setCollapsedKeys] = useState<ReadonlySet<string>>(
     new Set(),
   )
 
-  const result = useMemo(() => {
-    if (!mods.data || !selected) return null
-    return runQuery(mods.data, { tags: selected.tags, itemLevel: search.ilvl })
-  }, [mods.data, selected, search.ilvl])
+  const modsById = useMemo(() => {
+    const map = new Map<string, Mod>()
+    for (const m of mods.data ?? []) map.set(m.id, m)
+    return map
+  }, [mods.data])
 
-  const tags = useMemo(
-    () => (result ? availableTags(result) : []),
-    [result],
-  )
+  const result = useMemo(() => {
+    if (!mods.data || !baseMods.data || !selected) return null
+    const rows = baseMods.data[selected.base] ?? []
+    return runBaseQuery(rows, modsById, { itemLevel: search.ilvl })
+  }, [mods.data, baseMods.data, modsById, selected, search.ilvl])
+
+  const tags = useMemo(() => (result ? availableTags(result) : []), [result])
 
   const filtered = useMemo(
     () =>
@@ -93,8 +96,8 @@ export function ModifierBrowser({
     patchSearch({ tags: [...active] })
   }
 
-  const isPending = mods.isPending || baseItems.isPending
-  const error = mods.error ?? baseItems.error
+  const isPending = mods.isPending || baseMods.isPending
+  const error = mods.error ?? baseMods.error
 
   if (error) {
     return (
@@ -125,8 +128,8 @@ export function ModifierBrowser({
           </p>
           <VariantSelect
             variants={variants}
-            selectedId={selected.id}
-            onSelect={(id) => patchSearch({ v: id })}
+            selectedBase={selected.base}
+            onSelect={(base) => patchSearch({ v: base })}
           />
         </div>
       )}

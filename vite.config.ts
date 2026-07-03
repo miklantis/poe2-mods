@@ -48,7 +48,13 @@ function dataAssets(): Plugin {
     },
     closeBundle() {
       if (existsSync(dataDir)) {
-        cpSync(dataDir, path.resolve(__dirname, 'dist/data'), { recursive: true })
+        // _source enthaelt nur die versionierten Roh-Snapshots (Eingabe fuer
+        // die Import-Skripte) und gehoert nicht ins Deploy.
+        const sourceDir = path.join(dataDir, '_source')
+        cpSync(dataDir, path.resolve(__dirname, 'dist/data'), {
+          recursive: true,
+          filter: (src) => src !== sourceDir && !src.startsWith(sourceDir + path.sep),
+        })
       }
     },
   }

@@ -1,23 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { filterResult, availableTags } from './filter'
-import type { ModGroup, QueryResult } from './engine'
-import type { Mod, Slot } from '@/data/schema'
+import type { ModGroup, QueryResult } from './baseEngine'
+import type { Mod, Slot } from '@/data/schema.coe'
 
-function mod(text: string, implicitTags: string[]): Mod {
-  return {
-    id: text,
-    name: text,
-    type: text,
-    groups: [],
-    slot: 'prefix',
-    requiredLevel: 1,
-    stats: [],
-    text,
-    spawnWeights: [],
-    implicitTags,
-    addsTags: [],
-    isEssenceOnly: false,
-  }
+function mod(text: string, tags: string[]): Mod {
+  return { id: text, text, slot: 'prefix', group: text, tags }
 }
 
 function group(slot: Slot, name: string, m: Mod): ModGroup {
@@ -27,23 +14,26 @@ function group(slot: Slot, name: string, m: Mod): ModGroup {
     weight: 100,
     probability: 0.1,
     mods: [
-      { mod: m, weight: 100, tier: 1, tierCount: 1, probability: 0.1 },
+      {
+        mod: m,
+        tier: 1,
+        tierCount: 1,
+        ilvl: 1,
+        weight: 100,
+        values: [[1, 2]],
+        probability: 0.1,
+      },
     ],
   }
 }
 
 function result(prefixes: ModGroup[], suffixes: ModGroup[]): QueryResult {
-  return {
-    prefixes,
-    suffixes,
-    prefixWeightTotal: 0,
-    suffixWeightTotal: 0,
-  }
+  return { prefixes, suffixes, prefixWeightTotal: 0, suffixWeightTotal: 0 }
 }
 
-const fire = group('prefix', 'Fire', mod('Adds (1-2) Fire Damage', ['fire']))
-const cold = group('prefix', 'Cold', mod('Adds (1-2) Cold Damage', ['cold']))
-const life = group('suffix', 'Life', mod('+(10-20) to maximum Life', ['life']))
+const fire = group('prefix', 'Fire', mod('Adds # to # Fire Damage', ['fire']))
+const cold = group('prefix', 'Cold', mod('Adds # to # Cold Damage', ['cold']))
+const life = group('suffix', 'Life', mod('# to maximum Life', ['life']))
 
 describe('availableTags', () => {
   it('sammelt Farb-Tags aus Praefixen und Suffixen, sortiert', () => {

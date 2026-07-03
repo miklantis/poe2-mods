@@ -28,6 +28,9 @@ import {
   Sparkles,
   Fish,
   Wrench,
+  FlaskConical,
+  Square,
+  Map as MapIcon,
   Box,
   type LucideIcon,
 } from 'lucide-react'
@@ -66,6 +69,9 @@ const ICONS: Record<string, LucideIcon> = {
   sparkles: Sparkles,
   fish: Fish,
   wrench: Wrench,
+  'flask-conical': FlaskConical,
+  square: Square,
+  map: MapIcon,
   box: Box,
 }
 

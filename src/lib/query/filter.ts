@@ -1,4 +1,4 @@
-import type { ModGroup, QueryResult } from './engine'
+import type { ModGroup, QueryResult } from './baseEngine'
 import { displayTags, COLOR_TAG_ORDER } from '@/lib/modTags'
 import type { ColorTag } from '@/lib/modTags'
 import { cleanModText, modFamilyLabel } from '@/lib/modText'

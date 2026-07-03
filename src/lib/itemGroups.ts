@@ -1,27 +1,27 @@
-import type { ItemType } from '@/data/schema'
-import { slugify } from '@/lib/slug'
+import type { ItemType } from '@/data/schema.coe'
 
 /**
- * Gruppierung der Item-Typen fuer Screen 1. Die Config liefert Reihenfolge,
- * Anzeigenamen (kurz, wie im Design-Handoff) und Icon-Schluessel; welche
- * Item-Typen tatsaechlich existieren, kommt aus den geladenen Daten. Typen,
- * die in keiner Config-Gruppe stehen (z. B. kuenftige neue Typen), werden an
- * die Gruppe "Other" angehaengt, damit nie Daten verschwinden.
+ * Gruppierung der Item-Typen fuer Screen 1. Die Struktur kommt aus den Daten:
+ * gruppiert wird nach der `category` jedes Item-Typs. Eine schlanke Config gibt
+ * nur die Reihenfolge der Kategorien und ein Icon je Typ vor; die Anzeigenamen
+ * und die Zugehoerigkeit stammen aus den geladenen Daten. Kategorien, die in
+ * der Reihenfolge fehlen (z. B. kuenftige neue), werden hinten alphabetisch
+ * angehaengt, damit nie Daten verschwinden.
  *
- * Der Icon-Schluessel bleibt ein String (kein React-Import), damit dieses
- * Modul DOM-frei und testbar bleibt; die Zuordnung zur Icon-Komponente
- * passiert erst in der UI (`@/lib/icons`).
+ * Der Icon-Schluessel bleibt ein String (kein React-Import), damit dieses Modul
+ * DOM-frei und testbar bleibt; die Zuordnung zur Icon-Komponente passiert erst
+ * in der UI (`@/lib/icons`).
  */
 
 export interface TileView {
-  /** Item-Typ-Id aus den Daten. */
+  /** Item-Typ-Id aus den Daten (zugleich URL-Slug). */
   id: string
-  /** Kurzer Anzeigename fuer die Kachel. */
+  /** Anzeigename fuer die Kachel. */
   label: string
   iconKey: string
-  /** URL-Slug (aus dem Daten-Namen abgeleitet). */
+  /** URL-Slug (= Id). */
   slug: string
-  /** Zeigt Screen 2 den Basis-Varianten-Selektor (Ruestung/Schild). */
+  /** Zeigt Screen 2 den Basis-Varianten-Selektor (mehr als eine Variante). */
   hasVariants: boolean
 }
 
@@ -30,130 +30,121 @@ export interface GroupView {
   types: TileView[]
 }
 
-interface TypeConfig {
-  id: string
-  label: string
-  iconKey: string
-  hasVariants?: boolean
-}
-
-interface GroupConfig {
-  label: string
-  types: TypeConfig[]
-}
-
-const OTHER_LABEL = 'Other'
-
-const GROUP_CONFIG: GroupConfig[] = [
-  {
-    label: 'One-Handed Weapons',
-    types: [
-      { id: 'One Hand Axe', label: 'Axe', iconKey: 'axe' },
-      { id: 'One Hand Mace', label: 'Mace', iconKey: 'gavel' },
-      { id: 'One Hand Sword', label: 'Sword', iconKey: 'sword' },
-      { id: 'Sceptre', label: 'Sceptre', iconKey: 'wand-sparkles' },
-      { id: 'Wand', label: 'Wand', iconKey: 'wand-2' },
-      { id: 'Dagger', label: 'Dagger', iconKey: 'pen-tool' },
-      { id: 'Claw', label: 'Claw', iconKey: 'grab' },
-      { id: 'Spear', label: 'Spear', iconKey: 'navigation' },
-      { id: 'Flail', label: 'Flail', iconKey: 'link' },
-    ],
-  },
-  {
-    label: 'Two-Handed Weapons',
-    types: [
-      { id: 'Two Hand Axe', label: 'Two Hand Axe', iconKey: 'axe' },
-      { id: 'Two Hand Mace', label: 'Two Hand Mace', iconKey: 'hammer' },
-      { id: 'Two Hand Sword', label: 'Two Hand Sword', iconKey: 'swords' },
-      { id: 'Warstaff', label: 'Quarterstaff', iconKey: 'grip-vertical' },
-      { id: 'Bow', label: 'Bow', iconKey: 'moon' },
-      { id: 'Crossbow', label: 'Crossbow', iconKey: 'crosshair' },
-      { id: 'Staff', label: 'Staff', iconKey: 'wand' },
-    ],
-  },
-  {
-    label: 'Off-Hand',
-    types: [
-      { id: 'Shield', label: 'Shield', iconKey: 'shield', hasVariants: true },
-      { id: 'Buckler', label: 'Buckler', iconKey: 'shield-half' },
-      { id: 'Focus', label: 'Focus', iconKey: 'focus' },
-      { id: 'Quiver', label: 'Quiver', iconKey: 'feather' },
-    ],
-  },
-  {
-    label: 'Armour',
-    types: [
-      { id: 'Body Armour', label: 'Body Armour', iconKey: 'shirt', hasVariants: true },
-      { id: 'Helmet', label: 'Helmet', iconKey: 'hard-hat', hasVariants: true },
-      { id: 'Gloves', label: 'Gloves', iconKey: 'hand', hasVariants: true },
-      { id: 'Boots', label: 'Boots', iconKey: 'footprints', hasVariants: true },
-    ],
-  },
-  {
-    label: 'Jewellery',
-    types: [
-      { id: 'Ring', label: 'Ring', iconKey: 'circle-dot' },
-      { id: 'Amulet', label: 'Amulet', iconKey: 'gem' },
-      { id: 'Belt', label: 'Belt', iconKey: 'rectangle-horizontal' },
-    ],
-  },
-  {
-    label: OTHER_LABEL,
-    types: [
-      { id: 'Talisman', label: 'Talisman', iconKey: 'sparkles' },
-      { id: 'FishingRod', label: 'Fishing Rod', iconKey: 'fish' },
-      { id: 'TrapTool', label: 'Trap Tool', iconKey: 'wrench' },
-    ],
-  },
+/** Reihenfolge der Kategorien, angelehnt an die poe2db-Uebersicht. */
+const CATEGORY_ORDER = [
+  'One-Handed Weapons',
+  'Two-Handed Weapons',
+  'Offhands',
+  'Body Armours',
+  'Helmets',
+  'Gloves',
+  'Boots',
+  'Jewellery',
+  'Charms',
+  'Flasks',
+  'Jewels',
+  'Tablets',
+  'Waystones',
 ]
 
-/**
- * Baut die geordneten Gruppen aus den geladenen Item-Typen. Nur Typen, die in
- * den Daten existieren, erscheinen. Unbekannte Typen landen in "Other".
- */
-export function buildItemGroups(itemTypes: readonly ItemType[]): GroupView[] {
-  const byId = new Map(itemTypes.map((t) => [t.id, t]))
-  const used = new Set<string>()
-  const groups: GroupView[] = []
-
-  for (const group of GROUP_CONFIG) {
-    const tiles: TileView[] = []
-    for (const tc of group.types) {
-      const it = byId.get(tc.id)
-      if (!it) continue
-      used.add(tc.id)
-      tiles.push({
-        id: it.id,
-        label: tc.label,
-        iconKey: tc.iconKey,
-        slug: slugify(it.name),
-        hasVariants: tc.hasVariants ?? false,
-      })
-    }
-    if (tiles.length > 0) groups.push({ label: group.label, types: tiles })
-  }
-
-  const rest = itemTypes.filter((t) => !used.has(t.id))
-  if (rest.length > 0) {
-    const restTiles: TileView[] = rest.map((t) => ({
-      id: t.id,
-      label: t.name,
-      iconKey: 'box',
-      slug: slugify(t.name),
-      hasVariants: false,
-    }))
-    const other = groups.find((g) => g.label === OTHER_LABEL)
-    if (other) other.types.push(...restTiles)
-    else groups.push({ label: OTHER_LABEL, types: restTiles })
-  }
-
-  return groups
+/** Icon je Item-Typ-Id; unbekannte Typen fallen auf ein neutrales Icon. */
+const TYPE_ICONS: Record<string, string> = {
+  'one-hand-axe': 'axe',
+  'one-hand-mace': 'gavel',
+  'one-hand-sword': 'sword',
+  sceptre: 'wand-sparkles',
+  wand: 'wand-2',
+  dagger: 'pen-tool',
+  claw: 'grab',
+  spear: 'navigation',
+  flail: 'link',
+  'two-hand-axe': 'axe',
+  'two-hand-mace': 'hammer',
+  'two-hand-sword': 'swords',
+  warstaff: 'grip-vertical',
+  staff: 'wand',
+  bow: 'moon',
+  crossbow: 'crosshair',
+  talisman: 'sparkles',
+  shield: 'shield',
+  focus: 'focus',
+  quiver: 'feather',
+  'body-armour': 'shirt',
+  'grasping-mail': 'shirt',
+  helmet: 'hard-hat',
+  gloves: 'hand',
+  boots: 'footprints',
+  ring: 'circle-dot',
+  amulet: 'gem',
+  belt: 'rectangle-horizontal',
+  charm: 'sparkles',
+  'life-flask': 'flask-conical',
+  'mana-flask': 'flask-conical',
+  emerald: 'gem',
+  ruby: 'gem',
+  sapphire: 'gem',
 }
 
-/** Findet den Item-Typ zu einem Slug (fuer Screen 2). */
+/** Tablets und Waystones teilen sich je ein Icon (per Kategorie). */
+const CATEGORY_ICONS: Record<string, string> = {
+  Tablets: 'square',
+  Waystones: 'map',
+}
+
+const ORDER_INDEX = new Map<string, number>(
+  CATEGORY_ORDER.map((c, i) => [c, i]),
+)
+
+function iconFor(itemType: ItemType): string {
+  return TYPE_ICONS[itemType.id] ?? CATEGORY_ICONS[itemType.category] ?? 'box'
+}
+
+function toTile(itemType: ItemType): TileView {
+  return {
+    id: itemType.id,
+    label: itemType.name,
+    iconKey: iconFor(itemType),
+    slug: itemType.id,
+    hasVariants: itemType.variants.length > 1,
+  }
+}
+
+/**
+ * Baut die geordneten Gruppen aus den geladenen Item-Typen. Gruppiert nach
+ * Kategorie, sortiert Kategorien nach der Config (Unbekanntes alphabetisch
+ * hinten) und die Typen je Kategorie alphabetisch nach Anzeigename.
+ */
+export function buildItemGroups(itemTypes: readonly ItemType[]): GroupView[] {
+  const byCategory = new Map<string, ItemType[]>()
+  for (const t of itemTypes) {
+    const list = byCategory.get(t.category)
+    if (list) list.push(t)
+    else byCategory.set(t.category, [t])
+  }
+
+  const categories = [...byCategory.keys()].sort((a, b) => {
+    const ia = ORDER_INDEX.get(a)
+    const ib = ORDER_INDEX.get(b)
+    if (ia !== undefined && ib !== undefined) return ia - ib
+    if (ia !== undefined) return -1
+    if (ib !== undefined) return 1
+    return a.localeCompare(b)
+  })
+
+  return categories.map((category) => ({
+    label: category,
+    types: byCategory
+      .get(category)!
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(toTile),
+  }))
+}
+
+/** Findet den Item-Typ zu einem Slug (fuer Screen 2). Slug ist die Typ-Id. */
 export function resolveSlug(
   itemTypes: readonly ItemType[],
   slug: string,
 ): ItemType | undefined {
-  return itemTypes.find((t) => slugify(t.name) === slug)
+  return itemTypes.find((t) => t.id === slug)
 }

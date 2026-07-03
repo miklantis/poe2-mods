@@ -1,4 +1,4 @@
-import type { Slot } from '@/data/schema'
+import type { Slot } from '@/data/schema.coe'
 import { cn } from '@/lib/utils'
 
 const FILL: Record<Slot, string> = {

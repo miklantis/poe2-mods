@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import type { ModGroup } from '@/lib/query/engine'
+import type { ModGroup } from '@/lib/query/baseEngine'
 import { modFamilyLabel } from '@/lib/modText'
 import { displayTags } from '@/lib/modTags'
 import { formatPercent } from '@/lib/format'
@@ -60,13 +60,13 @@ export function ModGroupBlock({
           {group.mods.map((m) =>
             view === 'bars' ? (
               <TierBar
-                key={m.mod.id}
+                key={`${m.mod.id}-${m.tier}`}
                 item={m}
                 slot={group.slot}
                 max={slotMaxTierProbability}
               />
             ) : (
-              <TierRow key={m.mod.id} item={m} slot={group.slot} />
+              <TierRow key={`${m.mod.id}-${m.tier}`} item={m} slot={group.slot} />
             ),
           )}
         </div>
