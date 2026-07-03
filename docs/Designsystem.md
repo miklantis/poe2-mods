@@ -68,3 +68,10 @@ Inputs/Segmente, kleinere Werte für Tier-Badges. Pillen sind voll rund
 Primitives werden bei Bedarf manuell unter `src/components/ui` angelegt (siehe
 ADR 0002). Für die Item-Ansichten vorgesehen: Card, Table, Select, Slider, Badge,
 Tabs, Input, Button, Separator, Collapsible. Icons über `lucide-react`.
+
+Vorhandene projektspezifische Bausteine (Screen 2): `Badge`, `TagChip` /
+`TagChipRow` (farbige Typ-Tags anhand der `tag-*`-Tokens; die vollen
+Klassennamen stehen statisch im Code, damit Tailwind sie erzeugt),
+`ProbabilityBar` (Chance-Balken, Breite relativ zum Slot-Max), `ViewSwitcher`
+(Segment-Control Karten/Tabelle/Balken). Zusammengesetzt in `ModifierBrowser`,
+`ModColumn`, `ModGroupBlock`, `ModTable`, `TierRow`, `TierBar`, `VariantSelect`.

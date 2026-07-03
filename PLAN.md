@@ -19,14 +19,18 @@ gewinnt", Tier als stabile Rangfolge je Gruppe plus Slot (requiredLevel
 absteigend), Itemstufe filtert den Pool, Wahrscheinlichkeit pro Slot über den
 erreichbaren Rest. 11 Unit-Tests (Vitest).
 
-Phase 3 (UI-Grundgerüst) läuft. Design-Fundament, Screen 1 und Screen 2
-(Grundversion) stehen. Screen 2 ist der Modifier-Browser je Item-Typ: er leitet
-die Basis-Varianten aus den Daten ab (`src/lib/baseVariants.ts`, ADR 0006), lässt
-zwischen ihnen umschalten und zeigt Präfixe und Suffixe getrennt – je Mod-Familie
-die Tiers mit Rollen-Bereich, Itemstufe, Gewicht und Chance, gerechnet über
-`runQuery` bei fester Itemstufe 100. Wiederverwendbare Bausteine: `ModifierBrowser`,
-`ModColumn`, `ModGroupBlock`, `TierRow`, `VariantSelect`, `Badge`; reine Helfer
-`baseVariants`, `modText`, `format` mit Tests.
+Phase 3 (UI-Grundgerüst) läuft. Design-Fundament, Screen 1 und Screen 2 stehen.
+Screen 2 ist der Modifier-Browser je Item-Typ: er leitet die Basis-Varianten aus
+den Daten ab (`src/lib/baseVariants.ts`, ADR 0006), lässt zwischen ihnen
+umschalten und zeigt Präfixe und Suffixe getrennt. Der Feinschliff ist drin: drei
+umschaltbare Darstellungen (Karten, Tabelle, Balken über `ViewSwitcher`), farbige
+Typ-Tag-Chips je Mod-Familie (`TagChip`, Quelle `implicitTags` gefiltert auf die
+Farb-Tags, `src/lib/modTags.ts`) und ein-/ausklappbare Familien samt globalem
+„Alle ein-/ausklappen". Gerechnet über `runQuery` bei fester Itemstufe 100.
+Wiederverwendbare Bausteine: `ModifierBrowser`, `ModColumn`, `ModGroupBlock`,
+`ModTable`, `TierRow`, `TierBar`, `VariantSelect`, `ViewSwitcher`, `Badge`,
+`TagChip`, `ProbabilityBar`; reine Helfer `baseVariants`, `modText`, `modTags`,
+`format` mit Tests.
 
 Das folgende beschreibt den Stand vor Screen 2:
 
@@ -44,8 +48,8 @@ tatsächlichen Typen kommen aus den geladenen Daten, Unbekanntes fällt nach
 „Other". Grouping-Entscheidungen: `Warstaff` zeigt „Quarterstaff",
 `FishingRod`/`TrapTool` laufen unter „Other".
 
-Als Nächstes in Phase 3: Screen-2-Feinschliff (Tag-Highlight, View-Switcher
-Cards/Table/Bars, Collapse-all), danach die Unique-Ansicht (Datenlage klären).
+Als Nächstes in Phase 3: die Unique-Ansicht (Datenlage klären). Danach Phase 4
+(Facet-Search): Tag-Pills, Itemstufen-Slider, Fuzzy-Suche, Filter als URL-State.
 
 ---
 
@@ -56,7 +60,7 @@ Cards/Table/Bars, Collapse-all), danach die Unique-Ansicht (Datenlage klären).
 - [x] Screen 1: Item-Typ-Auswahl (gruppiertes Kachel-Grid, Suche, Navigation)
 - [x] Screen 2: Modifier-Browser (Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht/Wahrscheinlichkeit)
 - [x] Basis-Varianten-Selektor (Attribut/Restriktion, datengetrieben) – ADR 0006
-- [ ] Screen-2-Feinschliff (Tag-Highlight, View-Switcher Cards/Table/Bars, Collapse-all)
+- [x] Screen-2-Feinschliff (Tag-Highlight, View-Switcher Cards/Table/Bars, Collapse-all)
 - [ ] Unique-Ansicht – Datenlage klären
 
 ### Phase 4 – Facet-Search
@@ -102,6 +106,11 @@ Cards/Table/Bars, Collapse-all), danach die Unique-Ansicht (Datenlage klären).
 
 ## Log
 
+- 2026-07-03, 0.7.0 – Phase 3, Screen-2-Feinschliff. Drei umschaltbare
+  Darstellungen (Karten/Tabelle/Balken, `ViewSwitcher`), farbige Typ-Tag-Chips
+  je Familie (`TagChip`, Quelle `implicitTags`, `modTags.ts`), ein-/ausklappbare
+  Familien plus globaler Schalter. Neue Bausteine `ViewSwitcher`, `TagChip`,
+  `ProbabilityBar`, `ModTable`, `TierBar`. 4 neue Tests.
 - 2026-07-03, 0.6.0 – Phase 3, Screen 2: Modifier-Browser je Item-Typ. Präfixe
   und Suffixe getrennt, je Mod-Familie die Tiers mit Rollen-Bereich, Itemstufe,
   Gewicht und Chance über `runQuery` (Itemstufe fest 100). Basis-Varianten

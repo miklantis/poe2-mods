@@ -1,6 +1,15 @@
 {
-  "current": "0.6.0",
+  "current": "0.7.0",
   "entries": [
+    {
+      "version": "0.7.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Modifier-Browser mit drei Darstellungen umschaltbar: Karten, Tabelle und Balken (Chance als Balken).",
+        "Typ-Tags farbig als Chips an jeder Mod-Familie (Fire, Cold, Caster, Resistance …).",
+        "Mod-Familien lassen sich ein- und ausklappen, dazu ein Schalter „Alle ein-/ausklappen“."
+      ]
+    },
     {
       "version": "0.6.0",
       "date": "2026-07-03",
