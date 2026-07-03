@@ -12,7 +12,6 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "oxlint",
-    "import:coe": "tsx scripts/import-coe.ts",
     "import:repoe": "tsx scripts/import-repoe.ts",
     "import:essences": "tsx scripts/import-essences-coe.ts"
   },

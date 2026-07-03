@@ -16,13 +16,14 @@ auf repoe. Grund: Der CoE-Snapshot kannte die Genesis-Tree-Mods nicht
 Spawn-Gewichte offen (0/1), also entfällt die Wahrscheinlichkeits-Anzeige.
 Trade-off bewusst zugunsten der Vollständigkeit; ADR 0011 löst ADR 0008 (CoE) ab.
 
-Die Migration ist live: die App läuft auf dem repoe-Schema (manifest 4.5.4.3),
-alle Herkünfte einheitlich mit Tier und Wertebereich, ohne Chance. Essence bleibt
-erhalten, aus den CoE-Daten aufbereitet. Schritte 1–3 sind umgesetzt (Schema +
-Import, reine Engine, Essence-Aufbereitung, Verdrahtung/Umschaltung, Changelog
-0.13.0, ADR 0011). Offen ist nur noch Schritt 4: Aufräumen (CoE-Reste entfernen,
-Architektur.md nachziehen) und der Variant-Feinschliff (doppelte Anzeigenamen
-wie Two-Stone Ring).
+Die Migration ist abgeschlossen und live: die App läuft auf dem repoe-Schema
+(manifest 4.5.4.3), alle Herkünfte einheitlich mit Tier und Wertebereich, ohne
+Chance. Essence bleibt erhalten, aus einem eingefrorenen CoE-Snapshot aufbereitet.
+Alle vier Schritte sind umgesetzt (Schema + Import, reine Engine,
+Essence-Aufbereitung, Verdrahtung/Umschaltung, Variant-Feinschliff, Aufräumen der
+CoE-Reste, Doku). Es sind keine Phase-8-Punkte mehr offen; nur noch die
+optionalen Vorhaben aus Phase 5 (PWA, Design-Feinschliff, Referenz-Doku) sowie
+der laufende Betrieb (Daten bei neuem Patch aktualisieren).
 
 ---
 
@@ -60,13 +61,13 @@ die App während der Migration lauffähig bleibt.
   `RepoeGroup`, Gewicht/Chance entfernt, Schätzwert-Hinweis raus, Fußzeile auf
   repoe. Genesis-Tree erscheint automatisch im rollbaren Pool. `manifest.json`
   auf 4.5.4.3 umgeschaltet (App live auf repoe). Changelog 0.13.0.
-- [ ] Schritt 4: Aufräumen + Doku. CoE-Reste entfernen (`import-coe.ts`,
-  `schema.coe.ts`, `baseEngine`/`essenceEngine` samt Tests, `data/0.5.4`,
-  `data/_source/coe`), `Architektur.md` auf repoe nachziehen. Variant-Feinschliff
-  (doppelte Anzeigenamen wie Two-Stone Ring). ADR 0011 und die Ablösung von ADR
-  0008 sind bereits geschrieben. Achtung: `import-essences-coe.ts` liest
-  `data/0.5.4`; vor dessen Entfernung entscheiden, ob die CoE-Essence-Quelle
-  archiviert wird (sonst ist `essences.json` ein eingefrorenes Artefakt).
+- [x] Schritt 4: Aufräumen + Doku. CoE-Reste entfernt (`import-coe.ts`,
+  `schema.coe.ts`, `baseEngine`/`essenceEngine` samt Tests, `format.ts`,
+  `data/0.5.4`, roher `data/_source/coe`, `import:coe`-Skript). Die CoE-Essence-
+  Quelle ist als eingefrorenes Artefakt nach `data/_source/coe-essence/`
+  archiviert (Aufbereitung reproduzierbar, Ergebnis identisch). `Architektur.md`
+  auf repoe nachgezogen. Variant-Feinschliff erledigt (gleichnamige Basen zu
+  einer Variante, 0.13.1). ADR 0011 und Ablösung von ADR 0008 geschrieben.
 
 ### Phase 5 – optional/später
 - [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
@@ -109,6 +110,11 @@ die App während der Migration lauffähig bleibt.
 
 ## Log
 
+- 2026-07-03 – Phase 8, Schritt 4: CoE-Reste entfernt (import-coe, schema.coe,
+  baseEngine/essenceEngine + Tests, format.ts, data/0.5.4, roher _source/coe,
+  import:coe-Skript). CoE-Essence-Quelle nach data/_source/coe-essence/
+  archiviert (Aufbereitung reproduzierbar, Ergebnis identisch). Architektur.md
+  auf repoe. Phase 8 abgeschlossen. Typecheck, 51 Tests, Build, Lint grün.
 - 2026-07-03 – Phase 8, Schritt 2+3 live: App auf repoe umgeschaltet
   (manifest 4.5.4.3). Essence aus CoE je Item-Klasse aufbereitet
   (`import-essences-coe.ts`, 26 Klassen/530 Einträge); `essenceGroups`.

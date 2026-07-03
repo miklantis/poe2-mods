@@ -25,7 +25,7 @@ import {
 } from '../src/data/schema.repoe.ts'
 
 const REPOE_VERSION = '4.5.4.3'
-const COE_VERSION = '0.5.4'
+const COE_SRC = 'data/_source/coe-essence'
 const ROOT = path.resolve(import.meta.dirname, '..')
 
 interface CoeMod {
@@ -70,13 +70,13 @@ function widen(
 
 function main(): void {
   const coeMods = new Map(
-    readJson<CoeMod[]>(`data/${COE_VERSION}/mods.json`).map((m) => [m.id, m]),
+    readJson<CoeMod[]>(`${COE_SRC}/mods.json`).map((m) => [m.id, m]),
   )
   const coeEss = readJson<Record<string, CoeEssenceRow[]>>(
-    `data/${COE_VERSION}/essences.json`,
+    `${COE_SRC}/essences.json`,
   )
   const coeItemTypes = readJson<CoeItemType[]>(
-    `data/${COE_VERSION}/item_types.json`,
+    `${COE_SRC}/item_types.json`,
   )
   const repoeTypes = itemTypesFileSchema.parse(
     readJson<unknown>(`data/${REPOE_VERSION}/item_types.json`),
@@ -146,7 +146,7 @@ function main(): void {
   console.log('Fertig.')
   console.log(
     `  essences.json: ${Object.keys(out).length} Item-Klassen, ${total} Essence-Eintraege ` +
-      `(aus CoE ${COE_VERSION} aufbereitet).`,
+      `(aus dem eingefrorenen CoE-Snapshot aufbereitet).`,
   )
 }
 

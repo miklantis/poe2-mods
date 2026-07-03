@@ -7,9 +7,11 @@ liegen in `docs/adr/`.
 
 Statischer, durchsuchbarer Modifier-Browser für Path of Exile 2 (read-only).
 Er liest versionierte JSON-Daten und zeigt je Item-Typ und Basis-Variante die
-möglichen Modifier mit Tier, Rollen-Bereich und Spawn-Gewicht. Die Gewichte
-(und damit Tier und Chance) sind Schätzwerte aus Craft of Exile – PoE2 legt die
-echten Gewichte nicht offen (siehe ADR 0008).
+möglichen Modifier mit Tier und Rollen-Bereich. Datenquelle sind die Spieldaten
+aus dem repoe-Export; dieser führt nur binäre Spawn-Gewichte (0/1), daher gibt
+es keine Wahrscheinlichkeit – alle Herkünfte werden einheitlich mit Tier und
+Wertebereich gezeigt (siehe ADR 0011). Der Essence-Abschnitt ist einmalig aus
+Craft-of-Exile-Daten aufbereitet.
 
 ## Tech-Stack
 
@@ -32,61 +34,63 @@ echten Gewichte nicht offen (siehe ADR 0008).
 ## Datenschema
 
 Quelle der Wahrheit für die Datenformen sind die Zod-Schemas in
-`src/data/schema.coe.ts`; die TypeScript-Typen werden per `z.infer` daraus
+`src/data/schema.repoe.ts`; die TypeScript-Typen werden per `z.infer` daraus
 abgeleitet. Import-Skript und App validieren gegen dieselben Schemas.
 
-Das Schema ist basis-zentriert: die Spawn-Gewichte hängen an der Basis, nicht am
-Mod. Vier normalisierte Dateien je Version:
+Das Schema ist mod-zentriert: die Tiers hängen am Modifier, die Eignung läuft
+über Tags (Basis-Tags gegen Mod-Tags). Kein Gewichtsfeld. Normalisierte Dateien
+je Version:
 
 - `item_types.json` – Item-Typen mit ihren Basis-Varianten (id, Name, Kategorie,
   `variants` je mit Basis-Id und Label). Grundlage für Kategorien und Routen.
-- `mods.json` – schlanke Mod-Metadaten (id, Text als Vorlage mit `#`, Slot
-  Präfix/Suffix oder `null`, Herkunft `origin`, Gruppe, Tags). `origin` ist
-  `rollable | corrupted | desecrated | essence`; `slot` ist `null` bei Mods ohne
-  Präfix/Suffix-Belegung (Corrupted). Der lesbare Text stammt aus dem Export.
-- `base_mods.json` – je Basis-Id die rollbaren, Corrupted- und Desecrated-Mods
-  mit ihren Tiers: Itemstufe (`ilvl`), Gewicht und Rollen-Bereiche (`values` als
-  `[min, max]`-Paare). Die Herkunft-Trennung passiert über `origin` am Mod.
-- `essences.json` – je Basis-Id die per Essence garantierten Mods, je Mod eine
-  Zeile `{ mod, ilvl, values }`: der Wertebereich über alle Essence-Stufen und
-  die kleinste dafür nötige Itemstufe. Eigener Datenweg, ohne Gewicht/Chance.
+  Gleichnamige Basen ergeben eine Variante.
+- `mods.json` – Modifier-Familien: id, Text (Vorlage; repoe schreibt die
+  Rollen-Bereiche inline als `(min-max)`), Slot (Präfix/Suffix oder `null` bei
+  Corrupted/Essence), Herkunft `origin` (`rollable | corrupted | desecrated`),
+  Eignungs-Tags und die Tiers (`id`, `ilvl`, Name, Text, `values` als
+  `[min, max]`-Paare).
+- `base_items.json` – Basen mit id, Name, Item-Klasse (`itemClass`) und Tags.
+  Die Tags entscheiden über die Eignung.
+- `tags.json` – Tag-Metadaten (Anzeigename, Crafting-Relevanz).
+- `essences.json` – je Item-Klasse die per Essence garantierten Mods, je Eintrag
+  `{ id, text, slot, ilvl, values }`: der Wertebereich über alle Essence-Stufen
+  und die kleinste dafür nötige Itemstufe. Aus CoE aufbereitet, selbst-enthaltend.
 - Dazu `data/manifest.json` – aktive Version, verfügbare Versionen, Quelle,
   Liga, Zeitstempel.
 
-Bewusst nicht in den Daten: Tier und Wahrscheinlichkeit. Beide werden in der
-Query-Engine berechnet (siehe unten). Ebenfalls draußen: Uniques und
-Nicht-Item-Domains.
+Bewusst nicht in den Daten: die Tier-Rangfolge (wird in der Engine aus der
+Itemstufe berechnet). Ebenfalls draußen: Uniques und Nicht-Item-Domains.
 
 ## Query-Engine
 
-`src/lib/query/baseEngine.ts` (`runBaseQuery`) ist ein reines, DOM-freies,
-getestetes Modul. Es nimmt die Mod-Zeilen einer Basis (`base_mods[basis]`), eine
-Nachschlage-Map der Mods und eine Itemstufe und liefert Präfixe und Suffixe je
-Gruppe mit Tier und Chance. Regel: jeder bei der Itemstufe erreichbare Tier
-(`ilvl ≤ Itemstufe`) ist ein eigener gewichteter, konkurrierender Eintrag;
-Chance je Tier = Tier-Gewicht / Slot-Pool; höchstes `ilvl` = Tier 1. Die
-nachgelagerte Facet-Filterung (Suche, Tags) liegt getrennt in
-`src/lib/query/filter.ts`.
+`src/lib/query/repoeEngine.ts` ist ein reines, DOM-freies, getestetes Modul.
+`runRepoeQuery` nimmt alle Mods, die Tags der Basis, eine Herkunft und eine
+Itemstufe und liefert die passenden Familien (Herkunft + Eignung über Tags) mit
+ihren bei der Itemstufe erreichbaren Tiers. Regel: höchstes `ilvl` = Tier 1 (Rang
+stabil über die volle Tier-Liste); nur Tiers mit `ilvl ≤ Itemstufe` erscheinen.
+Kein Gewicht, keine Chance – alle Herkünfte laufen über dieselbe flache Logik;
+Präfix/Suffix ergibt sich aus `group.slot`, Corrupted hat `slot` null.
 
-Für die slot-losen und gezielt gesetzten Herkünfte gibt es zwei weitere reine
-Module: `runFlatQuery` (im selben `baseEngine.ts`) für Corrupted – flach, ohne
-Präfix/Suffix und ohne Chance – und `src/lib/query/essenceEngine.ts`
-(`runEssenceQuery`) für Essence: je Mod genau eine `DisplayGroup`, nach Slot
-getrennt, mit dem Bereich über alle Stufen und der kleinsten Itemstufe, ebenfalls
-ohne Chance. Alle drei liefern den gemeinsamen `DisplayGroup`, sodass Filter und
-Tag-Sammlung einheitlich greifen.
+Der Essence-Abschnitt kommt über `essenceGroups` (im selben Modul): es baut aus
+den Essence-Einträgen einer Item-Klasse Anzeige-Zeilen mit je einem Tier. Die
+nachgelagerte Facet-Filterung (Suche, Tags) liegt getrennt in
+`src/lib/query/filter.ts` und arbeitet auf dem gemeinsamen `RepoeGroup`.
 
 ## Datenpipeline
 
-Quelle der Wahrheit für die Gewichte ist ein versionierter Craft-of-Exile-
-Snapshot unter `data/_source/coe/` (Schätzwerte; siehe ADR 0008). Das
-Import-Skript `scripts/import-coe.ts` (Aufruf `npm run import:coe`) normalisiert
-ihn auf das Schema, validiert mit Zod und legt das Ergebnis unter
-`data/<version>/` ab; das Manifest wird fortgeschrieben.
+Quelle der Wahrheit sind die Spieldaten aus dem repoe-Export
+(`repoe-fork/poe2`). Das Import-Skript `scripts/import-repoe.ts` (Aufruf
+`npm run import:repoe`) zieht die Rohdaten, gruppiert die Mod-Einträge zu
+Familien, validiert mit Zod und legt das Ergebnis unter `data/<version>/` ab.
+
+Der Essence-Abschnitt wird einmalig aus einem eingefrorenen CoE-Snapshot unter
+`data/_source/coe-essence/` aufbereitet (`scripts/import-essences-coe.ts`, Aufruf
+`npm run import:essences`); Ergebnis `essences.json` je Item-Klasse. Siehe
+ADR 0011.
 
 Datenzugriff in der App läuft über Hooks (`useManifest`, `useMods`,
-`useItemTypes`, `useBaseMods`, `useEssences`) via TanStack Query; sie validieren beim Laden
-erneut gegen die Schemas.
+`useItemTypes`, `useBaseItems`, `useEssences`) via TanStack Query; sie validieren
+beim Laden erneut gegen die Schemas.
 
 ## Deployment
 
@@ -94,18 +98,18 @@ GitHub Pages über GitHub Actions. Vite `base` ist `/poe2-mods/`. Für Deep-Link
 wird beim Build `index.html` nach `404.html` kopiert (SPA-Fallback). Die
 versionierten Daten liegen unter `data/` im Repo-Root; ein Vite-Plugin bedient
 `data/` im Dev-Server und kopiert es beim Build nach `dist/data/` – ohne
-`data/_source` (die Roh-Snapshots gehören nicht ins Deploy).
+`data/_source` (die eingefrorene Essence-Quelle gehört nicht ins Deploy).
 
 ## Ist-Zustand
 
 Phasen 0 bis 4 umgesetzt: Grundgerüst, Routing, Styling, Deploy-Pipeline;
-Datenpipeline und Schema; reine Query-Engine; UI-Grundgerüst (Item-Typ-Auswahl
-und Modifier-Browser je Item-Typ mit Basis-Varianten, drei Darstellungen und
-Tag-Highlight); Facet-Search (Suche, Tag-Pills, Itemstufen-Slider) mit
-Filterzustand im URL-State.
+Datenpipeline und Schema; reine Query-Engine; UI (Item-Typ-Auswahl und
+Modifier-Browser je Item-Typ mit Basis-Varianten); Facet-Search (Suche,
+Tag-Pills, Itemstufen-Slider) mit Filterzustand im URL-State.
 
-Phase 6 (Datenquelle Craft of Exile) fast fertig: die App läuft vollständig auf
-dem basis-zentrierten CoE-Schema (Version 0.5.4). Der Schätzwert-Charakter der
-Gewichte ist in der Oberfläche kenntlich gemacht (Hinweis im Browser, globale
-Fußzeile mit Attribution). Offen bleibt der laufende Betrieb: Daten bei neuem
-Patch aktualisieren. Die Unique-Ansicht ist zurückgestellt (ADR 0007).
+Phase 8 (Datenquelle zurück auf repoe) umgesetzt: die App läuft auf dem
+mod-zentrierten repoe-Schema (Version 4.5.4.3), alle Herkünfte einheitlich mit
+Tier und Wertebereich, ohne Chance. Die Pools sind vollständig (inkl.
+Genesis-Tree). Essence bleibt aus CoE-Daten erhalten. Die Unique-Ansicht ist
+zurückgestellt (ADR 0007). Offen bleibt der laufende Betrieb: Daten bei neuem
+Patch aktualisieren.
