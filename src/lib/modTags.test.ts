@@ -7,10 +7,10 @@ function mod(tags: string[]): Mod {
 }
 
 describe('displayTags', () => {
-  it('behaelt nur Farb-Tags', () => {
+  it('behaelt nur bekannte Tags, laesst interne Unter-Tags weg', () => {
     expect(
       displayTags(mod(['elemental_resistance', 'fire', 'resistance', 'elemental'])),
-    ).toEqual(['fire', 'resistance'])
+    ).toEqual(['fire', 'elemental', 'resistance'])
   })
 
   it('sortiert in fester Reihenfolge (Schadensarten zuerst)', () => {
@@ -21,8 +21,8 @@ describe('displayTags', () => {
     ])
   })
 
-  it('liefert leeres Array ohne Farb-Tag', () => {
-    expect(displayTags(mod(['defences', 'armour']))).toEqual([])
+  it('behaelt primaere Tags, laesst Sammel-Tag defences weg', () => {
+    expect(displayTags(mod(['defences', 'armour']))).toEqual(['armour'])
   })
 
   it('entfernt Duplikate', () => {

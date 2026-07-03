@@ -1,6 +1,15 @@
 {
-  "current": "0.12.2",
+  "current": "0.12.3",
   "entries": [
+    {
+      "version": "0.12.3",
+      "date": "2026-07-03",
+      "changes": [
+        "Deutlich mehr Filter-Tags, wie auf poe2db: neben den Schadensarten jetzt u. a. Elemental, Damage, Critical, Speed, Minion, Energy Shield, Armour, Evasion, Attribute, Ailment, Curse, Aura, Gem sowie die Desecrated-Herkünfte Ulaman, Amanamu und Kurgal.",
+        "Es erscheinen weiterhin nur die Tags, die beim gewählten Item-Typ wirklich vorkommen.",
+        "Farbe behalten nur die konkreten Schadensarten (Physical, Fire, Cold, Lightning, Chaos); alle übrigen Tags sind neutral gehalten, damit die Leiste ruhig bleibt."
+      ]
+    },
     {
       "version": "0.12.2",
       "date": "2026-07-03",

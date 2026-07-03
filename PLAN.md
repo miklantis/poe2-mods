@@ -186,6 +186,13 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.12.3 – Phase 5: Filter-Tags auf poe2db-Granularität erweitert.
+  `COLOR_TAG_ORDER` (modTags.ts) von 10 auf 26 primäre Tags plus die drei
+  Desecrated-Herkünfte (ulaman/amanamu/kurgal_mod) erweitert; interne Unter-Tags
+  bleiben aussen vor, da jeder Unter-Tag im Snapshot auch seinen Ober-Tag trägt
+  (Filter fängt sie so ohnehin) – Engine/filter.ts unverändert. `tagColors`:
+  nur Schadensarten farbig, Rest neutraler Aktiv-Stil. Tag-Tests angepasst.
+  Typecheck, 57 Tests, Build grün.
 - 2026-07-03, 0.12.2 – Phase 5 (Design-Feinschliff): Textgrößen vereinheitlicht
   (Familienkopf in ModTable 12.5→14px, weiß statt heading), alle Modifier-Texte
   weiß. Theme insgesamt heller und kontrastärmer: `--background`, Surface-,
