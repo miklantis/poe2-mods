@@ -3,54 +3,48 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-}
+/*
+ * poe2-mods Design-System. Werte stammen aus dem Design-Handoff (dunkles
+ * Theme). Semantische shadcn-Tokens (background, foreground, card, ...) sind
+ * hier mit den dunklen Werten belegt; das Theme ist fest dunkel, kein Umschalter.
+ * Projektspezifische Tokens (Praefix-/Suffix-Akzent, Tag-Farben, Surface- und
+ * Text-Abstufungen) sind zusaetzlich als --color-* im @theme angelegt und damit
+ * als Tailwind-Utilities nutzbar (z. B. bg-surface, text-prefix, text-heading).
+ */
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+:root {
+  --radius: 0.8125rem;
+
+  --background: #0a0c0f;
+  --foreground: #e6e8ec;
+  --card: #0f1217;
+  --card-foreground: #e6e8ec;
+  --popover: #101318;
+  --popover-foreground: #e6e8ec;
+  --primary: #e8b45a;
+  --primary-foreground: #0a0c0f;
+  --secondary: #101318;
+  --secondary-foreground: #e6e8ec;
+  --muted: #12151a;
+  --muted-foreground: #8b93a1;
+  --accent: #161a20;
+  --accent-foreground: #f3ead6;
+  --destructive: #e05a6f;
+  --border: #23272f;
+  --input: #23272f;
+  --ring: #e8b45a;
 }
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 5px);
+  --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  --font-display: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -69,6 +63,39 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Surface-Abstufungen */
+  --color-surface: #0f1217;
+  --color-surface-raised: #101318;
+  --color-surface-header: #12151a;
+  --color-surface-group: #0c0f13;
+
+  /* Border-Abstufungen */
+  --color-border-card: #20242c;
+  --color-border-subtle: #1a1e25;
+
+  /* Text-Abstufungen */
+  --color-heading: #f3ead6;
+  --color-body: #e6e8ec;
+  --color-secondary-text: #8b93a1;
+  --color-muted-text: #6b7280;
+  --color-dim: #565d68;
+
+  /* Praefix-/Suffix-Akzent */
+  --color-prefix: #6ea8ff;
+  --color-suffix: #e8b45a;
+
+  /* Tag-Farben */
+  --color-tag-caster: #8aa2ff;
+  --color-tag-fire: #e0663c;
+  --color-tag-cold: #4db4e0;
+  --color-tag-lightning: #e6c94d;
+  --color-tag-physical: #b9c0cc;
+  --color-tag-chaos: #b06fd6;
+  --color-tag-attack: #d98a4d;
+  --color-tag-life: #e05a6f;
+  --color-tag-mana: #4d8fe0;
+  --color-tag-resistance: #6fcf97;
 }
 
 @layer base {
@@ -78,6 +105,15 @@
   }
   body {
     background-color: var(--background);
+    background-image: radial-gradient(
+      1100px 560px at 50% -12%,
+      rgba(232, 180, 90, 0.07),
+      transparent 62%
+    );
+    background-repeat: no-repeat;
     color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 }

@@ -1,6 +1,13 @@
 {
-  "current": "0.3.0",
+  "current": "0.4.0",
   "entries": [
+    {
+      "version": "0.4.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Dunkles Design eingeführt: App-Hintergrund, Farben und die drei Schriftarten der Vorlage sind jetzt eingebunden. Noch ohne die neuen Ansichten – die Startseite zeigt weiter den Datenstatus, aber im neuen Look."
+      ]
+    },
     {
       "version": "0.3.0",
       "date": "2026-07-03",

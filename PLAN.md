@@ -19,17 +19,24 @@ gewinnt", Tier als stabile Rangfolge je Gruppe plus Slot (requiredLevel
 absteigend), Itemstufe filtert den Pool, Wahrscheinlichkeit pro Slot über den
 erreichbaren Rest. 11 Unit-Tests (Vitest).
 
-Als Nächstes: Phase 3 – UI-Grundgerüst. Vorher das UI-Design aus der
-poe2db-Vorlage in Claude Design prototypen und einarbeiten. Vorbild ist die
-ModifiersCalc-Ansicht (Item Level, Präfix/Suffix, Tier- und Prozentspalten),
-mit schlichter, moderner Oberfläche. Das besprechen wir per Konzept-vor-Code.
+Phase 3 (UI-Grundgerüst) läuft. Das Design-Fundament steht: das dunkle Theme
+aus dem Design-Handoff ist als Design-System eingezogen (Farb- und Text-Tokens,
+Präfix-/Suffix- und Tag-Farben, drei self-hosted Schriften, Hintergrund-Glow,
+schlanke Layout-Shell). Die Startseite zeigt weiter den Datenstatus, jetzt im
+neuen Look. Doku in `docs/Designsystem.md`.
+
+Als Nächstes in Phase 3: Screen 1 (Item-Typ-Auswahl mit gruppiertem
+Kachel-Grid), danach der Modifier-Browser je Item-Typ (Screen 2) und dessen
+Feinschliff (Tag-Highlight, View-Switcher, Collapse-all). Grouping-Entscheidung:
+`Warstaff` bekommt das Anzeige-Label „Quarterstaff", `FishingRod` und `TrapTool`
+laufen unter „Sonstige" mit.
 
 ---
 
 ## Offene Vorhaben
 
 ### Phase 3 – UI-Grundgerüst
-- [ ] Design-Vorlage aus Claude Design einarbeiten (vor dem Ausbau)
+- [x] Design-Vorlage aus Claude Design einarbeiten (Design-System: Tokens, Schriften, Layout-Shell)
 - [ ] Routen je Item-Typ (`/rings`, `/amulets`, …)
 - [ ] Mod-Tabelle: Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht
 - [ ] Basis- und Unique-Ansicht je Item-Typ
@@ -77,6 +84,11 @@ mit schlichter, moderner Oberfläche. Das besprechen wir per Konzept-vor-Code.
 
 ## Log
 
+- 2026-07-03, 0.4.0 – Phase 3 gestartet: Design-System eingezogen. Dunkles Theme
+  aus dem Handoff als Tokens (Farben, Text-Abstufungen, Präfix-/Suffix- und
+  Tag-Farben), drei self-hosted Schriften (Space Grotesk, Manrope, JetBrains
+  Mono), Hintergrund-Glow, schlanke Layout-Shell ohne globalen Header. Grundlage
+  für die Item-Ansichten.
 - 2026-07-03, 0.3.0 – Phase 2 (Query-Engine) abgeschlossen. Reines Modul
   `src/lib/query/engine.ts`: Eignung nach „erster passender Tag gewinnt", Tier je
   Gruppe plus Slot, Itemstufen-Filter, Wahrscheinlichkeit pro Slot. 11 Unit-Tests.

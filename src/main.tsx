@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { routeTree } from './routeTree.gen'
+import '@fontsource-variable/space-grotesk'
+import '@fontsource-variable/manrope'
+import '@fontsource-variable/jetbrains-mono'
 import './index.css'
 
 const router = createRouter({
