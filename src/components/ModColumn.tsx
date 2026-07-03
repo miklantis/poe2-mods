@@ -1,4 +1,4 @@
-import type { DisplayGroup } from '@/lib/query/baseEngine'
+import type { RepoeGroup } from '@/lib/query/repoeEngine'
 import { ModTable } from '@/components/ModTable'
 import type { Accent } from '@/components/ui/accent'
 import { ACCENT_DOT, ACCENT_TEXT } from '@/components/ui/accent'
@@ -6,14 +6,13 @@ import { cn } from '@/lib/utils'
 
 /**
  * Eine betitelte Mod-Tabelle. Titel und Akzent (Farbe) kommen von aussen, damit
- * dieselbe Spalte fuer rollbare Präfixe/Suffixe, die grünen Desecrated-Spalten
- * und die rote Corrupted-Tabelle dient. `showProbability` blendet die Chance aus.
+ * dieselbe Spalte fuer rollbare Praefixe/Suffixe, die gruenen Desecrated-Spalten
+ * und die rote Corrupted-Tabelle dient.
  */
 export function ModColumn({
   title,
   accent,
   keyNs,
-  showProbability,
   groups,
   collapsedKeys,
   onToggle,
@@ -21,8 +20,7 @@ export function ModColumn({
   title: string
   accent: Accent
   keyNs: string
-  showProbability: boolean
-  groups: readonly DisplayGroup[]
+  groups: readonly RepoeGroup[]
   collapsedKeys: ReadonlySet<string>
   onToggle: (key: string) => void
 }) {
@@ -45,7 +43,6 @@ export function ModColumn({
           accent={accent}
           keyNs={keyNs}
           groups={groups}
-          showProbability={showProbability}
           isCollapsed={(k) => collapsedKeys.has(k)}
           onToggle={onToggle}
         />

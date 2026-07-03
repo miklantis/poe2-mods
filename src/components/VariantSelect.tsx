@@ -1,4 +1,4 @@
-import type { Variant } from '@/data/schema.coe'
+import type { Variant } from '@/data/schema.repoe'
 import { cn } from '@/lib/utils'
 
 /**

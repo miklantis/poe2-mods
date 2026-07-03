@@ -1,9 +1,9 @@
 import { useManifest } from '@/hooks/useManifest'
 
 /**
- * Schlanke globale Fusszeile. Nennt die Herkunft der Spawn-Gewichte (Craft of
- * Exile) und macht deren Schaetzwert-Charakter transparent, dazu den aktuellen
- * Datenstand (Spielversion und Liga) aus dem Manifest.
+ * Schlanke globale Fusszeile. Nennt die Herkunft der Daten (repoe-Export aus den
+ * Spieldateien; Essence aus Craft of Exile aufbereitet) und den aktuellen
+ * Datenstand (Export-Version und Liga) aus dem Manifest.
  */
 export function AppFooter() {
   const { data: manifest } = useManifest()
@@ -12,20 +12,21 @@ export function AppFooter() {
     <footer className="mt-auto border-t border-border-subtle">
       <div className="mx-auto w-full max-w-[1240px] px-6 py-5 text-[12px] leading-relaxed text-dim">
         <p>
-          Spawn-Gewichte, Tier und Chance sind Schätzwerte. Quelle:{' '}
+          Modifier aus den Spieldaten. Quelle:{' '}
           <a
-            href="https://www.craftofexile.com/"
+            href="https://github.com/repoe-fork/poe2"
             target="_blank"
             rel="noopener noreferrer"
             className="text-secondary-text underline decoration-dotted underline-offset-2 transition-colors hover:text-body"
           >
-            Craft of Exile
+            repoe
           </a>
-          . Path of Exile 2 und die Mod-Texte gehören Grinding Gear Games.
+          ; die Essence-Daten sind aus Craft of Exile aufbereitet. Path of Exile
+          2 und die Mod-Texte gehören Grinding Gear Games.
         </p>
         {manifest && (
           <p className="mt-1">
-            Datenstand: PoE2 {manifest.current}
+            Datenstand: repoe-Export {manifest.current}
             {manifest.leagueLabel ? ` · ${manifest.leagueLabel}` : ''}
           </p>
         )}

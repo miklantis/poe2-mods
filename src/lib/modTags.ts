@@ -1,7 +1,5 @@
-import type { Mod } from '@/data/schema.coe'
-
 /**
- * Auswahl der filter-/anzeigbaren Tags eines Mods. DOM-frei und testbar.
+ * Auswahl der filter-/anzeigbaren Tags. DOM-frei und testbar.
  *
  * `COLOR_TAG_ORDER` ist die Liste der im Filter angebotenen „primaeren" Tags,
  * in fester Reihenfolge (Schadensarten zuerst, dann Offensiv, Defensiv/
@@ -53,9 +51,9 @@ const ORDER_INDEX = new Map<string, number>(
   COLOR_TAG_ORDER.map((t, i) => [t, i]),
 )
 
-/** Filter-/Anzeige-Tags eines Mods, in fester Reihenfolge, ohne Duplikate. */
-export function displayTags(mod: Mod): ColorTag[] {
-  const present = new Set(mod.tags.filter((t) => ORDER_INDEX.has(t)))
+/** Filter-/Anzeige-Tags einer Familie, in fester Reihenfolge, ohne Duplikate. */
+export function displayTags(tags: readonly string[]): ColorTag[] {
+  const present = new Set(tags.filter((t) => ORDER_INDEX.has(t)))
   return [...present].sort(
     (a, b) => ORDER_INDEX.get(a)! - ORDER_INDEX.get(b)!,
   ) as ColorTag[]

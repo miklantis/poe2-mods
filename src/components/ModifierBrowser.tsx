@@ -1,13 +1,9 @@
 import { useMemo, useState } from 'react'
-import type { ItemType, Mod } from '@/data/schema.coe'
+import type { BaseItem, ItemType, Mod } from '@/data/schema.repoe'
 import type { BrowserSearch } from '@/routes/$type'
-import { useMods, useBaseMods, useEssences } from '@/hooks/useGameData'
-import {
-  runBaseQuery,
-  runFlatQuery,
-  filterRowsByOrigin,
-} from '@/lib/query/baseEngine'
-import { runEssenceQuery } from '@/lib/query/essenceEngine'
+import { useMods, useBaseItems, useEssences } from '@/hooks/useGameData'
+import { runRepoeQuery, essenceGroups } from '@/lib/query/repoeEngine'
+import type { RepoeGroup } from '@/lib/query/repoeEngine'
 import { filterGroups, availableTags } from '@/lib/query/filter'
 import type { ColorTag } from '@/lib/modTags'
 import { VariantSelect } from '@/components/VariantSelect'
@@ -18,16 +14,20 @@ import { FilterBar } from '@/components/FilterBar'
 const MIN_ITEM_LEVEL = 1
 const MAX_ITEM_LEVEL = 100
 
+const prefixesOf = (groups: RepoeGroup[]) =>
+  groups.filter((g) => g.slot === 'prefix')
+const suffixesOf = (groups: RepoeGroup[]) =>
+  groups.filter((g) => g.slot === 'suffix')
+
 /**
  * Modifier-Browser je Item-Typ (Screen 2). Alle Herkünfte gleichzeitig, ohne
- * Umschalten: oben der rollbare Pool (Präfixe blau, Suffixe gelb, mit Chance),
- * darunter Desecrated (Präfixe/Suffixe, grün, ohne Chance), dann Essence
- * (Präfixe/Suffixe, violett, je Mod eine Zeile mit Bereich über alle Stufen,
- * ohne Chance) und ganz unten Corrupted (eine breite Tabelle, rot, ohne
- * Chance). Ein gemeinsamer Filter (Suche, Tags, Itemstufe) wirkt auf alle
- * Abschnitte; Darstellung ist stets die Tabelle. Filterzustand liegt im
- * URL-State, nur das Ein-/Ausklappen ist lokal. Query- und Filter-Logik bleiben
- * in den reinen Modulen.
+ * Umschalten: oben der rollbare Pool (Präfixe blau, Suffixe gelb), darunter
+ * Desecrated (grün), dann Essence (violett, je Mod eine Zeile mit Bereich) und
+ * ganz unten Corrupted (rot). Datenquelle repoe: nur binäre Spawn-Gewichte,
+ * daher keine Chance – alle Herkünfte einheitlich mit Tier und Wertebereich.
+ * Ein gemeinsamer Filter (Suche, Tags, Itemstufe) wirkt auf alle Abschnitte;
+ * Filterzustand liegt im URL-State, nur das Ein-/Ausklappen ist lokal. Query-
+ * und Filter-Logik bleiben in den reinen Modulen.
  */
 export function ModifierBrowser({
   itemType,
@@ -39,7 +39,7 @@ export function ModifierBrowser({
   patchSearch: (patch: Partial<BrowserSearch>) => void
 }) {
   const mods = useMods()
-  const baseMods = useBaseMods()
+  const baseItems = useBaseItems()
   const essences = useEssences()
 
   const variants = itemType.variants
@@ -50,50 +50,35 @@ export function ModifierBrowser({
     new Set(),
   )
 
-  const modsById = useMemo(() => {
-    const map = new Map<string, Mod>()
-    for (const m of mods.data ?? []) map.set(m.id, m)
+  const baseById = useMemo(() => {
+    const map = new Map<string, BaseItem>()
+    for (const b of baseItems.data ?? []) map.set(b.id, b)
     return map
-  }, [mods.data])
+  }, [baseItems.data])
 
-  const rows = useMemo(
-    () =>
-      baseMods.data && selected ? (baseMods.data[selected.base] ?? []) : [],
-    [baseMods.data, selected],
-  )
-
-  const essenceRows = useMemo(
-    () =>
-      essences.data && selected ? (essences.data[selected.base] ?? []) : [],
-    [essences.data, selected],
-  )
+  const base = selected ? baseById.get(selected.base) : undefined
+  const baseTags = base?.tags ?? []
+  const itemClass = base?.itemClass
 
   // Rohe Gruppen je Herkunft (vor dem Suchfilter, nach Itemstufe).
   const raw = useMemo(() => {
+    const allMods: Mod[] = mods.data ?? []
     const ctx = { itemLevel: search.ilvl }
-    return {
-      roll: runBaseQuery(filterRowsByOrigin(rows, modsById, 'rollable'), modsById, ctx),
-      des: runBaseQuery(filterRowsByOrigin(rows, modsById, 'desecrated'), modsById, ctx),
-      ess: runEssenceQuery(essenceRows, modsById, ctx),
-      cor: runFlatQuery(filterRowsByOrigin(rows, modsById, 'corrupted'), modsById, ctx),
-    }
-  }, [rows, essenceRows, modsById, search.ilvl])
+    const roll = runRepoeQuery(allMods, baseTags, 'rollable', ctx)
+    const des = runRepoeQuery(allMods, baseTags, 'desecrated', ctx)
+    const cor = runRepoeQuery(allMods, baseTags, 'corrupted', ctx)
+    const essList =
+      essences.data && itemClass ? (essences.data[itemClass] ?? []) : []
+    const ess = essenceGroups(essList, ctx)
+    return { roll, des, cor, ess }
+  }, [mods.data, essences.data, baseTags, itemClass, search.ilvl])
 
-  const hasDesecrated = raw.des.prefixes.length + raw.des.suffixes.length > 0
-  const hasEssence = raw.ess.prefixes.length + raw.ess.suffixes.length > 0
+  const hasDesecrated = raw.des.length > 0
+  const hasEssence = raw.ess.length > 0
   const hasCorrupted = raw.cor.length > 0
 
   const tags = useMemo(
-    () =>
-      availableTags([
-        ...raw.roll.prefixes,
-        ...raw.roll.suffixes,
-        ...raw.des.prefixes,
-        ...raw.des.suffixes,
-        ...raw.ess.prefixes,
-        ...raw.ess.suffixes,
-        ...raw.cor,
-      ]),
+    () => availableTags([...raw.roll, ...raw.des, ...raw.cor]),
     [raw],
   )
 
@@ -101,23 +86,23 @@ export function ModifierBrowser({
   const f = useMemo(() => {
     const c = { tags: search.tags, search: search.q }
     return {
-      rollPre: filterGroups(raw.roll.prefixes, c),
-      rollSuf: filterGroups(raw.roll.suffixes, c),
-      desPre: filterGroups(raw.des.prefixes, c),
-      desSuf: filterGroups(raw.des.suffixes, c),
-      essPre: filterGroups(raw.ess.prefixes, c),
-      essSuf: filterGroups(raw.ess.suffixes, c),
+      rollPre: filterGroups(prefixesOf(raw.roll), c),
+      rollSuf: filterGroups(suffixesOf(raw.roll), c),
+      desPre: filterGroups(prefixesOf(raw.des), c),
+      desSuf: filterGroups(suffixesOf(raw.des), c),
+      essPre: filterGroups(prefixesOf(raw.ess), c),
+      essSuf: filterGroups(suffixesOf(raw.ess), c),
       cor: filterGroups(raw.cor, c),
     }
   }, [raw, search.tags, search.q])
 
   const allKeys = useMemo(
     () => [
-      ...f.rollPre.map((g) => `r-pre-${g.group}`),
-      ...f.rollSuf.map((g) => `r-suf-${g.group}`),
-      ...f.desPre.map((g) => `d-pre-${g.group}`),
-      ...f.desSuf.map((g) => `d-suf-${g.group}`),
-      ...f.cor.map((g) => `c-${g.group}`),
+      ...f.rollPre.map((g) => `r-pre-${g.id}`),
+      ...f.rollSuf.map((g) => `r-suf-${g.id}`),
+      ...f.desPre.map((g) => `d-pre-${g.id}`),
+      ...f.desSuf.map((g) => `d-suf-${g.id}`),
+      ...f.cor.map((g) => `c-${g.id}`),
     ],
     [f],
   )
@@ -143,8 +128,8 @@ export function ModifierBrowser({
     patchSearch({ tags: [...active] })
   }
 
-  const isPending = mods.isPending || baseMods.isPending || essences.isPending
-  const error = mods.error ?? baseMods.error ?? essences.error
+  const isPending = mods.isPending || baseItems.isPending || essences.isPending
+  const error = mods.error ?? baseItems.error ?? essences.error
 
   if (error) {
     return (
@@ -192,8 +177,9 @@ export function ModifierBrowser({
       />
 
       <p className="mb-6 text-[12px] text-dim">
-        Chance nur im rollbaren Pool (geschätzte Spawn-Gewichte, Craft of
-        Exile). Desecrated, Essence und Corrupted werden gezielt gesetzt.
+        Modifier aus den Spieldaten (repoe). repoe führt nur binäre
+        Spawn-Gewichte, daher keine Chance – alle Herkünfte mit Tier und
+        Wertebereich.
       </p>
 
       {/* Rollbar */}
@@ -203,7 +189,6 @@ export function ModifierBrowser({
             title="Präfixe"
             accent="prefix"
             keyNs="r-pre"
-            showProbability
             groups={f.rollPre}
             collapsedKeys={collapsedKeys}
             onToggle={toggleKey}
@@ -212,7 +197,6 @@ export function ModifierBrowser({
             title="Suffixe"
             accent="suffix"
             keyNs="r-suf"
-            showProbability
             groups={f.rollSuf}
             collapsedKeys={collapsedKeys}
             onToggle={toggleKey}
@@ -228,7 +212,6 @@ export function ModifierBrowser({
               title="Desecrated Präfixe"
               accent="desecrated"
               keyNs="d-pre"
-              showProbability={false}
               groups={f.desPre}
               collapsedKeys={collapsedKeys}
               onToggle={toggleKey}
@@ -237,7 +220,6 @@ export function ModifierBrowser({
               title="Desecrated Suffixe"
               accent="desecrated"
               keyNs="d-suf"
-              showProbability={false}
               groups={f.desSuf}
               collapsedKeys={collapsedKeys}
               onToggle={toggleKey}
@@ -271,7 +253,6 @@ export function ModifierBrowser({
             title="Corrupted"
             accent="corrupted"
             keyNs="c"
-            showProbability={false}
             groups={f.cor}
             collapsedKeys={collapsedKeys}
             onToggle={toggleKey}

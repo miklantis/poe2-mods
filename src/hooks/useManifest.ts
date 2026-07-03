@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { loadJson } from '@/data/client'
-import { manifestSchema } from '@/data/schema.coe'
+import { manifestSchema } from '@/data/schema.repoe'
 
 /** Laedt data/manifest.json (aktive Version + verfuegbare Versionen). */
 export function useManifest() {

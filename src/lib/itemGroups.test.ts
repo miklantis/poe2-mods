@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import type { ItemType } from '@/data/schema.coe'
+import type { ItemType } from '@/data/schema.repoe'
 import { buildItemGroups, resolveSlug } from '@/lib/itemGroups'
 
 const t = (

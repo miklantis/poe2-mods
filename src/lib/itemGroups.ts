@@ -1,4 +1,4 @@
-import type { ItemType } from '@/data/schema.coe'
+import type { ItemType } from '@/data/schema.repoe'
 
 /**
  * Gruppierung der Item-Typen fuer Screen 1. Die Struktur kommt aus den Daten:

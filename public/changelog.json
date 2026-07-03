@@ -1,6 +1,15 @@
 {
-  "current": "0.12.5",
+  "current": "0.13.0",
   "entries": [
+    {
+      "version": "0.13.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Datenquelle umgestellt: die Modifier kommen jetzt direkt aus den Spieldaten (repoe) statt aus geschätzten Werten. Dadurch sind Pools vollständig, u. a. die bisher fehlenden Genesis-Tree-Modifier auf Ringen, Gürteln und Amuletten.",
+        "Keine Chance-Spalte mehr: repoe führt nur, ob ein Modifier auf einer Basis vorkommt (ja/nein), keine Spawn-Gewichte. Alle Herkünfte (rollbar, Desecrated, Essence, Corrupted) werden jetzt einheitlich mit Tier und Wertebereich gezeigt.",
+        "Der Essence-Abschnitt bleibt erhalten (aus den bisherigen Craft-of-Exile-Daten aufbereitet)."
+      ]
+    },
     {
       "version": "0.12.5",
       "date": "2026-07-03",

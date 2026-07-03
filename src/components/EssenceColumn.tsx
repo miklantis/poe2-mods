@@ -1,4 +1,4 @@
-import type { DisplayGroup } from '@/lib/query/baseEngine'
+import type { RepoeGroup } from '@/lib/query/repoeEngine'
 import { fillModText } from '@/lib/modText'
 import type { Accent } from '@/components/ui/accent'
 import { ACCENT_DOT, ACCENT_TEXT } from '@/components/ui/accent'
@@ -9,11 +9,9 @@ import { cn } from '@/lib/utils'
  * Anders als `ModColumn`/`ModTable` (klappbare Familien mit Tier-Zeilen) gibt es
  * hier keine Stufen und kein Ein-/Ausklappen – die Stufen sind bereits zu einem
  * Wertebereich verdichtet. Gezeigt werden Modifier-Text (mit eingesetztem
- * Bereich) samt Typ-Tags und die kleinste per Essence erreichbare Itemstufe.
- * Keine Chance – Essences setzen den Mod gezielt.
- *
- * Erwartet `DisplayGroup`s mit je genau einem `ComputedMod` (aus
- * `runEssenceQuery`); Akzent und Titel kommen von aussen.
+ * Bereich) und die kleinste per Essence erreichbare Itemstufe. Keine Chance –
+ * Essences setzen den Mod gezielt. Erwartet `RepoeGroup`s mit je genau einem
+ * Tier (aus `essenceGroups`).
  */
 export function EssenceColumn({
   title,
@@ -22,7 +20,7 @@ export function EssenceColumn({
 }: {
   title: string
   accent: Accent
-  groups: readonly DisplayGroup[]
+  groups: readonly RepoeGroup[]
 }) {
   return (
     <div>
@@ -49,18 +47,15 @@ export function EssenceColumn({
             </thead>
             <tbody>
               {groups.map((group) => {
-                const mod = group.mods[0]
-                if (!mod) return null
+                const t = group.tiers[0]
+                if (!t) return null
                 return (
-                  <tr
-                    key={mod.mod.id}
-                    className="border-t border-border-subtle"
-                  >
+                  <tr key={group.id} className="border-t border-border-subtle">
                     <td className="px-2 py-1.5 text-[14px] text-body">
-                      {fillModText(mod.mod.text, mod.values)}
+                      {fillModText(group.text, t.values)}
                     </td>
                     <td className="px-2 py-1.5 text-right font-mono text-[11.5px] tabular-nums text-muted-text">
-                      {mod.ilvl}
+                      {t.ilvl}
                     </td>
                   </tr>
                 )

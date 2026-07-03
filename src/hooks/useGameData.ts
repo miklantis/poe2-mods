@@ -4,20 +4,22 @@ import { useManifest } from '@/hooks/useManifest'
 import {
   modsFileSchema,
   itemTypesFileSchema,
-  baseModsFileSchema,
+  baseItemsFileSchema,
   essencesFileSchema,
-} from '@/data/schema.coe'
+} from '@/data/schema.repoe'
 
 /**
  * Version-spezifische Loader. Sie warten auf das Manifest und laden dann die
  * Dateien der aktuell gueltigen Version. Komponenten kennen die JSON-Struktur
  * nicht direkt, sondern gehen ueber diese Hooks.
  *
- * Datenform (basis-zentriertes CoE-Schema, `src/data/schema.coe.ts`):
- *  - mods.json       schlanke Mod-Metadaten (Text, Slot, Gruppe, Tags),
+ * Datenform (mod-zentriertes repoe-Schema, `src/data/schema.repoe.ts`):
+ *  - mods.json       Modifier-Familien mit Tiers (id, ilvl, Werte), Herkunft,
+ *                    Slot und Eignungs-Tags,
  *  - item_types.json Item-Typen mit ihren Basis-Varianten,
- *  - base_mods.json  je Basis die rollbaren Mods mit Tiers (ilvl/Gewicht/Werte).
- *  - essences.json   je Basis die per Essence garantierten Mods (Bereich, ilvl).
+ *  - base_items.json Basen mit Tags (fuer die Eignung) und Item-Klasse,
+ *  - essences.json   je Item-Klasse die per Essence garantierten Mods (aus den
+ *                    CoE-Daten aufbereitet).
  */
 export function useMods() {
   const { data: manifest } = useManifest()
@@ -39,12 +41,12 @@ export function useItemTypes() {
   })
 }
 
-export function useBaseMods() {
+export function useBaseItems() {
   const { data: manifest } = useManifest()
   const version = manifest?.current
   return useQuery({
-    queryKey: ['base_mods', version],
-    queryFn: () => loadJson(`data/${version}/base_mods.json`, baseModsFileSchema),
+    queryKey: ['base_items', version],
+    queryFn: () => loadJson(`data/${version}/base_items.json`, baseItemsFileSchema),
     enabled: Boolean(version),
   })
 }
