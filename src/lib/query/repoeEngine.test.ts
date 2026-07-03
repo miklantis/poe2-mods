@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Mod, Tier } from '@/data/schema.repoe'
-import { modFitsBase, runRepoeQuery } from './repoeEngine'
+import { essenceGroups, modFitsBase, runRepoeQuery } from './repoeEngine'
 
 /** Kurzschreibweise fuer einen Tier. */
 function tier(
@@ -101,5 +101,28 @@ describe('runRepoeQuery – Auswahl und Erreichbarkeit', () => {
     const res = runRepoeQuery(mods, ['ring'], 'corrupted', { itemLevel: 100 })
     expect(res).toHaveLength(2)
     expect(res.every((g) => g.slot === null)).toBe(true)
+  })
+})
+
+describe('essenceGroups', () => {
+  const entries = [
+    { id: 'e2', text: '+# to Zeal', slot: 'suffix' as const, ilvl: 20, values: [[1, 5]] as [number, number][] },
+    { id: 'e1', text: '+# to Armour', slot: 'prefix' as const, ilvl: 5, values: [[10, 20]] as [number, number][] },
+  ]
+
+  it('macht je Eintrag eine Zeile mit genau einem Tier', () => {
+    const res = essenceGroups(entries, { itemLevel: 100 })
+    expect(res).toHaveLength(2)
+    expect(res.every((g) => g.tiers.length === 1 && g.origin === 'essence')).toBe(true)
+  })
+
+  it('filtert nach Itemstufe', () => {
+    const res = essenceGroups(entries, { itemLevel: 10 })
+    expect(res.map((g) => g.id)).toEqual(['e1'])
+  })
+
+  it('sortiert nach Familien-Label', () => {
+    const res = essenceGroups(entries, { itemLevel: 100 })
+    expect(res.map((g) => g.id)).toEqual(['e1', 'e2'])
   })
 })

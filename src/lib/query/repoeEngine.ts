@@ -1,4 +1,4 @@
-import type { Mod, Origin, Slot } from '@/data/schema.repoe'
+import type { EssenceEntry, Mod, Origin, Slot } from '@/data/schema.repoe'
 import { modFamilyLabel } from '@/lib/modText'
 
 /**
@@ -123,6 +123,46 @@ export function runRepoeQuery(
       text: mod.text,
       tags: mod.tags,
       tiers,
+    })
+  }
+  groups.sort((a, b) =>
+    modFamilyLabel(a.text).localeCompare(modFamilyLabel(b.text)),
+  )
+  return groups
+}
+
+/**
+ * Baut die Anzeige-Zeilen des Essence-Abschnitts aus den aufbereiteten
+ * Essence-Eintraegen einer Item-Klasse. Anders als der rollbare Pool gibt es
+ * hier keine Stufen: je Eintrag genau ein Tier mit dem Bereich ueber alle
+ * Essence-Stufen. Eintraege oberhalb der Itemstufe fallen heraus; sortiert nach
+ * Familien-Label. `tags` bleibt leer – der Essence-Abschnitt wird ueber die
+ * Item-Klasse ausgewaehlt, nicht ueber Tag-Eignung.
+ */
+export function essenceGroups(
+  entries: readonly EssenceEntry[],
+  ctx: RepoeQueryContext,
+): RepoeGroup[] {
+  const groups: RepoeGroup[] = []
+  for (const e of entries) {
+    if (e.ilvl > ctx.itemLevel) continue
+    groups.push({
+      id: e.id,
+      slot: e.slot,
+      origin: 'essence',
+      text: e.text,
+      tags: [],
+      tiers: [
+        {
+          id: e.id,
+          tier: 1,
+          tierCount: 1,
+          ilvl: e.ilvl,
+          name: '',
+          text: e.text,
+          values: e.values,
+        },
+      ],
     })
   }
   groups.sort((a, b) =>

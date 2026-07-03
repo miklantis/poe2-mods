@@ -97,6 +97,28 @@ export const baseItemSchema = z.object({
 })
 export type BaseItem = z.infer<typeof baseItemSchema>
 
+/**
+ * Ein per Essence garantierter Modifier, aufbereitet aus den CoE-Daten (repoe
+ * fuehrt keine Essence→Mod-Zuordnung). Selbst-enthaltend: Text (#-Vorlage),
+ * Slot, kleinste per Essence erreichbare Itemstufe und der Wertebereich ueber
+ * alle Essence-Stufen. Keine Chance – Essences setzen den Mod gezielt.
+ */
+export const essenceEntrySchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  slot: slotSchema,
+  ilvl: z.number().int(),
+  values: z.array(z.tuple([z.number(), z.number()])),
+})
+export type EssenceEntry = z.infer<typeof essenceEntrySchema>
+
+/** essences.json: repoe-Item-Klasse -> per Essence garantierte Modifier. */
+export const essencesFileSchema = z.record(
+  z.string(),
+  z.array(essenceEntrySchema),
+)
+export type EssencesFile = z.infer<typeof essencesFileSchema>
+
 /** Ein Tag mit Anzeigename und Crafting-Relevanz. */
 export const tagSchema = z.object({
   id: z.string(),
