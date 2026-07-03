@@ -145,6 +145,10 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.9.3 – Itemstufe-Slider sichtbar gemacht. Neue Klasse
+  `.il-slider` (index.css) mit sichtbarer Schiene, bis zum Wert gefuelltem
+  Bereich (WebKit via `--il-pct`, Firefox via `::-moz-range-progress`) und
+  deutlichem Regler; FilterBar zeigt Min/Max unter dem Slider.
 - 2026-07-03, 0.9.2 – Modifier-Browser startet vollständig eingeklappt. State
   in `ModifierBrowser` von collapsed- auf expandedKeys umgestellt (Standard =
   eingeklappt, neue Gruppen ebenfalls); collapsedKeys/Toggle-Logik daraus

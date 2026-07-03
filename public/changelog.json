@@ -1,6 +1,13 @@
 {
-  "current": "0.9.2",
+  "current": "0.9.3",
   "entries": [
+    {
+      "version": "0.9.3",
+      "date": "2026-07-03",
+      "changes": [
+        "Itemstufe-Regler ist jetzt klar als Schieberegler erkennbar: sichtbare Schiene, der eingestellte Bereich bis zum Wert gelb gefüllt, deutlicher Regler-Punkt und Min/Max-Beschriftung (1 bis 100)."
+      ]
+    },
     {
       "version": "0.9.2",
       "date": "2026-07-03",

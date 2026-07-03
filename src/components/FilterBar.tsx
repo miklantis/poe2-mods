@@ -76,13 +76,19 @@ export function FilterBar({
           Itemstufe{' '}
           <span className="font-mono tabular-nums text-body">{itemLevel}</span>
         </span>
-        <Slider
-          value={itemLevel}
-          min={minLevel}
-          max={maxLevel}
-          onChange={onItemLevel}
-          aria-label="Itemstufe"
-        />
+        <div className="flex-1">
+          <Slider
+            value={itemLevel}
+            min={minLevel}
+            max={maxLevel}
+            onChange={onItemLevel}
+            aria-label="Itemstufe"
+          />
+          <div className="mt-0.5 flex justify-between font-mono text-[10.5px] tabular-nums text-dim">
+            <span>{minLevel}</span>
+            <span>{maxLevel}</span>
+          </div>
+        </div>
       </div>
     </div>
   )
