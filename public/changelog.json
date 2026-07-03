@@ -1,6 +1,13 @@
 {
-  "current": "0.8.0",
+  "current": "0.8.1",
   "entries": [
+    {
+      "version": "0.8.1",
+      "date": "2026-07-03",
+      "changes": [
+        "Interner Rechen-Kern für die neue Datenquelle (Craft of Exile) ergänzt: er ermittelt je Basis aus den echten, geschätzten Spawn-Gewichten die Tiers und Wahrscheinlichkeiten. Noch nicht in der Ansicht sichtbar – die Umstellung folgt im nächsten Schritt."
+      ]
+    },
     {
       "version": "0.8.0",
       "date": "2026-07-03",

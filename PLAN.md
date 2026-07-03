@@ -2,25 +2,34 @@
 
 ## Aktueller Stand
 
-Phase 6 (Datenquelle Craft of Exile) läuft, Schritt 1 ist umgesetzt. Grund für
-den Umbau: repoe-fork und der PoB-Export enthalten keine echten Spawn-Gewichte
-(alle Werte 1), PoE2 legt sie nicht offen; CoE rekonstruiert sie (Schätzwerte).
+Phase 6 (Datenquelle Craft of Exile) läuft, Schritte 1 und 2 sind umgesetzt.
+Grund für den Umbau: repoe-fork und der PoB-Export enthalten keine echten
+Spawn-Gewichte (alle Werte 1), PoE2 legt sie nicht offen; CoE rekonstruiert sie
+(Schätzwerte).
 
 Schritt 1 (erledigt): `scripts/import-coe.ts` (`npm run import:coe`) verarbeitet
 den versionierten CoE-Snapshot unter `data/_source/coe/` zu einem
 basis-zentrierten Schema unter `data/0.5.4/` (`item_types.json` mit Varianten,
 `mods.json` mit Text/Slot/Gruppe/Tags, `base_mods.json` mit je Basis den Tiers:
 Itemstufe, Gewicht, Rollen-Bereiche). Zod-validiert im Import, an den Ringen
-gegengeprüft (variable Gewichte). Der Import ist allein aus dem Repo
-reproduzierbar (kein Abruf, keine Uploads nötig).
+gegengeprüft (variable Gewichte).
+
+Schritt 2 (erledigt): neue reine Engine `src/lib/query/baseEngine.ts`
+(`runBaseQuery`) rechnet aus den Mod-Zeilen einer Basis plus Itemstufe die
+Präfix-/Suffix-Gruppen mit Tier und Wahrscheinlichkeit. Modell: jeder erreichbare
+Tier (ilvl ≤ Itemstufe) ist ein eigener gewichteter, konkurrierender Eintrag;
+Chance je Tier = Tier-Gewicht / Slot-Pool, Gruppe = Summe der erreichbaren
+Tier-Gewichte / Slot-Pool; höchstes ilvl = Tier 1, tierCount über die volle
+Tier-Liste. Ausgabe-Formen `ModGroup`/`ComputedMod` bleiben (mit `ilvl`/`values`
+je Tier). Neues CoE-Zod-Schema `src/data/schema.coe.ts` als Typ-Grundlage
+(Engine + Tests nutzen es; Loader zieht in Schritt 3 nach). 13 Unit-Tests.
 
 Wichtig für die nächste Sitzung: `data/manifest.json` zeigt noch auf die alte
-repoe-Version `4.5.4.3`, die App läuft unverändert auf den alten Daten und dem
-alten Schema (`src/data/schema.ts`). Erst Schritt 3 stellt die App auf das neue
-Schema und das Manifest auf `0.5.4` um. Als Nächstes: **Schritt 2** – die
-Query-Engine auf die Basis-Gewichte umstellen (pro Basis Tiers →
-Wahrscheinlichkeit, Ausgabe-Formen `ModGroup`/`ComputedMod` beibehalten) mit
-Unit-Tests, ohne die App-Verdrahtung anzufassen.
+repoe-Version `4.5.4.3`, die App läuft unverändert auf den alten Daten, dem
+alten Schema (`src/data/schema.ts`) und der alten `engine.ts`. Erst **Schritt 3**
+stellt die App um: Loader/Hooks auf `schema.coe.ts`, Screens/Filter/Varianten auf
+`runBaseQuery`, Manifest auf `0.5.4`. Ausgabe-Formen bleiben, nur Datenquelle und
+Engine-Aufruf wechseln.
 
 --- Stand vor Phase 6 (weiter gültig für die Oberfläche): ---
 
@@ -97,7 +106,7 @@ solche gekennzeichnet; Quelle Craft of Exile. Automatischer Abruf ist nicht
 möglich (privater Endpunkt, Org-Netzsperre) – die CoE-Dateien werden als
 versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
 - [x] Schritt 1: Import + basis-zentriertes Schema aus dem CoE-Snapshot, Zod-validiert, an den Ringen gegengeprüft (echte, variable Gewichte)
-- [ ] Schritt 2: Query-Engine auf Basis-Gewichte umstellen (pro Basis Tiers → Wahrscheinlichkeit), Unit-Tests
+- [x] Schritt 2: Query-Engine auf Basis-Gewichte umstellen (pro Basis Tiers → Wahrscheinlichkeit), Unit-Tests
 - [ ] Schritt 3: Screens/Filter/Varianten neu verdrahten (Ausgabe-Formen bleiben, nur Datenquelle wechselt)
 - [ ] Schritt 4: Gewichte als CoE-Schätzung kennzeichnen + Attribution, ADR, Doku, Changelog
 
@@ -152,6 +161,14 @@ versionierter Snapshot ins Repo gelegt und per Upload aktualisiert.
 
 ## Log
 
+- 2026-07-03, 0.8.1 – Phase 6, Schritt 2: Query-Engine auf Basis-Gewichte.
+  Neue reine Engine `src/lib/query/baseEngine.ts` (`runBaseQuery`) rechnet je
+  Basis plus Itemstufe die Präfix-/Suffix-Gruppen mit Tier und Chance; jeder
+  erreichbare Tier ist ein eigener gewichteter, konkurrierender Eintrag.
+  Ausgabe-Formen `ModGroup`/`ComputedMod` beibehalten (nun mit `ilvl`/`values`
+  je Tier). Neues CoE-Zod-Schema `src/data/schema.coe.ts` als Typ-Grundlage.
+  13 Unit-Tests. Alte `engine.ts`/`schema.ts` und App-Verdrahtung unberührt –
+  Umstellung folgt in Schritt 3.
 - 2026-07-03, 0.8.0 – Phase 4 (Facet-Search) abgeschlossen. `FilterBar` mit
   Textsuche, Tag-Pills (ODER) und Itemstufen-Slider; nachgelagerte Filterung als
   reines Modul `filter.ts` (`filterResult`/`availableTags`, 7 Tests). Filter-,
