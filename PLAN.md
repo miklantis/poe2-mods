@@ -2,30 +2,26 @@
 
 ## Aktueller Stand
 
-Phase 0 (Setup) umgesetzt. Das Grundgerüst steht: React 19 + Vite,
-TypeScript strict, TanStack Router und Query, Tailwind v4 mit shadcn-Basis,
-Zod und Vitest installiert. Deploy-Pipeline über GitHub Actions auf GitHub
-Pages inkl. SPA-Fallback. Changelog (0.1.0) und Docs-Struktur angelegt.
+Phase 0 (Setup) und Phase 1 (Datenpipeline und Schema) umgesetzt. Die App lädt
+die normalisierten Spieldaten (Version 4.5.4.3) über TanStack Query, validiert
+sie beim Laden gegen die Zod-Schemas und zeigt einen Datenstatus auf der
+Startseite (Version, Anzahl Mods/Basen/Item-Typen/Tags).
 
-Als Nächstes: Phase 1 – Datenpipeline und Schema. Startpunkt ist die
-Konzept-Abstimmung zum Ziel-Schema (welche Felder aus dem repoe-fork-Export
-wir übernehmen) und wie wir Item-Typen/Groupings aus `item_classes` und `tags`
-ableiten.
+Datenpipeline: `scripts/import.ts` zieht den poe2-Export von `repoe-fork/poe2`,
+slimt ihn aufs Schema, validiert und legt ihn unter `data/4.5.4.3/` ab;
+`data/manifest.json` zeigt auf die aktive Version. Ergebnis rund 1,5 MB, gegen
+poe2db an den Ringen gegengeprüft (203 rollbare Mods).
 
-Hinweis Betrieb: Die Pages-Quelle im Repo muss einmalig auf „GitHub Actions"
-stehen (Settings → Pages → Source), sonst greift der Deploy nicht.
+Als Nächstes: Phase 2 – Query-Engine (reines, testbares Modul): Tier aus der
+Gruppen-Rangfolge, Wahrscheinlichkeit aus den Gewichten, Filter und Dedup. Das
+besprechen wir per Konzept-vor-Code, bevor gebaut wird.
+
+Hinweis: Das UI-Design aus der poe2db-Vorlage soll in Claude Design prototypt
+und vor Phase 3 (UI-Grundgerüst) eingearbeitet werden.
 
 ---
 
 ## Offene Vorhaben
-
-### Phase 1 – Datenpipeline und Schema
-- [ ] Ziel-Schema festlegen: `mods`, `base_items`, `tags`, `mod_types` (nur benötigte Felder)
-- [ ] Zod-Schemas als Quelle der Wahrheit, TS-Typen ableiten
-- [ ] Import-Skript: repoe-fork-Export → normalisiertes Schema
-- [ ] Daten unter `data/<spielversion>/` ablegen, `data/manifest.json` mit aktueller Version
-- [ ] Loader-Hooks (`useManifest`, `useMods`, `useBaseItems`, `useTags`) über TanStack Query
-- [ ] Zod-Validierung beim Laden
 
 ### Phase 2 – Query-Engine (reines Modul)
 - [ ] Filter: Domain, Slot (Präfix/Suffix), Itemstufe, Tag-Gewicht > 0
@@ -34,6 +30,7 @@ stehen (Settings → Pages → Source), sonst greift der Deploy nicht.
 - [ ] Unit-Tests (Vitest)
 
 ### Phase 3 – UI-Grundgerüst
+- [ ] Design-Vorlage aus Claude Design einarbeiten (vor dem Ausbau)
 - [ ] Routen je Item-Typ (`/rings`, `/amulets`, …)
 - [ ] Mod-Tabelle: Präfix/Suffix getrennt, Tier, Rollen-Bereich, Gewicht
 - [ ] Basis- und Unique-Ansicht je Item-Typ
@@ -63,9 +60,20 @@ stehen (Settings → Pages → Source), sonst greift der Deploy nicht.
 - [x] `public/changelog.json` anlegen (Startversion 0.1.0)
 - [x] `docs/Architektur.md`, `docs/adr/` und `docs/archive/` anlegen
 
+### Phase 1 – Datenpipeline und Schema
+- [x] Ziel-Schema festlegen: `mods`, `base_items`, `tags`, `item_types` (nur benötigte Felder)
+- [x] Zod-Schemas als Quelle der Wahrheit, TS-Typen ableiten
+- [x] Import-Skript: repoe-fork-Export → normalisiertes Schema
+- [x] Daten unter `data/<spielversion>/` ablegen, `data/manifest.json` mit aktueller Version
+- [x] Loader-Hooks (`useManifest`, `useMods`, `useBaseItems`, `useItemTypes`, `useTags`) über TanStack Query
+- [x] Zod-Validierung beim Laden
+
 ---
 
 ## Log
 
+- 2026-07-03, 0.2.0 – Phase 1 (Datenpipeline und Schema) abgeschlossen. Zod-Schema,
+  Import-Skript, normalisierte Daten (4.5.4.3), Loader-Hooks mit Validierung und
+  Datenstatus-Anzeige. An den Ringen gegen poe2db gegengeprüft.
 - 2026-07-03, 0.1.0 – Phase 0 (Setup) abgeschlossen. Grundgerüst, Routing,
   Styling, Deploy-Pipeline und Docs-Struktur stehen; Basis für die Datenpipeline gelegt.

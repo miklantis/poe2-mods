@@ -29,14 +29,53 @@ je Item-Typ die möglichen Modifier mit Tier, Rollen-Bereich und Spawn-Gewicht.
 
 ## Datenschema
 
-Wird in Phase 1 festgelegt (normalisiertes Schema aus dem repoe-fork-Export).
+Quelle der Wahrheit fuer die Datenformen sind die Zod-Schemas in
+`src/data/schema.ts`; die TypeScript-Typen werden per `z.infer` daraus
+abgeleitet. Das Import-Skript und die App validieren gegen dieselben Schemas.
+
+Vier normalisierte Dateien je Version:
+
+- `item_types.json` – Item-Klassen mit released Basen, auf die craftbare Mods
+  rollen koennen (id, Name, Kategorie). Grundlage fuer Kategorien und Routen.
+- `base_items.json` – released Basen der behaltenen Klassen (id, Name,
+  Item-Klasse, Tags, Droplevel, Implicits, Anforderungen).
+- `mods.json` – Item-Domain-Mods vom Typ Praefix/Suffix mit mindestens einem
+  Spawn-Gewicht > 0 (id, Name, Typ, Gruppen, Slot, required_level, Stat-Ranges,
+  Text, Spawn-Gewichte je Tag, Zusatz-Flags). Der lesbare Text kommt direkt aus
+  dem Export.
+- Dazu `data/manifest.json` – aktive Version, verfuegbare Versionen, Quelle,
+  Zeitstempel.
+
+Bewusst nicht in den Daten: Tier und Wahrscheinlichkeit. Beide werden in der
+Query-Engine (Phase 2) berechnet – Tier aus der Rangfolge innerhalb einer
+Gruppe nach `required_level`, Wahrscheinlichkeit aus den Gewichten relativ zum
+verfuegbaren Pool. Die `spawnWeights` bleiben vollstaendig und in Reihenfolge,
+weil die Spawn-Semantik „erster passender Tag gewinnt" lautet und Eintraege mit
+Gewicht 0 gezielt ausschliessen. Ebenfalls draussen: Uniques, Essenzen/Runen und
+alle Nicht-Item-Domains.
+
+## Datenpipeline
+
+Das Import-Skript `scripts/import.ts` (Aufruf `npm run import`) zieht den
+poe2-Export von `repoe-fork/poe2`, filtert und slimt ihn auf das Schema,
+validiert mit Zod und legt das Ergebnis unter `data/<version>/` ab; das
+Manifest wird fortgeschrieben. Die Version kommt aus `version.txt` des Exports.
+
+Datenzugriff in der App laeuft ueber Hooks (`useManifest`, `useMods`,
+`useBaseItems`, `useItemTypes`, `useTags`) via TanStack Query; sie validieren
+beim Laden erneut gegen die Schemas.
 
 ## Deployment
 
 GitHub Pages über GitHub Actions. Vite `base` ist `/poe2-mods/`. Für Deep-Links
-wird beim Build `index.html` nach `404.html` kopiert (SPA-Fallback).
+wird beim Build `index.html` nach `404.html` kopiert (SPA-Fallback). Die
+versionierten Daten liegen unter `data/` im Repo-Root; ein Vite-Plugin bedient
+`data/` im Dev-Server und kopiert es beim Build nach `dist/data/`.
 
 ## Ist-Zustand
 
-Phase 0 (Setup) umgesetzt: Grundgerüst, Routing, Styling, Deploy-Pipeline,
-Changelog- und Docs-Struktur. Noch keine Spieldaten und keine fachlichen Ansichten.
+Phase 0 (Setup) und Phase 1 (Datenpipeline und Schema) umgesetzt: Grundgerüst,
+Routing, Styling, Deploy-Pipeline; Zod-Schema, Import-Skript, normalisierte
+Daten (Version 4.5.4.3), Loader-Hooks mit Validierung beim Laden und eine
+Datenstatus-Anzeige auf der Startseite. Noch offen: Query-Engine (Tier,
+Wahrscheinlichkeit), fachliche Ansichten je Item-Typ, Facet-Search.

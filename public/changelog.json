@@ -1,6 +1,14 @@
 {
-  "current": "0.1.0",
+  "current": "0.2.0",
   "entries": [
+    {
+      "version": "0.2.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Spieldaten werden jetzt geladen und geprüft: Version 4.5.4.3 mit Modifiern, Basis-Items, Item-Typen und Tags.",
+        "Startseite zeigt einen Datenstatus mit den geladenen Mengen."
+      ]
+    },
     {
       "version": "0.1.0",
       "date": "2026-07-03",
