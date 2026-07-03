@@ -21,3 +21,14 @@ Ausgelagerte, älteste Log-Einträge aus `PLAN.md`. Chronologisch, älteste zuer
   Navigation auf die Browser-Route `/$type` (noch Platzhalter). Reine
   Gruppierungslogik mit 6 Tests. Input-Primitive und `ItemTypeTile` als
   wiederverwendbare Bausteine.
+- 2026-07-03, 0.6.0 – Phase 3, Screen 2: Modifier-Browser je Item-Typ. Präfixe
+  und Suffixe getrennt, je Mod-Familie die Tiers mit Rollen-Bereich, Itemstufe,
+  Gewicht und Chance über runQuery (Itemstufe fest 100). Basis-Varianten
+  datengetrieben abgeleitet (baseVariants.ts, ADR 0006) mit Umschalter bei
+  mehreren Basen. Neue Bausteine ModifierBrowser, ModColumn, ModGroupBlock,
+  TierRow, VariantSelect, Badge; Helfer modText, format. 12 neue Tests.
+- 2026-07-03, 0.7.0 – Phase 3, Screen-2-Feinschliff. Drei umschaltbare
+  Darstellungen (Karten/Tabelle/Balken, ViewSwitcher), farbige Typ-Tag-Chips je
+  Familie (TagChip, Quelle implicitTags, modTags.ts), ein-/ausklappbare Familien
+  plus globaler Schalter. Neue Bausteine ViewSwitcher, TagChip, ProbabilityBar,
+  ModTable, TierBar. 4 neue Tests.

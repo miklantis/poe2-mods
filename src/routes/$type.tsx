@@ -13,11 +13,6 @@ import { ModifierBrowser } from '@/components/ModifierBrowser'
  */
 const searchSchema = z.object({
   v: z.string().optional(),
-  view: z.enum(['cards', 'table', 'bars']).default('cards').catch('cards'),
-  origin: z
-    .enum(['rollable', 'corrupted', 'desecrated'])
-    .default('rollable')
-    .catch('rollable'),
   ilvl: z.number().int().min(1).max(100).default(100).catch(100),
   tags: z.array(z.string()).default([]).catch([]),
   q: z.string().default('').catch(''),
@@ -26,8 +21,6 @@ export type BrowserSearch = z.infer<typeof searchSchema>
 
 /** Frische Ansicht (Defaults) fuer Links auf die Browser-Route. */
 export const DEFAULT_BROWSER_SEARCH: BrowserSearch = {
-  view: 'cards',
-  origin: 'rollable',
   ilvl: 100,
   tags: [],
   q: '',

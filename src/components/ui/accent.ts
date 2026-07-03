@@ -1,15 +1,16 @@
 /**
- * Akzent einer Mod-Spalte. Bisher an den Slot (Praefix/Suffix) gekoppelt; mit
- * den Herkunft-Reitern kommt Corrupted als dritter, slot-loser Akzent dazu. Die
- * Klassen-Records bündeln die vorher in mehreren Komponenten verstreuten
- * Slot-Farben an einer Stelle.
+ * Akzent (Farbe) einer Mod-Tabelle. An die Herkunft gekoppelt: Präfix/Suffix des
+ * rollbaren Pools tragen die klassischen Slot-Farben, Desecrated ist durchgehend
+ * grün, Corrupted rot. Zentral gebündelt, damit die Farben nicht über mehrere
+ * Komponenten verstreut liegen.
  */
-export type Accent = 'prefix' | 'suffix' | 'corrupted'
+export type Accent = 'prefix' | 'suffix' | 'desecrated' | 'corrupted'
 
 /** Punkt in der Spaltenüberschrift. */
 export const ACCENT_DOT: Record<Accent, string> = {
   prefix: 'bg-prefix',
   suffix: 'bg-suffix',
+  desecrated: 'bg-desecrated',
   corrupted: 'bg-corrupted',
 }
 
@@ -17,19 +18,6 @@ export const ACCENT_DOT: Record<Accent, string> = {
 export const ACCENT_TEXT: Record<Accent, string> = {
   prefix: 'text-prefix',
   suffix: 'text-suffix',
+  desecrated: 'text-desecrated',
   corrupted: 'text-corrupted',
-}
-
-/** Tier-Badge (Rahmen/Fläche/Text). */
-export const ACCENT_BADGE: Record<Accent, string> = {
-  prefix: 'border-prefix/40 bg-prefix/10 text-prefix',
-  suffix: 'border-suffix/40 bg-suffix/10 text-suffix',
-  corrupted: 'border-corrupted/40 bg-corrupted/10 text-corrupted',
-}
-
-/** Füllung im Balken-View. */
-export const ACCENT_FILL: Record<Accent, string> = {
-  prefix: 'bg-prefix',
-  suffix: 'bg-suffix',
-  corrupted: 'bg-corrupted',
 }

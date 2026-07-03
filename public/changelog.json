@@ -1,6 +1,15 @@
 {
-  "current": "0.10.0",
+  "current": "0.11.0",
   "entries": [
+    {
+      "version": "0.11.0",
+      "date": "2026-07-03",
+      "changes": [
+        "Herkünfte werden jetzt alle gleichzeitig gezeigt statt über Reiter umgeschaltet: oben der rollbare Pool (Präfixe blau, Suffixe gelb, mit Chance), darunter Desecrated (Präfixe/Suffixe in Grün, ohne Chance) und ganz unten Corrupted als eine breite Tabelle in Rot.",
+        "Darstellung ist durchgehend die Tabelle; der Umschalter Karten/Balken ist entfallen. Ein gemeinsamer Filter (Suche, Tags, Itemstufe) wirkt auf alle Abschnitte.",
+        "Es werden nur die Abschnitte gezeigt, die die gewählte Basis wirklich hat."
+      ]
+    },
     {
       "version": "0.10.0",
       "date": "2026-07-03",

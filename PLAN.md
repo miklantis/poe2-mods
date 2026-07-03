@@ -2,18 +2,19 @@
 
 ## Aktueller Stand
 
-Herkunft-Reiter stehen (Phase 7, Schritt 2). Der Modifier-Browser hat eine
-Reiter-Leiste über den Spalten; je Item-Typ erscheinen nur die vorhandenen
-Herkünfte. Rollbar unverändert (Präfix/Suffix mit Chance), Desecrated als
-Präfix/Suffix ohne Chance, Corrupted als flache Liste ohne Slot und ohne Chance.
-Der aktive Reiter liegt im URL-State (`origin`); ein Wechsel setzt die Tags
-zurück. Die Anzeige-Bausteine (ModColumn, ModGroupBlock, TierRow, TierBar,
-ModTable) laufen jetzt über einen Akzent (`prefix`/`suffix`/`corrupted`, zentral
-in `components/ui/accent.ts`) und einen `showProbability`-Schalter statt fest über
-den Slot; neue reine `runFlatQuery` (Engine) und generisches `filterGroups`
-(Filter) tragen den Corrupted-Fall. Corrupted-Farbton im Theme ergänzt.
+Herkünfte stehen im Browser, alle gleichzeitig (Phase 7 abgeschlossen). Kein
+Reiter-Umschalten mehr: oben der rollbare Pool (Präfixe blau, Suffixe gelb, mit
+Chance), darunter Desecrated (Präfixe/Suffixe grün, ohne Chance), ganz unten
+Corrupted als breite Tabelle (rot, ohne Chance). Nur vorhandene Abschnitte
+erscheinen. Darstellung ist durchgehend die Tabelle (Karten/Balken entfallen,
+ViewSwitcher entfernt); ein gemeinsamer Filter (Suche, Tags, Itemstufe) wirkt auf
+alle Abschnitte. Akzent-Achse um Grün (Desecrated) erweitert; Tabellen haben einen
+Ausklapp-Namensraum (`keyNs`), damit die zwei grünen Spalten nicht kollidieren.
+Nicht mehr genutzte Bausteine gelöscht (ViewSwitcher, ModGroupBlock, TierRow,
+TierBar, ProbabilityBar). Entscheidung/Nachtrag in ADR 0009.
 
-Als Nächstes: Schritt 3 – Essence als eigener, item-typ-bezogener Datenweg + Reiter.
+Essence (ursprünglich Schritt 3) ist noch offen und kommt als eigener,
+item-typ-bezogener Datenweg dazu, sobald gewünscht.
 
 --- Stand Phase 6 (weiter gueltig fuer Datenquelle und Oberflaeche): ---
 
@@ -101,15 +102,16 @@ neuem Patch aktualisieren.
 ## Offene Vorhaben
 
 ### Phase 7 – Herkünfte (rollbar / Corrupted / Desecrated / Essence)
-Eigene Reiter je Herkunft im Browser. Konzept und Entscheidungen in ADR 0009.
+Alle Herkünfte gleichzeitig im Browser (Tabelle). Entscheidungen in ADR 0009.
 Socket-Mods ausgeschlossen; Augment/Bonded zurückgestellt (im Snapshot 0.5.4
 nicht als eigene Herkunft vorhanden).
 - [x] Schritt 1: Datenfundament – Import zieht Corrupted + Desecrated, `origin`
   und nullable `slot` im Schema, Engine überspringt slot-lose Mods,
   `filterRowsByOrigin`, rollbare Ansicht unverändert. Tests, ADR 0009.
-- [x] Schritt 2: Herkunft-Reiter im Browser (rollbar/Desecrated als Präfix/
-  Suffix, Corrupted flach; Chance nur bei rollbar)
-- [ ] Schritt 3: Essence als eigener, item-typ-bezogener Datenweg + Reiter
+- [x] Schritt 2: Herkünfte im Browser sichtbar – zunächst als Reiter, dann auf
+  Wunsch zu „alles gleichzeitig" umgebaut (rollbar oben mit Chance, Desecrated
+  grün, Corrupted breite Tabelle rot; durchgehend Tabelle, gemeinsamer Filter).
+- [ ] Schritt 3: Essence als eigener, item-typ-bezogener Datenweg + Abschnitt
 
 ### Phase 5 – optional/später
 - [ ] PWA-Hülle (`vite-plugin-pwa`), Offline-Feinschliff
@@ -171,6 +173,11 @@ ADR 0008.
 
 ## Log
 
+- 2026-07-03, 0.11.0 – Phase 7: Herkünfte alle gleichzeitig statt Reiter. Rollbar
+  oben (Chance), Desecrated grün, Corrupted breite Tabelle rot; durchgehend
+  Tabelle (ViewSwitcher/Karten/Balken entfernt), gemeinsamer Filter. Akzent um
+  Grün erweitert, Tabellen-`keyNs` gegen Schlüssel-Kollision; tote View-Bausteine
+  gelöscht. ADR 0009 mit Nachtrag.
 - 2026-07-03, 0.10.0 – Phase 7, Schritt 2: Herkunft-Reiter im Browser. Reiter-
   Leiste (nur vorhandene Herkünfte), aktiver Reiter im URL-State (`origin`);
   rollbar mit Chance, Desecrated ohne, Corrupted flach ohne Slot/Chance. Anzeige-
@@ -233,4 +240,4 @@ ADR 0008.
   mehreren Basen. Neue Bausteine `ModifierBrowser`, `ModColumn`, `ModGroupBlock`,
   `TierRow`, `VariantSelect`, `Badge`; Helfer `modText`, `format`. 12 neue Tests.
 
-Ältere Einträge (0.1.0–0.5.0) im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
+Ältere Einträge (0.1.0–0.7.0) im Archiv: `docs/archive/PLAN-Log-Archiv.md`.

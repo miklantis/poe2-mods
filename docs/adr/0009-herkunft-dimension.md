@@ -63,3 +63,23 @@ Seelenkerne) liegen ebenfalls in der Base-Gruppe.
   an den Ringen gegengeprüft). Der bestehende Browser-Screen filtert strikt auf
   `origin: rollable`.
 - Datenzuwachs im Snapshot 0.5.4: 491 rollbar, 100 Corrupted, 204 Desecrated.
+
+## Nachtrag (2026-07-03): Darstellung ohne Reiter
+
+Die ursprüngliche UI-Idee (ein Reiter je Herkunft) wurde nach dem ersten
+Praxistest verworfen. Der Browser zeigt jetzt alle Herkünfte gleichzeitig
+untereinander, damit man nichts umschalten muss:
+
+- oben der rollbare Pool (Präfixe blau, Suffixe gelb, mit Chance),
+- darunter Desecrated (Präfixe/Suffixe, durchgehend grün, ohne Chance),
+- ganz unten Corrupted als eine breite Tabelle (rot, ohne Chance).
+
+Darstellung ist durchgehend die Tabelle; der Umschalter Karten/Balken und die
+zugehörigen Bausteine (ViewSwitcher, ModGroupBlock, TierRow, TierBar,
+ProbabilityBar) sind entfallen. Ein gemeinsamer Filter (Suche, Tags, Itemstufe)
+wirkt auf alle Abschnitte; der URL-State führt `origin`/`view` nicht mehr. Die
+Farb-Achse (`components/ui/accent.ts`) trägt jetzt `prefix`/`suffix`/`desecrated`/
+`corrupted`; Tabellen bekommen einen Ausklapp-Namensraum (`keyNs`), damit die
+zwei gleichfarbigen Desecrated-Spalten nicht kollidieren. Die reine Engine/Filter-
+Trennung (`runBaseQuery`, `runFlatQuery`, `filterGroups`, `filterRowsByOrigin`)
+bleibt unverändert.

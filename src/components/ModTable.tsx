@@ -17,12 +17,14 @@ import { cn } from '@/lib/utils'
  */
 export function ModTable({
   accent,
+  keyNs,
   groups,
   showProbability,
   isCollapsed,
   onToggle,
 }: {
   accent: Accent
+  keyNs: string
   groups: readonly DisplayGroup[]
   showProbability: boolean
   isCollapsed: (key: string) => boolean
@@ -47,7 +49,7 @@ export function ModTable({
         </thead>
         <tbody>
           {groups.map((group) => {
-            const key = `${accent}-${group.group}`
+            const key = `${keyNs}-${group.group}`
             const collapsed = isCollapsed(key)
             const top = group.mods[0]
             const family = top ? modFamilyLabel(top.mod.text) : group.group

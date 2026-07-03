@@ -84,7 +84,8 @@
   /* Praefix-/Suffix-Akzent */
   --color-prefix: #6ea8ff;
   --color-suffix: #e8b45a;
-  /* Herkunft Corrupted (rot) */
+  /* Herkunft Desecrated (grün) / Corrupted (rot) */
+  --color-desecrated: #63c088;
   --color-corrupted: #d05a52;
 
   /* Tag-Farben */

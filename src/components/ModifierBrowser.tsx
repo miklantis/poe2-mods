@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
-import type { ItemType, Mod, Origin } from '@/data/schema.coe'
+import type { ItemType, Mod } from '@/data/schema.coe'
 import type { BrowserSearch } from '@/routes/$type'
 import { useMods, useBaseMods } from '@/hooks/useGameData'
 import {
@@ -8,42 +8,23 @@ import {
   runFlatQuery,
   filterRowsByOrigin,
 } from '@/lib/query/baseEngine'
-import type { DisplayGroup } from '@/lib/query/baseEngine'
 import { filterGroups, availableTags } from '@/lib/query/filter'
 import type { ColorTag } from '@/lib/modTags'
-import type { Accent } from '@/components/ui/accent'
 import { VariantSelect } from '@/components/VariantSelect'
 import { ModColumn } from '@/components/ModColumn'
-import { ViewSwitcher } from '@/components/ViewSwitcher'
 import { FilterBar } from '@/components/FilterBar'
-import { cn } from '@/lib/utils'
 
 const MIN_ITEM_LEVEL = 1
 const MAX_ITEM_LEVEL = 100
 
-/** Reihenfolge und Beschriftung der Herkunft-Reiter. */
-const ORIGIN_ORDER: Origin[] = ['rollable', 'desecrated', 'corrupted']
-const ORIGIN_LABEL: Record<Origin, string> = {
-  rollable: 'Rollbar',
-  desecrated: 'Desecrated',
-  corrupted: 'Corrupted',
-}
-
-/** Eine darzustellende Spalte (Präfixe, Suffixe oder flache Corrupted-Liste). */
-interface Column {
-  accent: Accent
-  title: string
-  showProbability: boolean
-  groups: DisplayGroup[]
-}
-
 /**
- * Modifier-Browser je Item-Typ (Screen 2). Reiter je Herkunft: rollbar und
- * Desecrated als Präfix/Suffix-Spalten (nur rollbar mit Chance), Corrupted als
- * flache Liste ohne Slot und ohne Chance. Es werden nur die Herkünfte gezeigt,
- * die die gewählte Basis wirklich hat. Filterzustand (Reiter, Suche, Tags,
- * Itemstufe) liegt im URL-State; nur das Ein-/Ausklappen ist lokal. Query- und
- * Filter-Logik bleiben in den reinen Modulen.
+ * Modifier-Browser je Item-Typ (Screen 2). Alle Herkünfte gleichzeitig, ohne
+ * Umschalten: oben der rollbare Pool (Präfixe blau, Suffixe gelb, mit Chance),
+ * darunter Desecrated (Präfixe/Suffixe, grün, ohne Chance) und ganz unten
+ * Corrupted (eine breite Tabelle, rot, ohne Chance). Ein gemeinsamer Filter
+ * (Suche, Tags, Itemstufe) wirkt auf alle Abschnitte; Darstellung ist stets die
+ * Tabelle. Filterzustand liegt im URL-State, nur das Ein-/Ausklappen ist lokal.
+ * Query- und Filter-Logik bleiben in den reinen Modulen.
  */
 export function ModifierBrowser({
   itemType,
@@ -77,62 +58,54 @@ export function ModifierBrowser({
     [baseMods.data, selected],
   )
 
-  // Welche Herkünfte hat diese Basis? Nur diese bekommen einen Reiter.
-  const origins = useMemo(
-    () =>
-      ORIGIN_ORDER.filter(
-        (o) => filterRowsByOrigin(rows, modsById, o).length > 0,
-      ),
-    [rows, modsById],
-  )
-  const activeOrigin: Origin = origins.includes(search.origin)
-    ? search.origin
-    : (origins[0] ?? 'rollable')
-
-  // Ungefilterte Spalten des aktiven Reiters.
-  const rawColumns = useMemo<Column[]>(() => {
+  // Rohe Gruppen je Herkunft (vor dem Suchfilter, nach Itemstufe).
+  const raw = useMemo(() => {
     const ctx = { itemLevel: search.ilvl }
-    const originRows = filterRowsByOrigin(rows, modsById, activeOrigin)
-    if (activeOrigin === 'corrupted') {
-      return [
-        {
-          accent: 'corrupted',
-          title: 'Corrupted',
-          showProbability: false,
-          groups: runFlatQuery(originRows, modsById, ctx),
-        },
-      ]
+    return {
+      roll: runBaseQuery(filterRowsByOrigin(rows, modsById, 'rollable'), modsById, ctx),
+      des: runBaseQuery(filterRowsByOrigin(rows, modsById, 'desecrated'), modsById, ctx),
+      cor: runFlatQuery(filterRowsByOrigin(rows, modsById, 'corrupted'), modsById, ctx),
     }
-    const result = runBaseQuery(originRows, modsById, ctx)
-    const showProbability = activeOrigin === 'rollable'
-    return [
-      { accent: 'prefix', title: 'Präfixe', showProbability, groups: result.prefixes },
-      { accent: 'suffix', title: 'Suffixe', showProbability, groups: result.suffixes },
-    ]
-  }, [rows, modsById, activeOrigin, search.ilvl])
+  }, [rows, modsById, search.ilvl])
+
+  const hasDesecrated = raw.des.prefixes.length + raw.des.suffixes.length > 0
+  const hasCorrupted = raw.cor.length > 0
 
   const tags = useMemo(
-    () => availableTags(rawColumns.flatMap((c) => c.groups)),
-    [rawColumns],
+    () =>
+      availableTags([
+        ...raw.roll.prefixes,
+        ...raw.roll.suffixes,
+        ...raw.des.prefixes,
+        ...raw.des.suffixes,
+        ...raw.cor,
+      ]),
+    [raw],
   )
 
-  const columns = useMemo<Column[]>(
-    () =>
-      rawColumns.map((c) => ({
-        ...c,
-        groups: filterGroups(c.groups, { tags: search.tags, search: search.q }),
-      })),
-    [rawColumns, search.tags, search.q],
-  )
+  // Suchfilter auf jede Liste anwenden.
+  const f = useMemo(() => {
+    const c = { tags: search.tags, search: search.q }
+    return {
+      rollPre: filterGroups(raw.roll.prefixes, c),
+      rollSuf: filterGroups(raw.roll.suffixes, c),
+      desPre: filterGroups(raw.des.prefixes, c),
+      desSuf: filterGroups(raw.des.suffixes, c),
+      cor: filterGroups(raw.cor, c),
+    }
+  }, [raw, search.tags, search.q])
 
   const allKeys = useMemo(
-    () =>
-      columns.flatMap((c) => c.groups.map((g) => `${c.accent}-${g.group}`)),
-    [columns],
+    () => [
+      ...f.rollPre.map((g) => `r-pre-${g.group}`),
+      ...f.rollSuf.map((g) => `r-suf-${g.group}`),
+      ...f.desPre.map((g) => `d-pre-${g.group}`),
+      ...f.desSuf.map((g) => `d-suf-${g.group}`),
+      ...f.cor.map((g) => `c-${g.group}`),
+    ],
+    [f],
   )
 
-  // Standard: alles eingeklappt. Gefuehrt wird die Menge der ausgeklappten
-  // Gruppen; nicht enthaltene gelten als eingeklappt.
   const collapsedKeys = useMemo(() => {
     const s = new Set<string>()
     for (const k of allKeys) if (!expandedKeys.has(k)) s.add(k)
@@ -160,9 +133,6 @@ export function ModifierBrowser({
     patchSearch({ tags: [...active] })
   }
 
-  // Reiterwechsel setzt die Tag-Auswahl zurück (Tags sind reiterspezifisch).
-  const selectOrigin = (origin: Origin) => patchSearch({ origin, tags: [] })
-
   const isPending = mods.isPending || baseMods.isPending
   const error = mods.error ?? baseMods.error
 
@@ -185,7 +155,6 @@ export function ModifierBrowser({
   }
 
   const CollapseIcon = allCollapsed ? ChevronsUpDown : ChevronsDownUp
-  const showProbabilityHint = activeOrigin === 'rollable'
 
   return (
     <div className="mt-6">
@@ -202,35 +171,6 @@ export function ModifierBrowser({
         </div>
       )}
 
-      {origins.length > 1 && (
-        <div className="mb-5">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-text">
-            Herkunft
-          </p>
-          <div className="inline-flex flex-wrap gap-0.5 rounded-md border border-border bg-surface-raised p-0.5">
-            {origins.map((o) => {
-              const active = o === activeOrigin
-              return (
-                <button
-                  key={o}
-                  type="button"
-                  onClick={() => selectOrigin(o)}
-                  aria-pressed={active}
-                  className={cn(
-                    'rounded-[10px] px-3 py-1.5 text-[12.5px] font-semibold transition-colors',
-                    active
-                      ? 'bg-accent text-heading'
-                      : 'text-secondary-text hover:text-body',
-                  )}
-                >
-                  {ORIGIN_LABEL[o]}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
       <FilterBar
         search={search.q}
         onSearch={(q) => patchSearch({ q })}
@@ -243,59 +183,93 @@ export function ModifierBrowser({
         onItemLevel={(ilvl) => patchSearch({ ilvl })}
       />
 
-      {showProbabilityHint ? (
-        <p className="mb-4 text-[12px] text-dim">
-          Gewicht und Chance beruhen auf geschätzten Spawn-Gewichten (Craft of
-          Exile).
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <p className="text-[12px] text-dim">
+          Chance nur im rollbaren Pool (geschätzte Spawn-Gewichte, Craft of
+          Exile). Desecrated und Corrupted werden gezielt gesetzt.
         </p>
-      ) : activeOrigin === 'desecrated' ? (
-        <p className="mb-4 text-[12px] text-dim">
-          Desecrated-Modifier werden über Abyssal-Knochen am Well of Souls
-          gesetzt; sie haben keine Spawn-Chance. Viele erfordern Itemstufe 65.
-        </p>
-      ) : (
-        <p className="mb-4 text-[12px] text-dim">
-          Corrupted-Modifier werden per Vaal-Corruption gesetzt und belegen
-          keinen Präfix/Suffix-Slot; sie haben keine Spawn-Chance.
-        </p>
-      )}
-
-      <div className="mb-5 flex items-center justify-end gap-2">
         <button
           type="button"
           onClick={toggleAll}
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2.5 py-1.5 text-[12.5px] font-semibold text-secondary-text transition-colors hover:text-body"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2.5 py-1.5 text-[12.5px] font-semibold text-secondary-text transition-colors hover:text-body"
         >
           <CollapseIcon className="size-3.5" strokeWidth={2} aria-hidden />
           <span className="hidden sm:inline">
             {allCollapsed ? 'Alle ausklappen' : 'Alle einklappen'}
           </span>
         </button>
-        <ViewSwitcher
-          value={search.view}
-          onChange={(view) => patchSearch({ view })}
-        />
       </div>
 
-      <div
-        className={cn(
-          'grid grid-cols-1 gap-8 md:gap-6',
-          columns.length > 1 && 'md:grid-cols-2',
-        )}
-      >
-        {columns.map((c) => (
+      {/* Rollbar */}
+      <section>
+        <h2 className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-secondary-text">
+          Rollbar
+        </h2>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
           <ModColumn
-            key={c.accent}
-            title={c.title}
-            accent={c.accent}
-            showProbability={c.showProbability}
-            groups={c.groups}
-            view={search.view}
+            title="Präfixe"
+            accent="prefix"
+            keyNs="r-pre"
+            showProbability
+            groups={f.rollPre}
             collapsedKeys={collapsedKeys}
             onToggle={toggleKey}
           />
-        ))}
-      </div>
+          <ModColumn
+            title="Suffixe"
+            accent="suffix"
+            keyNs="r-suf"
+            showProbability
+            groups={f.rollSuf}
+            collapsedKeys={collapsedKeys}
+            onToggle={toggleKey}
+          />
+        </div>
+      </section>
+
+      {/* Desecrated */}
+      {hasDesecrated && (
+        <section className="mt-10">
+          <h2 className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-desecrated">
+            Desecrated
+          </h2>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
+            <ModColumn
+              title="Präfixe"
+              accent="desecrated"
+              keyNs="d-pre"
+              showProbability={false}
+              groups={f.desPre}
+              collapsedKeys={collapsedKeys}
+              onToggle={toggleKey}
+            />
+            <ModColumn
+              title="Suffixe"
+              accent="desecrated"
+              keyNs="d-suf"
+              showProbability={false}
+              groups={f.desSuf}
+              collapsedKeys={collapsedKeys}
+              onToggle={toggleKey}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Corrupted */}
+      {hasCorrupted && (
+        <section className="mt-10">
+          <ModColumn
+            title="Corrupted"
+            accent="corrupted"
+            keyNs="c"
+            showProbability={false}
+            groups={f.cor}
+            collapsedKeys={collapsedKeys}
+            onToggle={toggleKey}
+          />
+        </section>
+      )}
     </div>
   )
 }
