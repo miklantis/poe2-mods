@@ -1,6 +1,13 @@
 {
-  "current": "0.17.0",
+  "current": "0.17.1",
   "entries": [
+    {
+      "version": "0.17.1",
+      "date": "2026-07-08",
+      "changes": [
+        "Bei den aufklappbaren Augment-/Bonded-Quellen steht jetzt der echte Name des Sockelbaren statt nur Stufe und Typ – z. B. „Lesser Desert Rune“, „Perfect Desert Rune“, „Amanamu's Gaze“ oder „Idol of the Martyr“. Besonders bei Idols und Soul Cores, die keine Stufen haben, ist damit klar, welches Item den Effekt gibt."
+      ]
+    },
     {
       "version": "0.17.0",
       "date": "2026-07-08",

@@ -147,3 +147,11 @@ Ausgelagerte, älteste Log-Einträge aus `PLAN.md`. Chronologisch, älteste zuer
   StaleWhileRevalidate (Cache-Name erhoeht), damit In-Place-Updates unter
   gleicher Version beim naechsten Laden greifen (Symptom: fehlende Jewels aus
   dem Offline-Cache). App-Version in der Fusszeile ergaenzt. ADR 0014.
+- 2026-07-08, 0.15.2 – Bugfix Tag-Filter: Essence-Einträge tragen jetzt
+  Filter-Tags (aus dem CoE-Snapshot), sodass ein aktiver Tag-Filter den
+  Essence-Abschnitt nicht mehr komplett ausblendet (Symptom: „+# to Strength“
+  verschwand unter „Attribut“). ADR 0015.
+- 2026-07-08, 0.15.3 – Itemstufen-Regler aus der Filterleiste in die Kopfzeile
+  neben den Item-Namen verlegt (eigene Komponente `ItemLevelControl`, Label und
+  Slider mit Abstand); Filterleiste nur noch Suche + Tag-Chips. Mobil unter dem
+  Titel.

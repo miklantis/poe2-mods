@@ -192,12 +192,18 @@ function deriveFilterTags(text: string): string[] {
 }
 
 /**
- * Ableitbare Quellen-Bezeichnung: Stufe (aus dem Metadaten-Schluessel) plus
- * Sockelbaren-Typ (aus `type_name`). Beispiele: „Lesser Rune", „Greater Rune",
- * „Perfect Rune", „Rune", „Soul Core", „Idol". Marketing-Namen (z. B. „Desert
- * Rune") fuehrt der Export nicht.
+ * Quellen-Bezeichnung: bevorzugt der echte Item-Name des Sockelbaren aus
+ * `base_items.json` (enthaelt die Stufe schon, z. B. „Lesser Desert Rune",
+ * „Idol of the Martyr", „Amanamu's Gaze"). Fehlt der Name, wird er aus Stufe
+ * (Metadaten-Schluessel) plus Typ (`type_name`) abgeleitet – „Lesser Rune",
+ * „Greater Rune", „Soul Core" usw.
  */
-function sourceLabel(metaKey: string, typeName: string | undefined): string {
+function sourceLabel(
+  metaKey: string,
+  typeName: string | undefined,
+  itemName: string | undefined,
+): string {
+  if (itemName && itemName.trim()) return clean(itemName)
   const tier = /Lesser/.test(metaKey)
     ? 'Lesser'
     : /Greater/.test(metaKey)
@@ -268,6 +274,12 @@ async function main(): Promise<void> {
     r.json(),
   )) as Record<string, RawAugment>
 
+  // Namen der Sockelbaren (Runen/Soul Cores/Idols …) aus base_items.json.
+  const baseItems = (await fetch(`${RAW_BASE}/data/base_items.json`).then((r) =>
+    r.json(),
+  )) as Record<string, { name?: string }>
+  const nameByKey = (metaKey: string): string | undefined =>
+    baseItems[metaKey]?.name
   const itemTypes = itemTypesFileSchema.parse(
     JSON.parse(
       await readFile(
@@ -287,7 +299,7 @@ async function main(): Promise<void> {
     const augSrc: RawSource[] = []
     const bonSrc: RawSource[] = []
     for (const [metaKey, aug] of Object.entries(augments)) {
-      const label = sourceLabel(metaKey, aug.type_name)
+      const label = sourceLabel(metaKey, aug.type_name, nameByKey(metaKey))
       const level = aug.required_level ?? 1
       for (const [cat, cv] of Object.entries(aug.categories ?? {})) {
         const catTokens = CAT_TOKENS[cat]
