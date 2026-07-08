@@ -33,6 +33,26 @@ describe('modFitsBase', () => {
     const mod = makeMod({ id: 'm', tags: ['amulet'] })
     expect(modFitsBase(mod, new Set(['ring', 'default']))).toBe(false)
   })
+  it('passt nicht allein ueber den default-Tag', () => {
+    const mod = makeMod({ id: 'm', tags: ['amulet', 'default'] })
+    expect(modFitsBase(mod, new Set(['ring', 'default']))).toBe(false)
+  })
+  it('passt nicht allein ueber einen Domaenen-Marker', () => {
+    const mod = makeMod({ id: 'm', tags: ['amulet', '__dom_item'] })
+    expect(modFitsBase(mod, new Set(['ring', '__dom_item']))).toBe(false)
+  })
+  it('Corrupted-Ruestungsmod leakt nicht ueber __dom_item auf eine Waffe', () => {
+    // Realfall: +% to Cold Resistance (belt/boots) traf Claws nur, weil beide
+    // den Marker __dom_item teilen.
+    const mod = makeMod({
+      id: 'cold-res',
+      origin: 'corrupted',
+      slot: null,
+      tags: ['__dom_item', 'belt', 'boots'],
+    })
+    const claw = new Set(['claw', 'one_hand_weapon', 'weapon', 'default', '__dom_item'])
+    expect(modFitsBase(mod, claw)).toBe(false)
+  })
 })
 
 describe('runRepoeQuery – Auswahl und Erreichbarkeit', () => {

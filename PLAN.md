@@ -36,9 +36,10 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
   unter `data/<version>/` mit Manifest; Datenzugriff über Loader-Hooks
   (TanStack Query). Essence aus einem eingefrorenen CoE-Snapshot aufbereitet.
   ADR 0011 (löst ADR 0003, 0004, 0008 ab).
-- Query-Engine: reines, DOM-freies Modul (`repoeEngine.ts`): Eignung über Tags,
-  freier Slot, Itemstufe, Tier-Rangfolge; keine Wahrscheinlichkeit (repoe führt
-  nur Gewicht 0/1). Unit-Tests via Vitest.
+- Query-Engine: reines, DOM-freies Modul (`repoeEngine.ts`): Eignung über Tags
+  (Domänen-Marker `__…` und `default` zählen nicht, ADR 0017), freier Slot,
+  Itemstufe, Tier-Rangfolge; keine Wahrscheinlichkeit (repoe führt nur Gewicht
+  0/1). Unit-Tests via Vitest.
 - UI: Design-System (Tokens, Schriften, Shell), Item-Typ-Auswahl,
   Modifier-Browser mit allen Herkünften gleichzeitig als Tabellen, Facet-Search
   als URL-State. ADR 0005, 0006, 0009, 0010. Unique-Ansicht zurückgestellt
@@ -54,6 +55,12 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
+
+- 2026-07-08, 0.16.2 – Bugfix Eignung: `modFitsBase` ignoriert jetzt die
+  Domänen-Isolationsmarker (`__dom_*`) und `default`, statt sie als geteilten
+  Eignungs-Tag zu werten. Zuvor leakten sieben Rüstungs-/Schmuck-Corrupted
+  (Attribute, Einzel-Resistenzen) über `__dom_item` auf Waffen (Claws-Corrupted
+  16 → 9, deckt sich mit poe2db); rollbar/Desecrated unverändert. ADR 0017.
 
 - 2026-07-08, 0.16.1 – Warp-Runen korrigiert: sechs Slot-gebundene Runen
   (Waffen Thrud's, Helm Vorana's, Handschuhe Kolr's+Katla's, Körperrüstung

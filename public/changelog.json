@@ -1,6 +1,13 @@
 {
-  "current": "0.16.1",
+  "current": "0.16.2",
   "entries": [
+    {
+      "version": "0.16.2",
+      "date": "2026-07-08",
+      "changes": [
+        "Behoben: Bei manchen Waffen tauchten unter „Corrupted“ einzelne Modifier auf, die dort nicht hingehören – etwa „+#% to Fire/Cold/Lightning/Chaos Resistance“ oder „+# to Strength/Dexterity/Intelligence“. Diese Vaal-Corruptions gehören zu Rüstung und Schmuck und erscheinen jetzt nicht mehr fälschlich bei Waffen. Der rollbare und der Desecrated-Pool waren nicht betroffen."
+      ]
+    },
     {
       "version": "0.16.1",
       "date": "2026-07-08",

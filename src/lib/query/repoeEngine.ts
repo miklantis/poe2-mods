@@ -64,12 +64,27 @@ export interface RepoeGroup {
   tiers: RepoeTier[]
 }
 
-/** Ob eine Familie auf eine Basis passt: teilt sie mindestens einen Tag. */
+/**
+ * Tags, die keine Eignung stiften duerfen: die Domaenen-Isolationsmarker
+ * (`__dom_*`, allgemein alles mit `__`-Praefix) und der ueberall vorhandene
+ * `default`-Tag. Beide liegen auf nahezu jeder Basis und – je nach Herkunft –
+ * auch auf den Mods. Als Eignungssignal gewertet, wuerden sie herkunftsfremde
+ * Mods auf falsche Basen ziehen (z. B. Ruestungs-/Schmuck-Corrupted auf Waffen,
+ * die nur den gemeinsamen `__dom_item`-Marker teilen).
+ */
+function isEligibilityTag(tag: string): boolean {
+  return tag !== 'default' && !tag.startsWith('__')
+}
+
+/**
+ * Ob eine Familie auf eine Basis passt: teilt sie mindestens einen echten
+ * Eignungs-Tag. Domaenen-Marker (`__…`) und `default` zaehlen dabei nicht.
+ */
 export function modFitsBase(
   mod: Mod,
   baseTags: ReadonlySet<string>,
 ): boolean {
-  return mod.tags.some((t) => baseTags.has(t))
+  return mod.tags.some((t) => isEligibilityTag(t) && baseTags.has(t))
 }
 
 /**
