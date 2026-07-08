@@ -6,6 +6,7 @@ import { runRepoeQuery, essenceGroups, warpGroups } from '@/lib/query/repoeEngin
 import type { RepoeGroup } from '@/lib/query/repoeEngine'
 import { filterGroups, filterAugments, availableTags } from '@/lib/query/filter'
 import type { ColorTag } from '@/lib/modTags'
+import { warpThemesFor, WARP_LABEL } from '@/lib/warp'
 import { VariantSelect } from '@/components/VariantSelect'
 import { ModColumn } from '@/components/ModColumn'
 import { EssenceColumn } from '@/components/EssenceColumn'
@@ -20,10 +21,10 @@ const suffixesOf = (groups: RepoeGroup[]) =>
 /**
  * Modifier-Browser je Item-Typ (Screen 2). Alle Herkünfte gleichzeitig, ohne
  * Umschalten, in poe2db-Reihenfolge: rollbarer Pool (Präfixe blau, Suffixe
- * gelb), dann Rune-Magnituden (türkis, Präfix/Suffix mit Wertebereich),
- * Desecrated (grün), Essence (violett), dann Augment (bronze) und Bonded (pink)
- * als flache Effekt-Listen aus den Socketable-Daten, zuletzt Corrupted (rot).
- * Rune-Magnituden, Augment und Bonded erscheinen nur bei Ausrüstung.
+ * gelb), dann die zum Slot passende(n) Warp-Rune(n) (türkis, je Rune ein Block
+ * mit Präfix/Suffix), Desecrated (grün), Essence (violett), dann Augment
+ * (bronze) und Bonded (pink) als flache Effekt-Listen, zuletzt Corrupted (rot).
+ * Warp-Runen, Augment und Bonded erscheinen nur bei Ausrüstung.
  * Ein gemeinsamer Filter (Suche, Tags, Itemstufe) wirkt auf alle Abschnitte;
  * Itemstufe greift nur dort, wo es Stufen gibt (rollbar, Rune-Magnituden,
  * Desecrated, Essence). Filterzustand liegt im URL-State, nur das
@@ -72,11 +73,13 @@ export function ModifierBrowser({
     const essList =
       essences.data && itemClass ? (essences.data[itemClass] ?? []) : []
     const ess = essenceGroups(essList, ctx)
-    // Augment/Bonded und Rune-Magnituden gelten fuer Ausruestung. Ob ein Typ
-    // Ausruestung ist, sagt das Vorhandensein eines augments-Eintrags.
+    // Augment/Bonded und Warp-Runen gelten fuer Ausruestung. Ob ein Typ
+    // Ausruestung ist, sagt das Vorhandensein eines augments-Eintrags; welche
+    // Warp-Rune(n) passen, gibt die Slot-Zuordnung vor.
     const augEntry = augments.data?.[itemType.id]
-    const warp = augEntry ? warpGroups(allMods, ctx) : []
-    return { roll, des, cor, ess, warp, augEntry }
+    const warpThemes = warpThemesFor(itemType.id)
+    const warp = augEntry ? warpGroups(allMods, warpThemes, ctx) : []
+    return { roll, des, cor, ess, warp, warpThemes, augEntry }
   }, [
     mods.data,
     essences.data,
@@ -110,11 +113,20 @@ export function ModifierBrowser({
   // Suchfilter auf jede Liste anwenden.
   const f = useMemo(() => {
     const c = { tags: search.tags, search: search.q }
+    const warp = raw.warpThemes
+      .map((theme) => {
+        const g = raw.warp.filter((x) => x.tags.includes(theme))
+        return {
+          theme,
+          pre: filterGroups(prefixesOf(g), c),
+          suf: filterGroups(suffixesOf(g), c),
+        }
+      })
+      .filter((b) => b.pre.length > 0 || b.suf.length > 0)
     return {
       rollPre: filterGroups(prefixesOf(raw.roll), c),
       rollSuf: filterGroups(suffixesOf(raw.roll), c),
-      warpPre: filterGroups(prefixesOf(raw.warp), c),
-      warpSuf: filterGroups(suffixesOf(raw.warp), c),
+      warp,
       desPre: filterGroups(prefixesOf(raw.des), c),
       desSuf: filterGroups(suffixesOf(raw.des), c),
       essPre: filterGroups(prefixesOf(raw.ess), c),
@@ -129,8 +141,10 @@ export function ModifierBrowser({
     () => [
       ...f.rollPre.map((g) => `r-pre-${g.id}`),
       ...f.rollSuf.map((g) => `r-suf-${g.id}`),
-      ...f.warpPre.map((g) => `w-pre-${g.id}`),
-      ...f.warpSuf.map((g) => `w-suf-${g.id}`),
+      ...f.warp.flatMap((b) => [
+        ...b.pre.map((g) => `w-${b.theme}-pre-${g.id}`),
+        ...b.suf.map((g) => `w-${b.theme}-suf-${g.id}`),
+      ]),
       ...f.desPre.map((g) => `d-pre-${g.id}`),
       ...f.desSuf.map((g) => `d-suf-${g.id}`),
       ...f.cor.map((g) => `c-${g.id}`),
@@ -236,29 +250,33 @@ export function ModifierBrowser({
         </div>
       </section>
 
-      {/* Rune-Magnituden (warp) */}
-      {hasWarp && (
-        <section className="mt-10">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
-            <ModColumn
-              title="Rune-Magnituden Präfixe"
-              accent="warp"
-              keyNs="w-pre"
-              groups={f.warpPre}
-              collapsedKeys={collapsedKeys}
-              onToggle={toggleKey}
-            />
-            <ModColumn
-              title="Rune-Magnituden Suffixe"
-              accent="warp"
-              keyNs="w-suf"
-              groups={f.warpSuf}
-              collapsedKeys={collapsedKeys}
-              onToggle={toggleKey}
-            />
-          </div>
-        </section>
-      )}
+      {/* Warp-Runen (je Slot passende Rune, ein Block je Rune) */}
+      {hasWarp &&
+        f.warp.map((b) => (
+          <section key={b.theme} className="mt-10">
+            <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-warp">
+              Warp-Rune: {WARP_LABEL[b.theme] ?? b.theme}
+            </p>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
+              <ModColumn
+                title="Präfixe"
+                accent="warp"
+                keyNs={`w-${b.theme}-pre`}
+                groups={b.pre}
+                collapsedKeys={collapsedKeys}
+                onToggle={toggleKey}
+              />
+              <ModColumn
+                title="Suffixe"
+                accent="warp"
+                keyNs={`w-${b.theme}-suf`}
+                groups={b.suf}
+                collapsedKeys={collapsedKeys}
+                onToggle={toggleKey}
+              />
+            </div>
+          </section>
+        ))}
 
       {/* Desecrated */}
       {hasDesecrated && (

@@ -135,19 +135,24 @@ export function runRepoeQuery(
 }
 
 /**
- * Baut die Anzeige-Zeilen des Rune-Magnituden-Abschnitts (Herkunft `warp`).
- * Diese Mods haengen am Tag `destruction`, nicht an Basis-Tags; sie gelten
- * pauschal fuer Ausruestung. Darum kein Basis-Abgleich – nur Herkunft `warp`
- * und die bei der Itemstufe erreichbaren Tiers. Slot (Praefix/Suffix) bleibt
- * erhalten; die Ansicht trennt danach.
+ * Baut die Anzeige-Zeilen des Warp-Runen-Abschnitts (Herkunft `warp`). Diese
+ * Mods haengen an ihrem Themen-Tag (destruction, berserking, …), nicht an
+ * Basis-Tags; welche Rune auf welchen Slot passt, gibt `allowedThemes` vor
+ * (aus der Slot-Bindung, siehe `lib/warp.ts`). Es zaehlen also nur warp-Mods,
+ * deren Themen-Tag in `allowedThemes` liegt, mit den bei der Itemstufe
+ * erreichbaren Tiers. Slot (Praefix/Suffix) bleibt erhalten.
  */
 export function warpGroups(
   mods: readonly Mod[],
+  allowedThemes: readonly string[],
   ctx: RepoeQueryContext,
 ): RepoeGroup[] {
+  if (allowedThemes.length === 0) return []
+  const allow = new Set(allowedThemes)
   const groups: RepoeGroup[] = []
   for (const mod of mods) {
     if (mod.origin !== 'warp') continue
+    if (!mod.tags.some((t) => allow.has(t))) continue
     const tiers = reachableTiers(mod, ctx.itemLevel)
     if (tiers.length === 0) continue
     groups.push({

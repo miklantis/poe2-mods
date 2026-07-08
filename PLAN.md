@@ -5,7 +5,7 @@
 Die App ist im geplanten Umfang fertig und läuft live (GitHub Pages): ein
 statischer, read-only Modifier-Browser auf Basis der repoe-Daten
 (manifest 4.5.4.3). Startseite mit gruppierter Item-Typ-Auswahl; je Typ ein
-Browser, der alle Herkünfte (rollbar, Rune-Magnituden, Desecrated, Essence,
+Browser, der alle Herkünfte (rollbar, Warp-Runen, Desecrated, Essence,
 Corrupted) sowie – bei Ausrüstung – die Augment- und Bonded-Effekte der
 Socketables als Tabellen bzw. Listen zeigt, mit gemeinsamem Facet-Filter
 (Suche, Tags, Itemstufe) als teil-/bookmarkbarer URL-State. Installierbar und
@@ -43,9 +43,10 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
   Modifier-Browser mit allen Herkünften gleichzeitig als Tabellen, Facet-Search
   als URL-State. ADR 0005, 0006, 0009, 0010. Unique-Ansicht zurückgestellt
   (ADR 0007).
-- Augment/Bonded/Rune-Magnituden: drei zusätzliche Abschnitte je Ausrüstung.
-  Rune-Magnituden als Herkunft `warp` aus `mods.json`; Augment/Bonded invertiert
-  aus `augments.json` (eigene Import-Strecke, per-Typ-Datei). ADR 0016.
+- Augment/Bonded/Warp-Runen: drei zusätzliche Abschnitte je Ausrüstung.
+  Warp-Runen (sechs Slot-gebundene Runen) als Herkunft `warp` aus `mods.json`;
+  Augment/Bonded invertiert aus `augments.json` (eigene Import-Strecke,
+  per-Typ-Datei). ADR 0016.
 - PWA: installierbar und offline; App-Hülle vorgeladen, Spieldaten beim Benutzen
   gecacht, stille Hintergrund-Updates. ADR 0012.
 
@@ -53,6 +54,13 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
+
+- 2026-07-08, 0.16.1 – Warp-Runen korrigiert: sechs Slot-gebundene Runen
+  (Waffen Thrud's, Helm Vorana's, Handschuhe Kolr's+Katla's, Körperrüstung
+  Medved's, Stiefel Uhtred's, Talisman wie Waffen) statt fälschlich nur Thrud's
+  auf jede Ausrüstung. Alle sechs Themen als `warp` klassifiziert (frischer
+  repoe-Import, saubere Trennung von Jewel-Mods gleichen Typs); Anzeige je Rune
+  ein Präfix/Suffix-Block. ADR 0016.
 
 - 2026-07-08, 0.16.0 – Drei neue Abschnitte je Ausrüstung (poe2db-Vorbild):
   Rune-Magnituden (Herkunft `warp` aus `mods.json`), Augment und Bonded
@@ -88,11 +96,3 @@ Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
   Waystones, Tablets, Relics. Import um die Domains misc/flask/area/tablet/
   sanctum_relic erweitert; Domain-Marker isoliert die Welten gegen den
   allgegenwärtigen Tag `default`. 30 → 37 Item-Typen. ADR 0013.
-- 2026-07-03 – PLAN verschlankt: Übergang in den Betriebsmodus. Abgeschlossene
-  Vorhaben zu einem Überblick verdichtet, Phase-8-Detailblock entfernt (steht in
-  ADR 0011 und Commits), Aufbau-Log 0.12.0–Phase 8 ins Archiv verschoben.
-- 2026-07-03, 0.14.0 – PWA: `vite-plugin-pwa` (autoUpdate) erzeugt Service
-  Worker und Web-App-Manifest; Icons aus `favicon.svg` (192/512/maskable,
-  apple-touch), Theme-Farbe `#14171d`. App-Hülle vorgeladen, Spieldaten beim
-  Benutzen gecacht (Manifest NetworkFirst, `data/<version>/` CacheFirst,
-  Changelog StaleWhileRevalidate), SPA-Fallback offline. ADR 0012.

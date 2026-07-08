@@ -131,3 +131,11 @@ Ausgelagerte, älteste Log-Einträge aus `PLAN.md`. Chronologisch, älteste zuer
   baseEngine/essenceEngine + Tests, format.ts, data/0.5.4, roher _source/coe).
   CoE-Essence-Quelle nach `data/_source/coe-essence/` archiviert. Architektur.md
   auf repoe. Phase 8 abgeschlossen.
+- 2026-07-03, 0.14.0 – PWA: `vite-plugin-pwa` (autoUpdate) erzeugt Service
+  Worker und Web-App-Manifest; Icons aus `favicon.svg` (192/512/maskable,
+  apple-touch), Theme-Farbe `#14171d`. App-Hülle vorgeladen, Spieldaten beim
+  Benutzen gecacht (Manifest NetworkFirst, `data/<version>/` CacheFirst,
+  Changelog StaleWhileRevalidate), SPA-Fallback offline. ADR 0012.
+- 2026-07-03 – PLAN verschlankt: Übergang in den Betriebsmodus. Abgeschlossene
+  Vorhaben zu einem Überblick verdichtet, Phase-8-Detailblock entfernt (steht in
+  ADR 0011 und Commits), Aufbau-Log 0.12.0–Phase 8 ins Archiv verschoben.

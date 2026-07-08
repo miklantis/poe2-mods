@@ -1,6 +1,15 @@
 {
-  "current": "0.16.0",
+  "current": "0.16.1",
   "entries": [
+    {
+      "version": "0.16.1",
+      "date": "2026-07-08",
+      "changes": [
+        "Korrektur an den Warp-Runen (in 0.16.0 noch „Rune-Magnituden“): Es gibt sechs Warp-Runen, jede an einen bestimmten Ausrüstungs-Slot gebunden – Waffen: Thrud's Might (Magnituden); Helm: Vorana's Carnage (Rage/Warcry); Handschuhe: Kolr's und Katla's; Körperrüstung: Medved's; Stiefel: Uhtred's; Talisman wie Waffen. Zuvor wurde fälschlich nur Thrud's Might auf jede Ausrüstung gelegt.",
+        "Der Abschnitt heißt jetzt „Warp-Runen“ und zeigt je Item-Typ nur die passende(n) Rune(n), als eigener Präfix/Suffix-Block je Rune (wie auf poe2db). Schilde, Foci, Ringe, Amulette, Gürtel und Köcher haben keine Warp-Rune.",
+        "Hinweis: Die vollen Namen von Kolr's, Katla's, Medved's und Uhtred's führt der Datenexport nicht sauber; sie sind vorläufig benannt."
+      ]
+    },
     {
       "version": "0.16.0",
       "date": "2026-07-08",

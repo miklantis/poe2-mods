@@ -131,6 +131,22 @@ function isAcceptedDomain(domain: string): boolean {
   return domain === ITEM_DOMAIN || EXTRA_ROLLABLE_DOMAINS.has(domain)
 }
 
+/**
+ * Warp-Runen: sechs Slot-gebundene Runen mit eigenem Themen-Pool. Ihre Mods
+ * (Domain item, Praefix/Suffix) tragen nur ihren Themen-Tag, keinen
+ * Item-Klassen-Tag; die Slot-Bindung steht in augments.json. Eigene Herkunft
+ * `warp`, damit sie nicht im rollbaren Pool landen (wo sie mangels passender
+ * Basis nie erschienen). Die Ansicht waehlt je Item-Typ die passenden Themen.
+ */
+const WARP_TAGS = new Set([
+  'destruction', // Thrud's Might – Waffen (Magnituden)
+  'berserking', // Vorana's Carnage – Helm (Rage/Warcry)
+  'marksman', // Kolr's – Handschuhe (Projektile)
+  'decay', // Katla's – Handschuhe (Ailments)
+  'soul', // Medved's – Koerperruestung (Leben/Spirit)
+  'chronomancy', // Uhtred's – Stiefel (Dauer)
+])
+
 /** Herkunft aus domain + generation_type ableiten; null = nicht relevant. */
 function originOf(m: RawMod): Origin | null {
   if (m.domain === 'desecrated') {
@@ -141,11 +157,8 @@ function originOf(m: RawMod): Origin | null {
   }
   if (!isAcceptedDomain(m.domain)) return null
   if (m.generation_type === 'prefix' || m.generation_type === 'suffix') {
-    // Rune-Magnituden ("of Destruction"/Thrud's): Praefix/Suffix, aber ueber den
-    // Tag `destruction` gesetzt, nicht ueber Basis-Tags. Eigene Herkunft, damit
-    // sie nicht im rollbaren Pool landen (wo sie mangels passender Basis-Tags
-    // ohnehin nie erschienen).
-    if (m.spawn_weights.some((w) => w.tag === 'destruction' && w.weight > 0)) {
+    // Warp-Rune: erkennbar am Themen-Tag (kein Item-Klassen-Tag).
+    if (m.spawn_weights.some((w) => WARP_TAGS.has(w.tag) && w.weight > 0)) {
       return 'warp'
     }
     return 'rollable'

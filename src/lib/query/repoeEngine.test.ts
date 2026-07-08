@@ -134,8 +134,8 @@ describe('essenceGroups', () => {
   })
 })
 
-describe('warpGroups – Rune-Magnituden ohne Basis-Abgleich', () => {
-  it('waehlt nur warp-Familien, unabhaengig von Basis-Tags', () => {
+describe('warpGroups – Warp-Runen nach Slot-Thema', () => {
+  it('waehlt nur warp-Familien der erlaubten Themen', () => {
     const mods = [
       makeMod({ id: 'roll', origin: 'rollable', tags: ['ring'] }),
       makeMod({
@@ -148,13 +148,19 @@ describe('warpGroups – Rune-Magnituden ohne Basis-Abgleich', () => {
         id: 'w2',
         origin: 'warp',
         slot: 'suffix',
-        tags: ['destruction'],
+        tags: ['berserking'],
       }),
     ]
-    // baseTags spielen fuer warp keine Rolle: leere Basis liefert trotzdem beide.
-    const res = warpGroups(mods, { itemLevel: 100 })
-    expect(res.map((g) => g.id).sort()).toEqual(['w1', 'w2'])
+    const res = warpGroups(mods, ['destruction'], { itemLevel: 100 })
+    expect(res.map((g) => g.id)).toEqual(['w1'])
     expect(res.every((g) => g.origin === 'warp')).toBe(true)
+  })
+
+  it('ohne erlaubte Themen kommt nichts', () => {
+    const mods = [
+      makeMod({ id: 'w', origin: 'warp', slot: 'prefix', tags: ['soul'] }),
+    ]
+    expect(warpGroups(mods, [], { itemLevel: 100 })).toHaveLength(0)
   })
 
   it('respektiert die Itemstufe (hohe Tiers fallen heraus)', () => {
@@ -167,7 +173,7 @@ describe('warpGroups – Rune-Magnituden ohne Basis-Abgleich', () => {
         tiers: [tier('w-1', 65)],
       }),
     ]
-    expect(warpGroups(mods, { itemLevel: 60 })).toHaveLength(0)
-    expect(warpGroups(mods, { itemLevel: 65 })).toHaveLength(1)
+    expect(warpGroups(mods, ['destruction'], { itemLevel: 60 })).toHaveLength(0)
+    expect(warpGroups(mods, ['destruction'], { itemLevel: 65 })).toHaveLength(1)
   })
 })
