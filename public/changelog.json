@@ -1,6 +1,13 @@
 {
-  "current": "0.15.3",
+  "current": "0.15.4",
   "entries": [
+    {
+      "version": "0.15.4",
+      "date": "2026-07-08",
+      "changes": [
+        "Startseite: Die getragene Ausrüstung (Body Armour, Helm, Handschuhe, Stiefel sowie Ringe, Amulette, Gürtel, Talismane) steht jetzt unter einer gemeinsamen Kategorie „Ausrüstung“ statt auf fünf einzelne Überschriften verteilt. Waffen und Offhands bleiben getrennt."
+      ]
+    },
     {
       "version": "0.15.3",
       "date": "2026-07-08",

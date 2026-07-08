@@ -27,7 +27,7 @@ describe('buildItemGroups', () => {
     expect(groups.map((g) => g.label)).toEqual([
       'One-Handed Weapons',
       'Offhands',
-      'Jewellery',
+      'Ausrüstung',
     ])
   })
 
@@ -38,7 +38,7 @@ describe('buildItemGroups', () => {
       t('Belt', 'Belts', 'Belt'),
     ])
     expect(groups).toHaveLength(1)
-    expect(groups[0].label).toBe('Jewellery')
+    expect(groups[0].label).toBe('Ausrüstung')
     expect(groups[0].types.map((x) => x.label)).toEqual([
       'Amulets',
       'Belts',
@@ -83,7 +83,7 @@ describe('buildItemGroups', () => {
       t('Ring', 'Rings', 'Ring'),
       t('Other', 'Other', 'Alpha'),
     ])
-    expect(groups.map((g) => g.label)).toEqual(['Jewellery', 'Alpha', 'Zeta'])
+    expect(groups.map((g) => g.label)).toEqual(['Ausrüstung', 'Alpha', 'Zeta'])
   })
 })
 
