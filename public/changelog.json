@@ -1,6 +1,13 @@
 {
-  "current": "0.16.2",
+  "current": "0.16.3",
   "entries": [
+    {
+      "version": "0.16.3",
+      "date": "2026-07-08",
+      "changes": [
+        "Augment und Bonded: Modifier, die zwei zusammengehörende Zeilen haben (oft ein Nachteil plus ein Vorteil, z. B. „-20% to all Elemental Resistances“ zusammen mit „Gain 20% of Damage as Extra Damage of a random Element“), wurden bisher als zwei getrennte Einträge gelistet – so wirkten sie einzeln erhältlich und die Anzahl war zu hoch. Sie stehen jetzt korrekt als ein Eintrag, wie im Spiel und auf poe2db."
+      ]
+    },
     {
       "version": "0.16.2",
       "date": "2026-07-08",

@@ -118,21 +118,34 @@ const CAT_TOKENS: Record<string, string[]> = {
   'Maces or Talisman': ['one_hand_mace', 'two_hand_mace', 'talisman'],
 }
 
-/** Text-Aufbereitung (identisch zur App: Link-Markup entfernen). */
-function clean(raw: string): string {
+/**
+ * Text-Aufbereitung mit erhaltener Zeilenstruktur: Link-Markup entfernen, je
+ * Zeile den Leerraum normalisieren, leere Zeilen verwerfen und die Zeilen mit
+ * `\n` verbinden. Ein Effekt kann mehrere Zeilen haben (ein Sockelbares gibt je
+ * Item-Kategorie genau EINEN Modifier, dessen Stat-Zeilen zusammengehoeren –
+ * z. B. Nachteil plus Vorteil). Die Kopplung bleibt so erhalten, statt in
+ * Einzeleffekte zu zerfallen.
+ */
+function cleanText(raw: string): string {
   return raw
     .replace(/\[[^\]|]*\|([^\]]+)\]/g, '$1')
     .replace(/\[([^\]]+)\]/g, '$1')
-    .replace(/\s+/g, ' ')
-    .trim()
+    .split('\n')
+    .map((l) => l.replace(/\s+/g, ' ').trim())
+    .filter((l) => l.length > 0)
+    .join('\n')
 }
-/** Familien-Label: Zahlen/Bereiche zu `#` vereinheitlichen. */
-function label(raw: string): string {
-  return clean(raw)
+/** Familien-Text: Zahlen/Bereiche zu `#` vereinheitlichen; Zeilen bleiben. */
+function familyText(raw: string): string {
+  return cleanText(raw)
     .replace(/\((\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)\)/g, '#')
     .replace(/\((\d+(?:\.\d+)?)\)/g, '#')
     .replace(/\b\d+(?:\.\d+)?\b/g, '#')
     .replace(/#+/g, '#')
+}
+/** Einzeiliger Gruppierungs-/ID-Schluessel (Zeilen zu Leerzeichen). */
+function labelKey(raw: string): string {
+  return familyText(raw).replace(/\n/g, ' ')
 }
 
 /** Beschreibende Filter-Tags aus dem Effekt-Text ableiten (COLOR_TAG_ORDER). */
@@ -166,22 +179,27 @@ function deriveFilterTags(text: string): string[] {
 }
 
 /**
- * Verdichtet rohe Effekt-Texte zu Familien: gruppiert nach Label; ist der Text
- * ueber alle Vorkommen gleich, wird er konkret gezeigt, sonst das Label mit `#`.
+ * Verdichtet die Modifier-Texte zu Familien: gruppiert nach einzeiligem
+ * Label-Schluessel; ist der (mehrzeilige) Text ueber alle Vorkommen gleich, wird
+ * er konkret gezeigt, sonst der Familien-Text mit `#`. Jeder Eingabe-Text ist
+ * bereits EIN vollstaendiger Modifier (ggf. mehrzeilig, `\n`-getrennt).
  */
-function toEntries(texts: string[]): AugmentEntry[] {
-  const fams = new Map<string, Set<string>>()
-  for (const raw of texts) {
-    const lb = label(raw)
-    if (!lb) continue
-    const set = fams.get(lb) ?? new Set<string>()
-    set.add(clean(raw))
-    fams.set(lb, set)
+function toEntries(mods: string[]): AugmentEntry[] {
+  const fams = new Map<
+    string,
+    { variants: Set<string>; famText: string }
+  >()
+  for (const raw of mods) {
+    const key = labelKey(raw)
+    if (!key) continue
+    const fam = fams.get(key) ?? { variants: new Set<string>(), famText: familyText(raw) }
+    fam.variants.add(cleanText(raw))
+    fams.set(key, fam)
   }
   const out: AugmentEntry[] = []
-  for (const [lb, variants] of fams) {
-    const text = variants.size === 1 ? [...variants][0]! : lb
-    out.push({ id: lb, text, filterTags: deriveFilterTags(lb) })
+  for (const [key, { variants, famText }] of fams) {
+    const text = variants.size === 1 ? [...variants][0]! : famText
+    out.push({ id: key, text, filterTags: deriveFilterTags(key) })
   }
   out.sort((a, b) => a.text.localeCompare(b.text))
   return out
@@ -220,8 +238,11 @@ async function main(): Promise<void> {
         const catTokens = CAT_TOKENS[cat]
         if (!catTokens) continue
         if (!catTokens.some((tok) => tset.has(tok))) continue
-        for (const s of cv.stat_text ?? []) augTexts.push(s)
-        for (const s of cv.bonded_stat_text ?? []) bonTexts.push(s)
+        // Alle Stat-Zeilen dieser Kategorie sind EIN Modifier -> zusammenhalten.
+        const at = (cv.stat_text ?? []).join('\n')
+        if (at.trim()) augTexts.push(at)
+        const bt = (cv.bonded_stat_text ?? []).join('\n')
+        if (bt.trim()) bonTexts.push(bt)
       }
     }
     result[it.id] = { augment: toEntries(augTexts), bonded: toEntries(bonTexts) }

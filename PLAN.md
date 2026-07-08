@@ -56,6 +56,13 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-08, 0.16.3 – Bugfix Augment/Bonded: der Import hält alle Stat-Zeilen
+  einer (Sockelbares, Kategorie) als einen Modifier zusammen (`\n`-getrennt),
+  statt zweizeilige Mods in Einzeleffekte zu zerlegen. Gekoppelte
+  Nachteil/Vorteil-Mods erscheinen wieder als ein Eintrag; Zählung deckt sich mit
+  poe2db (Wand Augment 46/Bonded 38, Claw/Dagger 61/37). `augments.json` für alle
+  30 Typen neu erzeugt. ADR 0018.
+
 - 2026-07-08, 0.16.2 – Bugfix Eignung: `modFitsBase` ignoriert jetzt die
   Domänen-Isolationsmarker (`__dom_*`) und `default`, statt sie als geteilten
   Eignungs-Tag zu werten. Zuvor leakten sieben Rüstungs-/Schmuck-Corrupted
@@ -94,12 +101,3 @@ Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
   Filter-Tags (aus dem CoE-Snapshot), sodass ein aktiver Tag-Filter den
   Essence-Abschnitt nicht mehr komplett ausblendet (Symptom: „+# to Strength“
   verschwand unter „Attribut“). ADR 0015.
-
-- 2026-07-03, 0.15.1 – Cache-Fix: Spieldaten von CacheFirst auf
-  StaleWhileRevalidate (Cache-Name erhoeht), damit In-Place-Updates unter
-  gleicher Version beim naechsten Laden greifen (Symptom: fehlende Jewels aus
-  dem Offline-Cache). App-Version in der Fusszeile ergaenzt. ADR 0014.
-- 2026-07-03, 0.15.0 – Weitere Basis-Welten aufgenommen: Jewels, Flasks/Charms,
-  Waystones, Tablets, Relics. Import um die Domains misc/flask/area/tablet/
-  sanctum_relic erweitert; Domain-Marker isoliert die Welten gegen den
-  allgegenwärtigen Tag `default`. 30 → 37 Item-Typen. ADR 0013.
