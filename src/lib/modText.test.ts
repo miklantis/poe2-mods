@@ -19,7 +19,13 @@ describe('cleanModText', () => {
   })
 
   it('behandelt mehrere Links im selben Text', () => {
-    expect(cleanModText('[A|x] and [B|y]')).toBe('A and B')
+    expect(cleanModText('[A|x] and [B|y]')).toBe('x and y')
+  })
+
+  it('nimmt bei [Ziel|Anzeige] den sichtbaren Teil hinter dem Pipe', () => {
+    expect(cleanModText('+#% to [Resistances|Cold Resistance]')).toBe(
+      '+#% to Cold Resistance',
+    )
   })
 })
 

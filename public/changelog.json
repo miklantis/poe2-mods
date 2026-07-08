@@ -1,6 +1,13 @@
 {
-  "current": "0.15.4",
+  "current": "0.15.5",
   "entries": [
+    {
+      "version": "0.15.5",
+      "date": "2026-07-08",
+      "changes": [
+        "Behoben: Modifier-Texte mit Link-Markup wurden mit dem internen Link-Ziel statt dem lesbaren Text angezeigt. Dadurch sahen etwa die vier Resistenz-Suffixe alle gleich als „+#% to Resistances“ aus und Begriffe erschienen zusammengeschrieben („EnergyShield“, „ElementalDamage“, „StunThreshold“). Sie lauten jetzt korrekt „+#% to Fire/Cold/Lightning/Chaos Resistance“, „Energy Shield“, „Elemental Damage“ usw. – über alle Item-Typen hinweg. Auch die Modifier-Suche findet die Einträge nun unter ihrem echten Wortlaut."
+      ]
+    },
     {
       "version": "0.15.4",
       "date": "2026-07-08",

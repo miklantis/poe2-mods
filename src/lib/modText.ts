@@ -7,11 +7,13 @@
  * stehen pro Tier separat in dessen `values`. Fuer die Anzeige einer Tier-Zeile
  * werden die Platzhalter der Reihe nach mit den Tier-Werten gefuellt.
  *
- * Etwaiges poe2db-/Wiki-Link-Markup der Form `[Anzeige|Ziel]` oder `[Text]`
- * wird auf den sichtbaren Teil reduziert.
+ * Etwaiges Wiki-Link-Markup der repoe-Texte hat die Form `[Ziel|Anzeige]`
+ * (vorne das Link-Ziel, hinten der sichtbare Text) oder `[Text]`; beides wird
+ * auf den sichtbaren Teil reduziert. Bei `[Ziel|Anzeige]` ist das der Teil
+ * hinter dem `|` (z. B. `[Resistances|Cold Resistance]` -> `Cold Resistance`).
  */
 
-const LINK_WITH_TARGET = /\[([^\]|]+)\|[^\]]*\]/g
+const LINK_WITH_TARGET = /\[[^\]|]*\|([^\]]+)\]/g
 const LINK_PLAIN = /\[([^\]]+)\]/g
 
 /** Entfernt das Link-Markup und liefert reinen, lesbaren Text. */

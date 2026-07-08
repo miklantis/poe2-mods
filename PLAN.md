@@ -49,6 +49,12 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-08, 0.15.5 – Modifier-Text: Link-Markup `[Ziel|Anzeige]` wurde auf
+  das Link-Ziel statt den Anzeigetext reduziert (Regex nahm die Seite vor dem
+  `|`). Folge u. a. vier optisch gleiche „to Resistances“-Suffixe und
+  zusammengeschriebene Begriffe. Fix in `modText.ts` (Capture hinter dem `|`),
+  Tests angepasst.
+
 - 2026-07-08, 0.15.4 – Startseite: getragene Ausrüstung (Rüstungsteile +
   Schmuck) in eine gemeinsame Kategorie „Ausrüstung“ zusammengefasst statt fünf
   getrennter Gruppen; Config in `itemGroups.ts`, Waffen/Offhands unverändert.
