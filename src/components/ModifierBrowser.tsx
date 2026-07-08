@@ -148,6 +148,8 @@ export function ModifierBrowser({
       ...f.desPre.map((g) => `d-pre-${g.id}`),
       ...f.desSuf.map((g) => `d-suf-${g.id}`),
       ...f.cor.map((g) => `c-${g.id}`),
+      ...f.augment.map((e) => `aug-${e.id}`),
+      ...f.bonded.map((e) => `bon-${e.id}`),
     ],
     [f],
   )
@@ -326,7 +328,10 @@ export function ModifierBrowser({
           <AugmentColumn
             title="Augment"
             accent="augment"
+            keyNs="aug"
             entries={f.augment}
+            collapsedKeys={collapsedKeys}
+            onToggle={toggleKey}
           />
         </section>
       )}
@@ -334,7 +339,14 @@ export function ModifierBrowser({
       {/* Bonded */}
       {hasBonded && (
         <section className="mt-10">
-          <AugmentColumn title="Bonded" accent="bonded" entries={f.bonded} />
+          <AugmentColumn
+            title="Bonded"
+            accent="bonded"
+            keyNs="bon"
+            entries={f.bonded}
+            collapsedKeys={collapsedKeys}
+            onToggle={toggleKey}
+          />
         </section>
       )}
 

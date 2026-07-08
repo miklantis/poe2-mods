@@ -47,7 +47,8 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 - Augment/Bonded/Warp-Runen: drei zusätzliche Abschnitte je Ausrüstung.
   Warp-Runen (sechs Slot-gebundene Runen) als Herkunft `warp` aus `mods.json`;
   Augment/Bonded invertiert aus `augments.json` (eigene Import-Strecke,
-  per-Typ-Datei). ADR 0016.
+  per-Typ-Datei), je Familie aufklappbar mit ihren Quellen (Stufe/Typ, Wert,
+  Level). ADR 0016, 0018, 0019.
 - PWA: installierbar und offline; App-Hülle vorgeladen, Spieldaten beim Benutzen
   gecacht, stille Hintergrund-Updates. ADR 0012.
 
@@ -55,6 +56,12 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
+
+- 2026-07-08, 0.17.0 – Augment/Bonded aufklappbar: je Familie werden die Quellen
+  gezeigt (Sockelbaren-Stufe + Typ, konkreter Wert, benötigtes Level), aus
+  Stufe-Einträgen/`type_name`/`required_level` der repoe-`augments.json`
+  abgeleitet. Schema um `sources` erweitert, `AugmentColumn` wie `ModTable`
+  aufklappbar, `augments.json` neu erzeugt. ADR 0019.
 
 - 2026-07-08, 0.16.3 – Bugfix Augment/Bonded: der Import hält alle Stat-Zeilen
   einer (Sockelbares, Kategorie) als einen Modifier zusammen (`\n`-getrennt),

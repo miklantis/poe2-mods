@@ -135,17 +135,33 @@ export const essencesFileSchema = z.record(
 export type EssencesFile = z.infer<typeof essencesFileSchema>
 
 /**
+ * Eine Quelle eines Augment-/Bonded-Effekts: ein konkretes Sockelbares (Rune,
+ * Soul Core, Idol …) in einer bestimmten Stufe. `label` ist die ableitbare
+ * Bezeichnung (Stufe + Typ, z. B. „Lesser Rune", „Greater Rune", „Soul Core");
+ * `level` das benoetigte Item-/Charakterlevel; `text` der konkrete Wert-Text
+ * (ggf. mehrzeilig). Marketing-Namen der Sockelbaren fuehrt der Export nicht.
+ */
+export const augmentSourceSchema = z.object({
+  label: z.string(),
+  level: z.number(),
+  text: z.string(),
+})
+export type AugmentSource = z.infer<typeof augmentSourceSchema>
+
+/**
  * Ein Augment- bzw. Bonded-Effekt, aufbereitet aus `augments.json` (Soul Cores,
  * Runen, Talismane). Anders als rollbare Mods haengt das nicht an der Basis,
  * sondern am eingesetzten Socketable, und die Werte sind fest (kein Tier, kein
  * Slot, keine Itemstufe). `text` ist der Original-Spieltext der Effekt-Familie;
- * variiert der Wert zwischen Rune-Stufen, stehen `#`-Platzhalter darin (wie auf
- * poe2db). `filterTags` (aus dem Text abgeleitet) speist die Filter-Pills.
+ * variiert der Wert zwischen Stufen, stehen `#`-Platzhalter darin (wie auf
+ * poe2db). `sources` listet die konkreten Sockelbaren, die den Effekt geben,
+ * mit ihrem Wert und Level (aufklappbar). `filterTags` speist die Filter-Pills.
  */
 export const augmentEntrySchema = z.object({
   id: z.string(),
   text: z.string(),
   filterTags: z.array(z.string()),
+  sources: z.array(augmentSourceSchema),
 })
 export type AugmentEntry = z.infer<typeof augmentEntrySchema>
 

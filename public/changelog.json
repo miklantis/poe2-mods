@@ -1,6 +1,14 @@
 {
-  "current": "0.16.3",
+  "current": "0.17.0",
   "entries": [
+    {
+      "version": "0.17.0",
+      "date": "2026-07-08",
+      "changes": [
+        "Augment und Bonded lassen sich jetzt aufklappen, wie die anderen Modifier-Tabellen. Aufgeklappt zeigt jede Familie ihre Quellen: welche Sockelbaren-Stufe (z. B. Lesser/Greater/Perfect Rune, Soul Core) den Effekt gibt, mit dem konkreten Wertebereich und dem benötigten Level. Beispiel „Adds # to # Fire Damage“: 4–6 (Lesser, Lvl 1), 7–11 (Lvl 15), 13–16 (Greater, Lvl 30), 17–20 (Perfect, Lvl 50).",
+        "Es werden alle Quellen gezeigt, die einen Effekt geben – auch mehrere Rune- oder Soul-Core-Linien. Die vollen Namen der Sockelbaren (z. B. „Desert Rune“) führt der Datenexport nicht; angezeigt wird die Stufe plus der Typ."
+      ]
+    },
     {
       "version": "0.16.3",
       "date": "2026-07-08",

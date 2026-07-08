@@ -61,9 +61,9 @@ describe('availableTags', () => {
 
 describe('filterAugments – flache Augment-/Bonded-Eintraege', () => {
   const entries = [
-    { id: 'a', text: 'Adds # to # Fire Damage', filterTags: ['fire', 'attack'] },
-    { id: 'b', text: '+# to maximum Life', filterTags: ['life'] },
-    { id: 'c', text: '#% increased Cold Damage', filterTags: ['cold'] },
+    { id: 'a', text: 'Adds # to # Fire Damage', filterTags: ['fire', 'attack'], sources: [] },
+    { id: 'b', text: '+# to maximum Life', filterTags: ['life'], sources: [] },
+    { id: 'c', text: '#% increased Cold Damage', filterTags: ['cold'], sources: [] },
   ]
 
   it('filtert nach Tag (ODER)', () => {
