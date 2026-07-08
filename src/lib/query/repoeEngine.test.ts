@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Mod, Tier } from '@/data/schema.repoe'
-import { essenceGroups, modFitsBase, runRepoeQuery } from './repoeEngine'
+import { essenceGroups, modFitsBase, runRepoeQuery, warpGroups } from './repoeEngine'
 
 /** Kurzschreibweise fuer einen Tier. */
 function tier(
@@ -131,5 +131,43 @@ describe('essenceGroups', () => {
   it('sortiert nach Familien-Label', () => {
     const res = essenceGroups(entries, { itemLevel: 100 })
     expect(res.map((g) => g.id)).toEqual(['e1', 'e2'])
+  })
+})
+
+describe('warpGroups – Rune-Magnituden ohne Basis-Abgleich', () => {
+  it('waehlt nur warp-Familien, unabhaengig von Basis-Tags', () => {
+    const mods = [
+      makeMod({ id: 'roll', origin: 'rollable', tags: ['ring'] }),
+      makeMod({
+        id: 'w1',
+        origin: 'warp',
+        slot: 'prefix',
+        tags: ['destruction'],
+      }),
+      makeMod({
+        id: 'w2',
+        origin: 'warp',
+        slot: 'suffix',
+        tags: ['destruction'],
+      }),
+    ]
+    // baseTags spielen fuer warp keine Rolle: leere Basis liefert trotzdem beide.
+    const res = warpGroups(mods, { itemLevel: 100 })
+    expect(res.map((g) => g.id).sort()).toEqual(['w1', 'w2'])
+    expect(res.every((g) => g.origin === 'warp')).toBe(true)
+  })
+
+  it('respektiert die Itemstufe (hohe Tiers fallen heraus)', () => {
+    const mods = [
+      makeMod({
+        id: 'w',
+        origin: 'warp',
+        slot: 'prefix',
+        tags: ['destruction'],
+        tiers: [tier('w-1', 65)],
+      }),
+    ]
+    expect(warpGroups(mods, { itemLevel: 60 })).toHaveLength(0)
+    expect(warpGroups(mods, { itemLevel: 65 })).toHaveLength(1)
   })
 })

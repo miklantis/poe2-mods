@@ -135,6 +135,38 @@ export function runRepoeQuery(
 }
 
 /**
+ * Baut die Anzeige-Zeilen des Rune-Magnituden-Abschnitts (Herkunft `warp`).
+ * Diese Mods haengen am Tag `destruction`, nicht an Basis-Tags; sie gelten
+ * pauschal fuer Ausruestung. Darum kein Basis-Abgleich – nur Herkunft `warp`
+ * und die bei der Itemstufe erreichbaren Tiers. Slot (Praefix/Suffix) bleibt
+ * erhalten; die Ansicht trennt danach.
+ */
+export function warpGroups(
+  mods: readonly Mod[],
+  ctx: RepoeQueryContext,
+): RepoeGroup[] {
+  const groups: RepoeGroup[] = []
+  for (const mod of mods) {
+    if (mod.origin !== 'warp') continue
+    const tiers = reachableTiers(mod, ctx.itemLevel)
+    if (tiers.length === 0) continue
+    groups.push({
+      id: mod.id,
+      slot: mod.slot,
+      origin: mod.origin,
+      text: mod.text,
+      tags: mod.tags,
+      filterTags: mod.filterTags,
+      tiers,
+    })
+  }
+  groups.sort((a, b) =>
+    modFamilyLabel(a.text).localeCompare(modFamilyLabel(b.text)),
+  )
+  return groups
+}
+
+/**
  * Baut die Anzeige-Zeilen des Essence-Abschnitts aus den aufbereiteten
  * Essence-Eintraegen einer Item-Klasse. Anders als der rollbare Pool gibt es
  * hier keine Stufen: je Eintrag genau ein Tier mit dem Bereich ueber alle

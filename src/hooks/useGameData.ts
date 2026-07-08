@@ -6,6 +6,7 @@ import {
   itemTypesFileSchema,
   baseItemsFileSchema,
   essencesFileSchema,
+  augmentsFileSchema,
 } from '@/data/schema.repoe'
 
 /**
@@ -57,6 +58,16 @@ export function useEssences() {
   return useQuery({
     queryKey: ['essences', version],
     queryFn: () => loadJson(`data/${version}/essences.json`, essencesFileSchema),
+    enabled: Boolean(version),
+  })
+}
+
+export function useAugments() {
+  const { data: manifest } = useManifest()
+  const version = manifest?.current
+  return useQuery({
+    queryKey: ['augments', version],
+    queryFn: () => loadJson(`data/${version}/augments.json`, augmentsFileSchema),
     enabled: Boolean(version),
   })
 }

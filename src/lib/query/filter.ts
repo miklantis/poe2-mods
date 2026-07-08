@@ -1,4 +1,5 @@
 import type { RepoeGroup } from './repoeEngine'
+import type { AugmentEntry } from '@/data/schema.repoe'
 import { displayTags, COLOR_TAG_ORDER } from '@/lib/modTags'
 import type { ColorTag } from '@/lib/modTags'
 import { cleanModText, modFamilyLabel } from '@/lib/modText'
@@ -25,9 +26,11 @@ const ORDER_INDEX = new Map<string, number>(
 )
 
 /** Alle in den Gruppen vorkommenden Farb-Tags, in fester Reihenfolge. */
-export function availableTags(groups: readonly RepoeGroup[]): ColorTag[] {
+export function availableTags(
+  items: readonly { filterTags: readonly string[] }[],
+): ColorTag[] {
   const present = new Set<ColorTag>()
-  for (const g of groups) {
+  for (const g of items) {
     for (const t of displayTags(g.filterTags)) present.add(t)
   }
   return [...present].sort((a, b) => ORDER_INDEX.get(a)! - ORDER_INDEX.get(b)!)
@@ -63,4 +66,26 @@ export function filterGroups<T extends RepoeGroup>(
   return groups.filter(
     (g) => matchesTags(g, criteria.tags) && matchesSearch(g, tokens),
   )
+}
+
+/**
+ * Filter fuer Augment-/Bonded-Eintraege. Gleiche Kriterien wie `filterGroups`,
+ * aber auf den flachen Eintraegen (kein Tier/Slot): Suche gegen den Effekt-Text,
+ * Tags gegen `filterTags`.
+ */
+export function filterAugments<T extends AugmentEntry>(
+  entries: readonly T[],
+  criteria: FilterCriteria,
+): T[] {
+  const tokens = tokensOf(criteria.search)
+  const tags = criteria.tags
+  return entries.filter((e) => {
+    if (tags.length > 0) {
+      const et = new Set<string>(displayTags(e.filterTags))
+      if (!tags.some((t) => et.has(t))) return false
+    }
+    if (tokens.length === 0) return true
+    const hay = cleanModText(e.text).toLowerCase()
+    return tokens.every((tok) => hay.includes(tok))
+  })
 }

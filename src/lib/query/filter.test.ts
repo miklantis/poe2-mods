@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { filterGroups, availableTags } from './filter'
+import { filterGroups, filterAugments, availableTags } from './filter'
 import type { RepoeGroup } from './repoeEngine'
 
 function group(
@@ -56,5 +56,27 @@ describe('filterGroups – Suche', () => {
 describe('availableTags', () => {
   it('sammelt vorkommende Farb-Tags in fester Reihenfolge', () => {
     expect(availableTags([fire, cold, life])).toEqual(['fire', 'cold', 'damage', 'life'])
+  })
+})
+
+describe('filterAugments – flache Augment-/Bonded-Eintraege', () => {
+  const entries = [
+    { id: 'a', text: 'Adds # to # Fire Damage', filterTags: ['fire', 'attack'] },
+    { id: 'b', text: '+# to maximum Life', filterTags: ['life'] },
+    { id: 'c', text: '#% increased Cold Damage', filterTags: ['cold'] },
+  ]
+
+  it('filtert nach Tag (ODER)', () => {
+    const res = filterAugments(entries, { tags: ['fire'], search: '' })
+    expect(res.map((e) => e.id)).toEqual(['a'])
+  })
+
+  it('filtert nach Suchtext (alle Tokens)', () => {
+    const res = filterAugments(entries, { tags: [], search: 'maximum life' })
+    expect(res.map((e) => e.id)).toEqual(['b'])
+  })
+
+  it('ohne Kriterien bleiben alle', () => {
+    expect(filterAugments(entries, { tags: [], search: '' })).toHaveLength(3)
   })
 })

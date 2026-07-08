@@ -141,6 +141,13 @@ function originOf(m: RawMod): Origin | null {
   }
   if (!isAcceptedDomain(m.domain)) return null
   if (m.generation_type === 'prefix' || m.generation_type === 'suffix') {
+    // Rune-Magnituden ("of Destruction"/Thrud's): Praefix/Suffix, aber ueber den
+    // Tag `destruction` gesetzt, nicht ueber Basis-Tags. Eigene Herkunft, damit
+    // sie nicht im rollbaren Pool landen (wo sie mangels passender Basis-Tags
+    // ohnehin nie erschienen).
+    if (m.spawn_weights.some((w) => w.tag === 'destruction' && w.weight > 0)) {
+      return 'warp'
+    }
     return 'rollable'
   }
   if (m.generation_type === 'corrupted') return 'corrupted'
@@ -152,9 +159,9 @@ function originOf(m: RawMod): Origin | null {
   return null
 }
 
-/** Slot: nur rollbare und desecrated Mods belegen einen Praefix/Suffix-Slot. */
+/** Slot: rollbare, desecrated und warp Mods belegen einen Praefix/Suffix-Slot. */
 function slotOf(m: RawMod, origin: Origin): Slot | null {
-  if (origin === 'rollable' || origin === 'desecrated') {
+  if (origin === 'rollable' || origin === 'desecrated' || origin === 'warp') {
     return m.generation_type === 'prefix' ? 'prefix' : 'suffix'
   }
   return null

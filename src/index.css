@@ -90,6 +90,10 @@
   /* Herkunft Essence (violett) */
   --color-essence: #b28bf0;
 
+  --color-warp: #4fc3d4;
+  --color-augment: #c98b3a;
+  --color-bonded: #d977b0;
+
   /* Tag-Farben */
   --color-tag-caster: #8aa2ff;
   --color-tag-fire: #e0663c;

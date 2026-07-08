@@ -1,6 +1,16 @@
 {
-  "current": "0.15.5",
+  "current": "0.16.0",
   "entries": [
+    {
+      "version": "0.16.0",
+      "date": "2026-07-08",
+      "changes": [
+        "Drei neue Modifier-Abschnitte je Ausrüstungs-Typ, wie auf poe2db: Rune-Magnituden (die „of Destruction“/Thrud's-Modifier, die die Stärke deiner Explicit-Modifier erhöhen – Präfixe und Suffixe mit Wertebereich), Augment (was eine eingesetzte Rune/Soul Core auf diesem Item-Typ geben kann) und Bonded (was ein gebundener Talisman geben kann).",
+        "Augment und Bonded sind flache Effekt-Listen ohne Tier und Itemstufe; variiert der Wert zwischen Rune-Stufen, steht ein „#“-Platzhalter im Text (wie auf poe2db). Rune-Magnituden reagieren wie der rollbare Pool auf den Itemstufen-Regler.",
+        "Der gemeinsame Filter (Suche und Tag-Pills) wirkt auch auf die drei neuen Abschnitte. Sie erscheinen nur bei Ausrüstung (Waffen, Rüstung, Offhands, Schmuck), nicht bei Flasks, Juwelen, Relics, Waystones oder Tablets.",
+        "Beim Talisman speisen sich Augment und Bonded – wie auf poe2db – zusätzlich aus dem Waffen- und Rüstungs-Pool."
+      ]
+    },
     {
       "version": "0.15.5",
       "date": "2026-07-08",

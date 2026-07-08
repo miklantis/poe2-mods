@@ -29,12 +29,18 @@ export type Slot = z.infer<typeof slotSchema>
  * - desecrated: ueber Desecration gesetzte Praefixe/Suffixe (Boss-Tags
  *   ulaman_mod / amanamu_mod / kurgal_mod).
  * - essence:    ueber Essence garantiert gesetzt (generation_type essence).
+ * - warp:       Rune-Magnituden ("of Destruction"/Thrud's): erhoehen die
+ *   Magnitude der Explicit-Modifier. Praefix/Suffix mit Wertebereich, aber ueber
+ *   den Tag `destruction` gesetzt statt ueber Basis-Tags; darum gelten sie
+ *   pauschal fuer Ausruestung und werden ueber `warpGroups` (ohne Tag-Abgleich)
+ *   ausgewaehlt.
  */
 export const originSchema = z.enum([
   'rollable',
   'corrupted',
   'desecrated',
   'essence',
+  'warp',
 ])
 export type Origin = z.infer<typeof originSchema>
 
@@ -127,6 +133,36 @@ export const essencesFileSchema = z.record(
   z.array(essenceEntrySchema),
 )
 export type EssencesFile = z.infer<typeof essencesFileSchema>
+
+/**
+ * Ein Augment- bzw. Bonded-Effekt, aufbereitet aus `augments.json` (Soul Cores,
+ * Runen, Talismane). Anders als rollbare Mods haengt das nicht an der Basis,
+ * sondern am eingesetzten Socketable, und die Werte sind fest (kein Tier, kein
+ * Slot, keine Itemstufe). `text` ist der Original-Spieltext der Effekt-Familie;
+ * variiert der Wert zwischen Rune-Stufen, stehen `#`-Platzhalter darin (wie auf
+ * poe2db). `filterTags` (aus dem Text abgeleitet) speist die Filter-Pills.
+ */
+export const augmentEntrySchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  filterTags: z.array(z.string()),
+})
+export type AugmentEntry = z.infer<typeof augmentEntrySchema>
+
+/**
+ * augments.json: je Item-Typ-ID die Augment- und Bonded-Effekte. Nur
+ * Ausruestungs-Typen sind enthalten; fehlt ein Typ, hat er keine Abschnitte.
+ * `augment` = beim Einsetzen einer Rune/Soul Core; `bonded` = ueber einen
+ * gebundenen Talisman.
+ */
+export const augmentsFileSchema = z.record(
+  z.string(),
+  z.object({
+    augment: z.array(augmentEntrySchema),
+    bonded: z.array(augmentEntrySchema),
+  }),
+)
+export type AugmentsFile = z.infer<typeof augmentsFileSchema>
 
 /** Ein Tag mit Anzeigename und Crafting-Relevanz. */
 export const tagSchema = z.object({

@@ -4,7 +4,15 @@
  * grün, Essence violett, Corrupted rot. Zentral gebündelt, damit die Farben
  * nicht über mehrere Komponenten verstreut liegen.
  */
-export type Accent = 'prefix' | 'suffix' | 'desecrated' | 'essence' | 'corrupted'
+export type Accent =
+  | 'prefix'
+  | 'suffix'
+  | 'desecrated'
+  | 'essence'
+  | 'corrupted'
+  | 'warp'
+  | 'augment'
+  | 'bonded'
 
 /** Punkt in der Spaltenüberschrift. */
 export const ACCENT_DOT: Record<Accent, string> = {
@@ -13,6 +21,9 @@ export const ACCENT_DOT: Record<Accent, string> = {
   desecrated: 'bg-desecrated',
   essence: 'bg-essence',
   corrupted: 'bg-corrupted',
+  warp: 'bg-warp',
+  augment: 'bg-augment',
+  bonded: 'bg-bonded',
 }
 
 /** Überschrift und Zahlenwerte. */
@@ -22,4 +33,7 @@ export const ACCENT_TEXT: Record<Accent, string> = {
   desecrated: 'text-desecrated',
   essence: 'text-essence',
   corrupted: 'text-corrupted',
+  warp: 'text-warp',
+  augment: 'text-augment',
+  bonded: 'text-bonded',
 }

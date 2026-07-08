@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "lint": "oxlint",
     "import:repoe": "tsx scripts/import-repoe.ts",
-    "import:essences": "tsx scripts/import-essences-coe.ts"
+    "import:essences": "tsx scripts/import-essences-coe.ts",
+    "import:augments": "tsx scripts/import-augments.ts"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.2.8",

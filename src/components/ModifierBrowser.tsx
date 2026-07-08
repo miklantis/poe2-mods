@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react'
 import type { BaseItem, ItemType, Mod } from '@/data/schema.repoe'
 import type { BrowserSearch } from '@/routes/$type'
-import { useMods, useBaseItems, useEssences } from '@/hooks/useGameData'
-import { runRepoeQuery, essenceGroups } from '@/lib/query/repoeEngine'
+import { useMods, useBaseItems, useEssences, useAugments } from '@/hooks/useGameData'
+import { runRepoeQuery, essenceGroups, warpGroups } from '@/lib/query/repoeEngine'
 import type { RepoeGroup } from '@/lib/query/repoeEngine'
-import { filterGroups, availableTags } from '@/lib/query/filter'
+import { filterGroups, filterAugments, availableTags } from '@/lib/query/filter'
 import type { ColorTag } from '@/lib/modTags'
 import { VariantSelect } from '@/components/VariantSelect'
 import { ModColumn } from '@/components/ModColumn'
 import { EssenceColumn } from '@/components/EssenceColumn'
+import { AugmentColumn } from '@/components/AugmentColumn'
 import { FilterBar } from '@/components/FilterBar'
 
 const prefixesOf = (groups: RepoeGroup[]) =>
@@ -18,13 +19,16 @@ const suffixesOf = (groups: RepoeGroup[]) =>
 
 /**
  * Modifier-Browser je Item-Typ (Screen 2). Alle Herkünfte gleichzeitig, ohne
- * Umschalten: oben der rollbare Pool (Präfixe blau, Suffixe gelb), darunter
- * Desecrated (grün), dann Essence (violett, je Mod eine Zeile mit Bereich) und
- * ganz unten Corrupted (rot). Datenquelle repoe: nur binäre Spawn-Gewichte,
- * daher keine Chance – alle Herkünfte einheitlich mit Tier und Wertebereich.
+ * Umschalten, in poe2db-Reihenfolge: rollbarer Pool (Präfixe blau, Suffixe
+ * gelb), dann Rune-Magnituden (türkis, Präfix/Suffix mit Wertebereich),
+ * Desecrated (grün), Essence (violett), dann Augment (bronze) und Bonded (pink)
+ * als flache Effekt-Listen aus den Socketable-Daten, zuletzt Corrupted (rot).
+ * Rune-Magnituden, Augment und Bonded erscheinen nur bei Ausrüstung.
  * Ein gemeinsamer Filter (Suche, Tags, Itemstufe) wirkt auf alle Abschnitte;
- * Filterzustand liegt im URL-State, nur das Ein-/Ausklappen ist lokal. Query-
- * und Filter-Logik bleiben in den reinen Modulen.
+ * Itemstufe greift nur dort, wo es Stufen gibt (rollbar, Rune-Magnituden,
+ * Desecrated, Essence). Filterzustand liegt im URL-State, nur das
+ * Ein-/Ausklappen ist lokal. Query- und Filter-Logik bleiben in den reinen
+ * Modulen.
  */
 export function ModifierBrowser({
   itemType,
@@ -38,6 +42,7 @@ export function ModifierBrowser({
   const mods = useMods()
   const baseItems = useBaseItems()
   const essences = useEssences()
+  const augments = useAugments()
 
   const variants = itemType.variants
   const selected =
@@ -67,15 +72,38 @@ export function ModifierBrowser({
     const essList =
       essences.data && itemClass ? (essences.data[itemClass] ?? []) : []
     const ess = essenceGroups(essList, ctx)
-    return { roll, des, cor, ess }
-  }, [mods.data, essences.data, baseTags, itemClass, search.ilvl])
+    // Augment/Bonded und Rune-Magnituden gelten fuer Ausruestung. Ob ein Typ
+    // Ausruestung ist, sagt das Vorhandensein eines augments-Eintrags.
+    const augEntry = augments.data?.[itemType.id]
+    const warp = augEntry ? warpGroups(allMods, ctx) : []
+    return { roll, des, cor, ess, warp, augEntry }
+  }, [
+    mods.data,
+    essences.data,
+    augments.data,
+    baseTags,
+    itemClass,
+    itemType.id,
+    search.ilvl,
+  ])
 
   const hasDesecrated = raw.des.length > 0
   const hasEssence = raw.ess.length > 0
   const hasCorrupted = raw.cor.length > 0
+  const hasWarp = raw.warp.length > 0
+  const hasAugment = (raw.augEntry?.augment.length ?? 0) > 0
+  const hasBonded = (raw.augEntry?.bonded.length ?? 0) > 0
 
   const tags = useMemo(
-    () => availableTags([...raw.roll, ...raw.des, ...raw.cor]),
+    () =>
+      availableTags([
+        ...raw.roll,
+        ...raw.des,
+        ...raw.cor,
+        ...raw.warp,
+        ...(raw.augEntry?.augment ?? []),
+        ...(raw.augEntry?.bonded ?? []),
+      ]),
     [raw],
   )
 
@@ -85,11 +113,15 @@ export function ModifierBrowser({
     return {
       rollPre: filterGroups(prefixesOf(raw.roll), c),
       rollSuf: filterGroups(suffixesOf(raw.roll), c),
+      warpPre: filterGroups(prefixesOf(raw.warp), c),
+      warpSuf: filterGroups(suffixesOf(raw.warp), c),
       desPre: filterGroups(prefixesOf(raw.des), c),
       desSuf: filterGroups(suffixesOf(raw.des), c),
       essPre: filterGroups(prefixesOf(raw.ess), c),
       essSuf: filterGroups(suffixesOf(raw.ess), c),
       cor: filterGroups(raw.cor, c),
+      augment: filterAugments(raw.augEntry?.augment ?? [], c),
+      bonded: filterAugments(raw.augEntry?.bonded ?? [], c),
     }
   }, [raw, search.tags, search.q])
 
@@ -97,6 +129,8 @@ export function ModifierBrowser({
     () => [
       ...f.rollPre.map((g) => `r-pre-${g.id}`),
       ...f.rollSuf.map((g) => `r-suf-${g.id}`),
+      ...f.warpPre.map((g) => `w-pre-${g.id}`),
+      ...f.warpSuf.map((g) => `w-suf-${g.id}`),
       ...f.desPre.map((g) => `d-pre-${g.id}`),
       ...f.desSuf.map((g) => `d-suf-${g.id}`),
       ...f.cor.map((g) => `c-${g.id}`),
@@ -125,8 +159,13 @@ export function ModifierBrowser({
     patchSearch({ tags: [...active] })
   }
 
-  const isPending = mods.isPending || baseItems.isPending || essences.isPending
-  const error = mods.error ?? baseItems.error ?? essences.error
+  const isPending =
+    mods.isPending ||
+    baseItems.isPending ||
+    essences.isPending ||
+    augments.isPending
+  const error =
+    mods.error ?? baseItems.error ?? essences.error ?? augments.error
 
   if (error) {
     return (
@@ -197,6 +236,30 @@ export function ModifierBrowser({
         </div>
       </section>
 
+      {/* Rune-Magnituden (warp) */}
+      {hasWarp && (
+        <section className="mt-10">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-6">
+            <ModColumn
+              title="Rune-Magnituden Präfixe"
+              accent="warp"
+              keyNs="w-pre"
+              groups={f.warpPre}
+              collapsedKeys={collapsedKeys}
+              onToggle={toggleKey}
+            />
+            <ModColumn
+              title="Rune-Magnituden Suffixe"
+              accent="warp"
+              keyNs="w-suf"
+              groups={f.warpSuf}
+              collapsedKeys={collapsedKeys}
+              onToggle={toggleKey}
+            />
+          </div>
+        </section>
+      )}
+
       {/* Desecrated */}
       {hasDesecrated && (
         <section className="mt-10">
@@ -236,6 +299,24 @@ export function ModifierBrowser({
               groups={f.essSuf}
             />
           </div>
+        </section>
+      )}
+
+      {/* Augment */}
+      {hasAugment && (
+        <section className="mt-10">
+          <AugmentColumn
+            title="Augment"
+            accent="augment"
+            entries={f.augment}
+          />
+        </section>
+      )}
+
+      {/* Bonded */}
+      {hasBonded && (
+        <section className="mt-10">
+          <AugmentColumn title="Bonded" accent="bonded" entries={f.bonded} />
         </section>
       )}
 

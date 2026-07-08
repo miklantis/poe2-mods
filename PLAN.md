@@ -5,16 +5,18 @@
 Die App ist im geplanten Umfang fertig und läuft live (GitHub Pages): ein
 statischer, read-only Modifier-Browser auf Basis der repoe-Daten
 (manifest 4.5.4.3). Startseite mit gruppierter Item-Typ-Auswahl; je Typ ein
-Browser, der alle Herkünfte (rollbar, Desecrated, Essence, Corrupted) als
-Tabellen mit Tier und Wertebereich zeigt, mit gemeinsamem Facet-Filter (Suche,
-Tags, Itemstufe) als teil-/bookmarkbarer URL-State. Installierbar und offline
-(PWA).
+Browser, der alle Herkünfte (rollbar, Rune-Magnituden, Desecrated, Essence,
+Corrupted) sowie – bei Ausrüstung – die Augment- und Bonded-Effekte der
+Socketables als Tabellen bzw. Listen zeigt, mit gemeinsamem Facet-Filter
+(Suche, Tags, Itemstufe) als teil-/bookmarkbarer URL-State. Installierbar und
+offline (PWA).
 
 Ab hier Betriebsmodus. Es sind keine Vorhaben mehr eingeplant; laufende Arbeit
-sind Bugfixes und die Datenpflege bei neuem Patch (Export ziehen, Import-Skript
-laufen lassen, `data/<version>/` ablegen, `manifest.json` fortschreiben,
-committen). Neue Features weiterhin über Konzept-vor-Code, in kleinen testbaren
-Schritten. Jede Auslieferung wie gehabt mit Changelog-Eintrag und Log-Zeile.
+sind Bugfixes und die Datenpflege bei neuem Patch (Export ziehen, Import-Skripte
+laufen lassen – `import:repoe` und danach `import:augments` –, `data/<version>/`
+ablegen, `manifest.json` fortschreiben, committen). Neue Features weiterhin über
+Konzept-vor-Code, in kleinen testbaren Schritten. Jede Auslieferung wie gehabt
+mit Changelog-Eintrag und Log-Zeile.
 
 ## Optionales Backlog
 
@@ -41,6 +43,9 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
   Modifier-Browser mit allen Herkünften gleichzeitig als Tabellen, Facet-Search
   als URL-State. ADR 0005, 0006, 0009, 0010. Unique-Ansicht zurückgestellt
   (ADR 0007).
+- Augment/Bonded/Rune-Magnituden: drei zusätzliche Abschnitte je Ausrüstung.
+  Rune-Magnituden als Herkunft `warp` aus `mods.json`; Augment/Bonded invertiert
+  aus `augments.json` (eigene Import-Strecke, per-Typ-Datei). ADR 0016.
 - PWA: installierbar und offline; App-Hülle vorgeladen, Spieldaten beim Benutzen
   gecacht, stille Hintergrund-Updates. ADR 0012.
 
@@ -48,6 +53,12 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
+
+- 2026-07-08, 0.16.0 – Drei neue Abschnitte je Ausrüstung (poe2db-Vorbild):
+  Rune-Magnituden (Herkunft `warp` aus `mods.json`), Augment und Bonded
+  (invertiert aus `augments.json` via neuem `import-augments.ts`). Filter wirkt
+  mit; Talisman zieht Augment/Bonded aus Waffen- und Rüstungs-Pool. ADR 0016.
+
 
 - 2026-07-08, 0.15.5 – Modifier-Text: Link-Markup `[Ziel|Anzeige]` wurde auf
   das Link-Ziel statt den Anzeigetext reduziert (Regex nahm die Seite vor dem
