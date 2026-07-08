@@ -1,6 +1,13 @@
 {
-  "current": "0.15.1",
+  "current": "0.15.2",
   "entries": [
+    {
+      "version": "0.15.2",
+      "date": "2026-07-08",
+      "changes": [
+        "Behoben: Sobald ein Tag-Filter (z. B. „Attribut“, „Feuer“, „Resistenz“) aktiv war, verschwand der komplette Essence-Abschnitt – auch passende Einträge wie „+# to Strength“ unter „Attribut“. Ursache war, dass Essence-Einträge keine beschreibenden Tags trugen. Die Essence-Modifier tragen jetzt dieselben Filter-Tags wie der rollbare Pool und werden vom Tag-Filter korrekt erfasst."
+      ]
+    },
     {
       "version": "0.15.1",
       "date": "2026-07-03",

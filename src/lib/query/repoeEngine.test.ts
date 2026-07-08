@@ -107,14 +107,20 @@ describe('runRepoeQuery – Auswahl und Erreichbarkeit', () => {
 
 describe('essenceGroups', () => {
   const entries = [
-    { id: 'e2', text: '+# to Zeal', slot: 'suffix' as const, ilvl: 20, values: [[1, 5]] as [number, number][] },
-    { id: 'e1', text: '+# to Armour', slot: 'prefix' as const, ilvl: 5, values: [[10, 20]] as [number, number][] },
+    { id: 'e2', text: '+# to Zeal', slot: 'suffix' as const, ilvl: 20, values: [[1, 5]] as [number, number][], filterTags: [] },
+    { id: 'e1', text: '+# to Armour', slot: 'prefix' as const, ilvl: 5, values: [[10, 20]] as [number, number][], filterTags: ['armour', 'defences'] },
   ]
 
   it('macht je Eintrag eine Zeile mit genau einem Tier', () => {
     const res = essenceGroups(entries, { itemLevel: 100 })
     expect(res).toHaveLength(2)
     expect(res.every((g) => g.tiers.length === 1 && g.origin === 'essence')).toBe(true)
+  })
+
+  it('reicht die filterTags des Eintrags durch', () => {
+    const res = essenceGroups(entries, { itemLevel: 100 })
+    const armour = res.find((g) => g.id === 'e1')
+    expect(armour?.filterTags).toEqual(['armour', 'defences'])
   })
 
   it('filtert nach Itemstufe', () => {

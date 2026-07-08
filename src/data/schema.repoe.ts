@@ -105,6 +105,11 @@ export type BaseItem = z.infer<typeof baseItemSchema>
  * fuehrt keine Essence→Mod-Zuordnung). Selbst-enthaltend: Text (#-Vorlage),
  * Slot, kleinste per Essence erreichbare Itemstufe und der Wertebereich ueber
  * alle Essence-Stufen. Keine Chance – Essences setzen den Mod gezielt.
+ *
+ * `filterTags` speist die Filter-Pills (fire, cold, attribute, resistance …),
+ * damit der Tag-Filter auch den Essence-Abschnitt trifft. Sie stammen aus dem
+ * CoE-Snapshot und sind rein beschreibend – Essence-Eignung laeuft ueber die
+ * Item-Klasse, nicht ueber Tag-Abgleich.
  */
 export const essenceEntrySchema = z.object({
   id: z.string(),
@@ -112,6 +117,7 @@ export const essenceEntrySchema = z.object({
   slot: slotSchema,
   ilvl: z.number().int(),
   values: z.array(z.tuple([z.number(), z.number()])),
+  filterTags: z.array(z.string()),
 })
 export type EssenceEntry = z.infer<typeof essenceEntrySchema>
 

@@ -32,6 +32,7 @@ interface CoeMod {
   id: string
   text: string
   slot: 'prefix' | 'suffix' | null
+  tags?: string[]
 }
 interface CoeEssenceRow {
   mod: string
@@ -120,6 +121,7 @@ function main(): void {
           slot: mod.slot,
           ilvl: row.ilvl,
           values: row.values,
+          filterTags: [...(mod.tags ?? [])].sort(),
         })
       }
     }

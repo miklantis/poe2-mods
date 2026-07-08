@@ -49,6 +49,11 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-08, 0.15.2 – Bugfix Tag-Filter: Essence-Einträge tragen jetzt
+  Filter-Tags (aus dem CoE-Snapshot), sodass ein aktiver Tag-Filter den
+  Essence-Abschnitt nicht mehr komplett ausblendet (Symptom: „+# to Strength“
+  verschwand unter „Attribut“). ADR 0015.
+
 - 2026-07-03, 0.15.1 – Cache-Fix: Spieldaten von CacheFirst auf
   StaleWhileRevalidate (Cache-Name erhoeht), damit In-Place-Updates unter
   gleicher Version beim naechsten Laden greifen (Symptom: fehlende Jewels aus

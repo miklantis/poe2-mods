@@ -53,8 +53,10 @@ je Version:
   Die Tags entscheiden über die Eignung.
 - `tags.json` – Tag-Metadaten (Anzeigename, Crafting-Relevanz).
 - `essences.json` – je Item-Klasse die per Essence garantierten Mods, je Eintrag
-  `{ id, text, slot, ilvl, values }`: der Wertebereich über alle Essence-Stufen
-  und die kleinste dafür nötige Itemstufe. Aus CoE aufbereitet, selbst-enthaltend.
+  `{ id, text, slot, ilvl, values, filterTags }`: der Wertebereich über alle
+  Essence-Stufen, die kleinste dafür nötige Itemstufe und die beschreibenden
+  Filter-Tags (für die Pills; aus CoE, siehe ADR 0015). Aus CoE aufbereitet,
+  selbst-enthaltend.
 - Dazu `data/manifest.json` – aktive Version, verfügbare Versionen, Quelle,
   Liga, Zeitstempel.
 

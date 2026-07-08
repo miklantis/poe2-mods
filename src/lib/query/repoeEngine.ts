@@ -139,8 +139,10 @@ export function runRepoeQuery(
  * Essence-Eintraegen einer Item-Klasse. Anders als der rollbare Pool gibt es
  * hier keine Stufen: je Eintrag genau ein Tier mit dem Bereich ueber alle
  * Essence-Stufen. Eintraege oberhalb der Itemstufe fallen heraus; sortiert nach
- * Familien-Label. `tags` bleibt leer – der Essence-Abschnitt wird ueber die
- * Item-Klasse ausgewaehlt, nicht ueber Tag-Eignung.
+ * Familien-Label. `tags` (Eignung) bleibt leer – der Essence-Abschnitt wird
+ * ueber die Item-Klasse ausgewaehlt, nicht ueber Tag-Eignung; `filterTags`
+ * (beschreibend) werden jedoch durchgereicht, damit die Filter-Pills auch hier
+ * greifen.
  */
 export function essenceGroups(
   entries: readonly EssenceEntry[],
@@ -155,7 +157,7 @@ export function essenceGroups(
       origin: 'essence',
       text: e.text,
       tags: [],
-      filterTags: [],
+      filterTags: e.filterTags,
       tiers: [
         {
           id: e.id,
