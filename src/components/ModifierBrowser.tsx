@@ -11,9 +11,6 @@ import { ModColumn } from '@/components/ModColumn'
 import { EssenceColumn } from '@/components/EssenceColumn'
 import { FilterBar } from '@/components/FilterBar'
 
-const MIN_ITEM_LEVEL = 1
-const MAX_ITEM_LEVEL = 100
-
 const prefixesOf = (groups: RepoeGroup[]) =>
   groups.filter((g) => g.slot === 'prefix')
 const suffixesOf = (groups: RepoeGroup[]) =>
@@ -170,10 +167,6 @@ export function ModifierBrowser({
         availableTags={tags}
         activeTags={search.tags}
         onToggleTag={toggleTag}
-        itemLevel={search.ilvl}
-        minLevel={MIN_ITEM_LEVEL}
-        maxLevel={MAX_ITEM_LEVEL}
-        onItemLevel={(ilvl) => patchSearch({ ilvl })}
       />
 
       <p className="mb-6 text-[12px] text-dim">

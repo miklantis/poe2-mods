@@ -1,6 +1,13 @@
 {
-  "current": "0.15.2",
+  "current": "0.15.3",
   "entries": [
+    {
+      "version": "0.15.3",
+      "date": "2026-07-08",
+      "changes": [
+        "Der Itemstufen-Regler sitzt jetzt oben in der Kopfzeile neben dem Item-Namen statt in der Filterleiste. Die Filterleiste enthält nur noch Suche und Tag-Filter. Auf schmalen Bildschirmen rutscht der Regler unter den Titel."
+      ]
+    },
     {
       "version": "0.15.2",
       "date": "2026-07-08",

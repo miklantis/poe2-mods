@@ -49,6 +49,11 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-08, 0.15.3 – Itemstufen-Regler aus der Filterleiste in die Kopfzeile
+  neben den Item-Namen verlegt (eigene Komponente `ItemLevelControl`, Label und
+  Slider mit Abstand); Filterleiste nur noch Suche + Tag-Chips. Mobil unter dem
+  Titel.
+
 - 2026-07-08, 0.15.2 – Bugfix Tag-Filter: Essence-Einträge tragen jetzt
   Filter-Tags (aus dem CoE-Snapshot), sodass ein aktiver Tag-Filter den
   Essence-Abschnitt nicht mehr komplett ausblendet (Symptom: „+# to Strength“

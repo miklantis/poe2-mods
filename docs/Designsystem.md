@@ -75,6 +75,7 @@ Klassennamen stehen statisch in `ui/tagColors.ts`, damit Tailwind sie erzeugt),
 `TagFilterPill` (klickbarer Tag-Filter, gleiche Farben), `ProbabilityBar`
 (Chance-Balken, Breite relativ zum Slot-Max), `ViewSwitcher` (Segment-Control
 Karten/Tabelle/Balken), `Slider` (gestyltes natives Range-Element),
-`FilterBar` (Suche, Tag-Pills, Itemstufen-Slider). Zusammengesetzt in
+`FilterBar` (Suche, Tag-Pills), `ItemLevelControl` (Itemstufen-Label und
+Slider, steht in der Kopfzeile neben dem Item-Namen). Zusammengesetzt in
 `ModifierBrowser`, `ModColumn`, `ModGroupBlock`, `ModTable`, `TierRow`,
 `TierBar`, `VariantSelect`.

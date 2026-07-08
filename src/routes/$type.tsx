@@ -6,6 +6,7 @@ import { useItemTypes } from '@/hooks/useGameData'
 import { buildItemGroups, resolveSlug } from '@/lib/itemGroups'
 import { getIcon } from '@/lib/icons'
 import { ModifierBrowser } from '@/components/ModifierBrowser'
+import { ItemLevelControl } from '@/components/ItemLevelControl'
 
 /**
  * URL-State fuer Screen 2: Variante, Darstellung, Itemstufe, aktive Tags und
@@ -72,22 +73,29 @@ function BrowserPage() {
         </p>
       ) : (
         <>
-          <div className="mt-6 flex items-center gap-4">
-            <span className="flex size-12 items-center justify-center rounded-lg border border-border bg-surface-raised">
-              {(() => {
-                const Icon = getIcon(tile?.iconKey ?? 'box')
-                return (
-                  <Icon
-                    className="size-6 text-suffix"
-                    strokeWidth={1.5}
-                    aria-hidden
-                  />
-                )
-              })()}
-            </span>
-            <h1 className="font-display text-[28px] font-bold tracking-[-0.02em] text-heading">
-              {itemType.name}
-            </h1>
+          <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
+            <div className="flex items-center gap-4">
+              <span className="flex size-12 items-center justify-center rounded-lg border border-border bg-surface-raised">
+                {(() => {
+                  const Icon = getIcon(tile?.iconKey ?? 'box')
+                  return (
+                    <Icon
+                      className="size-6 text-suffix"
+                      strokeWidth={1.5}
+                      aria-hidden
+                    />
+                  )
+                })()}
+              </span>
+              <h1 className="font-display text-[28px] font-bold tracking-[-0.02em] text-heading">
+                {itemType.name}
+              </h1>
+            </div>
+
+            <ItemLevelControl
+              itemLevel={search.ilvl}
+              onItemLevel={(ilvl) => patchSearch({ ilvl })}
+            />
           </div>
 
           <ModifierBrowser

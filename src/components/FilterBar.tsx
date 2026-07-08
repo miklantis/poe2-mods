@@ -1,13 +1,13 @@
 import { Search, X } from 'lucide-react'
 import type { ColorTag } from '@/lib/modTags'
 import { Input } from '@/components/ui/input'
-import { Slider } from '@/components/ui/Slider'
 import { TagFilterPill } from '@/components/ui/TagFilterPill'
 
 /**
- * Filterleiste fuer Screen 2: Fuzzy-/Substring-Suche ueber den Mod-Text,
- * Tag-Pills (ODER) und Itemstufen-Slider. Der Zustand liegt oberhalb (URL) und
- * wird nur durchgereicht.
+ * Filterleiste fuer Screen 2: Fuzzy-/Substring-Suche ueber den Mod-Text und
+ * Tag-Pills (ODER). Die Itemstufe steht separat in der Kopfzeile
+ * (`ItemLevelControl`). Der Zustand liegt oberhalb (URL) und wird nur
+ * durchgereicht.
  */
 export function FilterBar({
   search,
@@ -15,20 +15,12 @@ export function FilterBar({
   availableTags,
   activeTags,
   onToggleTag,
-  itemLevel,
-  minLevel,
-  maxLevel,
-  onItemLevel,
 }: {
   search: string
   onSearch: (value: string) => void
   availableTags: readonly ColorTag[]
   activeTags: readonly string[]
   onToggleTag: (tag: ColorTag) => void
-  itemLevel: number
-  minLevel: number
-  maxLevel: number
-  onItemLevel: (value: number) => void
 }) {
   const active = new Set(activeTags)
   return (
@@ -70,26 +62,6 @@ export function FilterBar({
           ))}
         </div>
       )}
-
-      <div className="flex items-center gap-3">
-        <span className="shrink-0 text-[13px] text-secondary-text">
-          Itemstufe{' '}
-          <span className="font-mono tabular-nums text-body">{itemLevel}</span>
-        </span>
-        <div className="w-full max-w-[260px]">
-          <Slider
-            value={itemLevel}
-            min={minLevel}
-            max={maxLevel}
-            onChange={onItemLevel}
-            aria-label="Itemstufe"
-          />
-          <div className="mt-0.5 flex justify-between font-mono text-[10.5px] tabular-nums text-dim">
-            <span>{minLevel}</span>
-            <span>{maxLevel}</span>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
