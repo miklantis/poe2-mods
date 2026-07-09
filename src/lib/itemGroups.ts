@@ -76,7 +76,7 @@ const CATEGORY_OF: Record<string, string> = {
   Amulet: 'Ausrüstung',
   Belt: 'Ausrüstung',
   Ring: 'Ausrüstung',
-  Talisman: 'Ausrüstung',
+  Talisman: 'Two-Handed Weapons',
   Jewel: 'Jewels',
   LifeFlask: 'Flasks',
   ManaFlask: 'Flasks',

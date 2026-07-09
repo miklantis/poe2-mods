@@ -87,6 +87,16 @@ describe('buildItemGroups', () => {
     expect(groups[0].types.map((x) => x.label)).toEqual(['Bows', 'Traps'])
   })
 
+  it('ordnet Talismane den Zweihandwaffen zu', () => {
+    const groups = buildItemGroups([
+      t('Talisman', 'Talismans', 'Talisman'),
+      t('Bow', 'Bows', 'Bow'),
+    ])
+    expect(groups).toHaveLength(1)
+    expect(groups[0].label).toBe('Two-Handed Weapons')
+    expect(groups[0].types.map((x) => x.label)).toEqual(['Bows', 'Talismans'])
+  })
+
   it('fasst Relics, Tablets und Waystones unter Endgame zusammen', () => {
     const groups = buildItemGroups([
       t('Map', 'Waystones', 'Map'),

@@ -57,6 +57,12 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-09, 0.17.3 – Startseiten-Kategorie korrigiert: Talismane zu den
+  Zweihandwaffen statt zur Ausrüstung. Der repoe-Typ `Talisman` ist eine
+  Zweihandwaffe (Basen unter `TwoHandWeapons/Talismans`, Tags `two_hand_weapon`,
+  `twohand`, `weapon`), kein Schmuck. Reine Config in `itemGroups.ts`, Test
+  ergänzt. Kein ADR.
+
 - 2026-07-09, 0.17.2 – Nachtrag: `current` in `changelog.json` stand noch auf
   0.17.1, obwohl der 0.17.2-Eintrag schon vorhanden war; korrigiert, damit
   Footer und Changelog-Aktualität stimmen. Reine JSON-Änderung.

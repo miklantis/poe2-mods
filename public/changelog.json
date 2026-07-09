@@ -1,6 +1,13 @@
 {
-  "current": "0.17.2",
+  "current": "0.17.3",
   "entries": [
+    {
+      "version": "0.17.3",
+      "date": "2026-07-09",
+      "changes": [
+        "Talismane stehen jetzt bei den Zweihandwaffen statt bei der Ausrüstung – im Spiel sind sie eine Zweihandwaffe (dieselbe Waffengattung wie Traps), kein tragbares Schmuckstück."
+      ]
+    },
     {
       "version": "0.17.2",
       "date": "2026-07-09",
