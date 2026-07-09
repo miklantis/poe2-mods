@@ -57,6 +57,10 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-09, 0.17.2 – Nachtrag: `current` in `changelog.json` stand noch auf
+  0.17.1, obwohl der 0.17.2-Eintrag schon vorhanden war; korrigiert, damit
+  Footer und Changelog-Aktualität stimmen. Reine JSON-Änderung.
+
 - 2026-07-09, 0.17.2 – Startseiten-Kategorien korrigiert: Traps zu den
   Zweihandwaffen (Basen tragen den Tag `twohand`) statt in eine eigene
   Werkzeug-Kategorie; Relics, Tablets und Waystones zu einer Kategorie
