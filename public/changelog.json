@@ -1,6 +1,14 @@
 {
-  "current": "0.17.3",
+  "current": "0.17.4",
   "entries": [
+    {
+      "version": "0.17.4",
+      "date": "2026-07-09",
+      "changes": [
+        "Relics zeigen jetzt ihren Corrupted-Modifier (erhöhte Resolve-Wiederherstellung). Er fehlte, weil er in den Spieldaten nur mit einem allgemeinen Tag geführt wird; er wird jetzt korrekt allen Relic-Größen zugeordnet.",
+        "Der Fenstertitel oben zeigt jetzt die aktuelle App-Version, z. B. „poe2-mods v0.17.4 – Modifier-Browser“."
+      ]
+    },
     {
       "version": "0.17.3",
       "date": "2026-07-09",

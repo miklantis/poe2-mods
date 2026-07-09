@@ -53,6 +53,24 @@ describe('modFitsBase', () => {
     const claw = new Set(['claw', 'one_hand_weapon', 'weapon', 'default', '__dom_item'])
     expect(modFitsBase(mod, claw)).toBe(false)
   })
+  it('domaenenweiter Relic-Corrupted matcht alle Relic-Basen', () => {
+    // In den isolierten Welten (sanctum_relic) traegt ein domaenenweiter
+    // Corrupted-Mod die realen Welt-Tags (small/medium/large_sanctum_relic),
+    // nicht nur den Marker – sonst verschwaende er (matcht nichts).
+    const mod = makeMod({
+      id: 'sanctum-resolve',
+      origin: 'corrupted',
+      slot: null,
+      tags: [
+        '__dom_sanctum_relic',
+        'large_sanctum_relic',
+        'medium_sanctum_relic',
+        'small_sanctum_relic',
+      ],
+    })
+    const smallRelic = new Set(['small_sanctum_relic', 'default', '__dom_sanctum_relic'])
+    expect(modFitsBase(mod, smallRelic)).toBe(true)
+  })
 })
 
 describe('runRepoeQuery – Auswahl und Erreichbarkeit', () => {

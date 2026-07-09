@@ -210,6 +210,27 @@ async function main(): Promise<void> {
       fetchJson<Record<string, RawMod>>(`${DATA_BASE}/mods.json`),
     ])
 
+  // Reale Eignungs-Tags je Basis-Welt (aus den released Basen). Fuer die
+  // isolierten Nicht-Item-Welten (sanctum_relic, tablet, area) braucht ein
+  // domaenenweiter Mod (nur 'default') diese konkreten Tags, damit er auf allen
+  // Basen seiner Welt erscheint – der Domaenen-Marker allein zaehlt in der
+  // Engine nicht als Eignung (ADR 0017). Auf der Ausruestungs-Welt (item) waere
+  // das ein Leak ueber alle Basen, dort bleibt es beim Marker.
+  const worldTags = new Map<string, Set<string>>()
+  for (const v of Object.values(baseItemsRaw)) {
+    if (v.release_state !== 'released') continue
+    const world = worldOf(v.domain)
+    if (world === ITEM_DOMAIN) continue
+    let set = worldTags.get(world)
+    if (!set) {
+      set = new Set()
+      worldTags.set(world, set)
+    }
+    for (const t of v.tags) {
+      if (t !== GENERIC_TAG && !t.startsWith('__')) set.add(t)
+    }
+  }
+
   // --- Mods zu Familien gruppieren -------------------------------------
   // Familienschluessel: origin + slot + type. Innerhalb einer Familie sind die
   // einzelnen repoe-Eintraege die Tiers (nach Itemstufe sortiert). Eignungs-Tags
@@ -271,12 +292,20 @@ async function main(): Promise<void> {
       }))
       .sort((a, b) => a.ilvl - b.ilvl || a.id.localeCompare(b.id))
     const top = tiers[tiers.length - 1]
-    // Eignungs-Tags: den generischen 'default' durch den Marker der Welt
-    // ersetzen, damit domaenenweite Mods nur auf ihren eigenen Basen greifen.
+    // Eignungs-Tags: den generischen 'default' aufloesen. Domaenenweite Mods
+    // (nur 'default') sollen auf allen Basen ihrer Welt erscheinen. Auf der
+    // Ausruestungs-Welt (item) geht das ueber den Domaenen-Marker, der die Mods
+    // in ihre Welt sperrt, ohne als Eignung zu leaken. In den isolierten
+    // Nicht-Item-Welten zaehlt der Marker nicht als Eignung (ADR 0017), daher
+    // dort die realen Welt-Tags einsetzen (z. B. small/medium/large_sanctum_relic),
+    // sonst verschwaende der Mod (kein matchbarer Tag).
     const eligTags = new Set(fam.tags)
     if (eligTags.has(GENERIC_TAG)) {
       eligTags.delete(GENERIC_TAG)
       eligTags.add(domainMarker(fam.world))
+      if (fam.world !== ITEM_DOMAIN) {
+        for (const t of worldTags.get(fam.world) ?? []) eligTags.add(t)
+      }
     }
     mods.push({
       id: fam.id,

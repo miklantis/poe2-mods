@@ -57,6 +57,15 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-09, 0.17.4 – Relic-Corrupted-Mod sichtbar + App-Version im
+  Fenstertitel. Import: in den isolierten Nicht-Item-Welten (sanctum_relic,
+  tablet, area) bekommt eine domänenweite Familie (nur `default`) statt nur des
+  Domänen-Markers die realen Welt-Tags, weil der Marker in der Engine nicht als
+  Eignung zählt (ADR 0017). Folge: `SanctumResolveRecovery` matcht wieder alle
+  Relic-Größen (der einzige corrupted Relic-Mod im repoe-Export; weitere
+  Corruption-Implicits sind dort nicht enthalten). Root setzt `document.title`
+  mit `changelog.current`. `mods.json` neu erzeugt, Engine-Test ergänzt.
+
 - 2026-07-09, 0.17.3 – Startseiten-Kategorie korrigiert: Talismane zu den
   Zweihandwaffen statt zur Ausrüstung. Der repoe-Typ `Talisman` ist eine
   Zweihandwaffe (Basen unter `TwoHandWeapons/Talismans`, Tags `two_hand_weapon`,
@@ -108,14 +117,3 @@ Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
   Rune-Magnituden (Herkunft `warp` aus `mods.json`), Augment und Bonded
   (invertiert aus `augments.json` via neuem `import-augments.ts`). Filter wirkt
   mit; Talisman zieht Augment/Bonded aus Waffen- und Rüstungs-Pool. ADR 0016.
-
-
-- 2026-07-08, 0.15.5 – Modifier-Text: Link-Markup `[Ziel|Anzeige]` wurde auf
-  das Link-Ziel statt den Anzeigetext reduziert (Regex nahm die Seite vor dem
-  `|`). Folge u. a. vier optisch gleiche „to Resistances“-Suffixe und
-  zusammengeschriebene Begriffe. Fix in `modText.ts` (Capture hinter dem `|`),
-  Tests angepasst.
-
-- 2026-07-08, 0.15.4 – Startseite: getragene Ausrüstung (Rüstungsteile +
-  Schmuck) in eine gemeinsame Kategorie „Ausrüstung“ zusammengefasst statt fünf
-  getrennter Gruppen; Config in `itemGroups.ts`, Waffen/Offhands unverändert.

@@ -155,3 +155,11 @@ Ausgelagerte, älteste Log-Einträge aus `PLAN.md`. Chronologisch, älteste zuer
   neben den Item-Namen verlegt (eigene Komponente `ItemLevelControl`, Label und
   Slider mit Abstand); Filterleiste nur noch Suche + Tag-Chips. Mobil unter dem
   Titel.
+- 2026-07-08, 0.15.4 – Startseite: getragene Ausrüstung (Rüstungsteile +
+  Schmuck) in eine gemeinsame Kategorie „Ausrüstung“ zusammengefasst statt fünf
+  getrennter Gruppen; Config in `itemGroups.ts`, Waffen/Offhands unverändert.
+- 2026-07-08, 0.15.5 – Modifier-Text: Link-Markup `[Ziel|Anzeige]` wurde auf
+  das Link-Ziel statt den Anzeigetext reduziert (Regex nahm die Seite vor dem
+  `|`). Folge u. a. vier optisch gleiche „to Resistances“-Suffixe und
+  zusammengeschriebene Begriffe. Fix in `modText.ts` (Capture hinter dem `|`),
+  Tests angepasst.
