@@ -163,3 +163,13 @@ Ausgelagerte, älteste Log-Einträge aus `PLAN.md`. Chronologisch, älteste zuer
   `|`). Folge u. a. vier optisch gleiche „to Resistances“-Suffixe und
   zusammengeschriebene Begriffe. Fix in `modText.ts` (Capture hinter dem `|`),
   Tests angepasst.
+- 2026-07-08, 0.16.0 – Drei neue Abschnitte je Ausrüstung (poe2db-Vorbild):
+  Rune-Magnituden (Herkunft `warp` aus `mods.json`), Augment und Bonded
+  (invertiert aus `augments.json` via neuem `import-augments.ts`). Filter wirkt
+  mit; Talisman zieht Augment/Bonded aus Waffen- und Rüstungs-Pool. ADR 0016.
+- 2026-07-08, 0.16.1 – Warp-Runen korrigiert: sechs Slot-gebundene Runen
+  (Waffen Thrud's, Helm Vorana's, Handschuhe Kolr's+Katla's, Körperrüstung
+  Medved's, Stiefel Uhtred's, Talisman wie Waffen) statt fälschlich nur Thrud's
+  auf jede Ausrüstung. Alle sechs Themen als `warp` klassifiziert (frischer
+  repoe-Import, saubere Trennung von Jewel-Mods gleichen Typs); Anzeige je Rune
+  ein Präfix/Suffix-Block. ADR 0016.

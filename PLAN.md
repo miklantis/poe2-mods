@@ -57,6 +57,11 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-09, Doku – Klärung Corrupted bei Relics: repoe führt (auch in
+  `mods_by_base.json`) nur einen corrupted Relic-Mod (`SanctumResolveRecovery`).
+  Die sieben Orb-of-Sacrifice-Implicits von poe2db stehen nicht in den
+  Spieldaten und werden bewusst nicht manuell ergänzt (datentreu). ADR 0021.
+
 - 2026-07-09, 0.17.5 – Fenstertitel-Dopplung behoben: Als Chrome-PWA stellt
   die App den Manifest-Namen („poe2-mods – Modifier-Browser") dem
   `document.title` voran. Dieser trägt jetzt nur noch die Version (`v0.17.5`)
@@ -110,15 +115,3 @@ Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
   Eignungs-Tag zu werten. Zuvor leakten sieben Rüstungs-/Schmuck-Corrupted
   (Attribute, Einzel-Resistenzen) über `__dom_item` auf Waffen (Claws-Corrupted
   16 → 9, deckt sich mit poe2db); rollbar/Desecrated unverändert. ADR 0017.
-
-- 2026-07-08, 0.16.1 – Warp-Runen korrigiert: sechs Slot-gebundene Runen
-  (Waffen Thrud's, Helm Vorana's, Handschuhe Kolr's+Katla's, Körperrüstung
-  Medved's, Stiefel Uhtred's, Talisman wie Waffen) statt fälschlich nur Thrud's
-  auf jede Ausrüstung. Alle sechs Themen als `warp` klassifiziert (frischer
-  repoe-Import, saubere Trennung von Jewel-Mods gleichen Typs); Anzeige je Rune
-  ein Präfix/Suffix-Block. ADR 0016.
-
-- 2026-07-08, 0.16.0 – Drei neue Abschnitte je Ausrüstung (poe2db-Vorbild):
-  Rune-Magnituden (Herkunft `warp` aus `mods.json`), Augment und Bonded
-  (invertiert aus `augments.json` via neuem `import-augments.ts`). Filter wirkt
-  mit; Talisman zieht Augment/Bonded aus Waffen- und Rüstungs-Pool. ADR 0016.
