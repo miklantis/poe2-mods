@@ -38,10 +38,7 @@ const CATEGORY_ORDER = [
   'Ausrüstung',
   'Jewels',
   'Flasks',
-  'Relics',
-  'Tablets',
-  'Waystones',
-  'Tools',
+  'Endgame',
 ]
 
 /**
@@ -84,10 +81,10 @@ const CATEGORY_OF: Record<string, string> = {
   LifeFlask: 'Flasks',
   ManaFlask: 'Flasks',
   UtilityFlask: 'Flasks',
-  Relic: 'Relics',
-  TowerAugmentation: 'Tablets',
-  Map: 'Waystones',
-  TrapTool: 'Tools',
+  TrapTool: 'Two-Handed Weapons',
+  Relic: 'Endgame',
+  TowerAugmentation: 'Endgame',
+  Map: 'Endgame',
 }
 
 /** Icon je repoe-Klassen-ID; unbekannte Typen fallen auf ein neutrales Icon. */
@@ -128,7 +125,7 @@ const TYPE_ICONS: Record<string, string> = {
   Relic: 'landmark',
   TowerAugmentation: 'scroll',
   Map: 'map',
-  TrapTool: 'wrench',
+  TrapTool: 'bomb',
 }
 
 /** Fallback-Icon je Sammelkategorie, falls die ID kein eigenes Icon hat. */

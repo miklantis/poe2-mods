@@ -77,13 +77,29 @@ describe('buildItemGroups', () => {
     expect(all.find((x) => x.id === 'Mystery')?.iconKey).toBe('box')
   })
 
-  it('haengt unbekannte Kategorien alphabetisch hinten an (Fallback auf Roh-category)', () => {
+  it('ordnet Traps den Zweihandwaffen zu', () => {
     const groups = buildItemGroups([
-      t('Mystery', 'Mystery', 'Zeta'),
-      t('Ring', 'Rings', 'Ring'),
-      t('Other', 'Other', 'Alpha'),
+      t('TrapTool', 'Traps', 'TrapTool'),
+      t('Bow', 'Bows', 'Bow'),
     ])
-    expect(groups.map((g) => g.label)).toEqual(['Ausrüstung', 'Alpha', 'Zeta'])
+    expect(groups).toHaveLength(1)
+    expect(groups[0].label).toBe('Two-Handed Weapons')
+    expect(groups[0].types.map((x) => x.label)).toEqual(['Bows', 'Traps'])
+  })
+
+  it('fasst Relics, Tablets und Waystones unter Endgame zusammen', () => {
+    const groups = buildItemGroups([
+      t('Map', 'Waystones', 'Map'),
+      t('Relic', 'Relics', 'Relic'),
+      t('TowerAugmentation', 'Tablet', 'TowerAugment'),
+    ])
+    expect(groups).toHaveLength(1)
+    expect(groups[0].label).toBe('Endgame')
+    expect(groups[0].types.map((x) => x.label)).toEqual([
+      'Relics',
+      'Tablet',
+      'Waystones',
+    ])
   })
 })
 

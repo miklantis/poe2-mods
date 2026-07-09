@@ -2,6 +2,14 @@
   "current": "0.17.1",
   "entries": [
     {
+      "version": "0.17.2",
+      "date": "2026-07-09",
+      "changes": [
+        "Traps stehen jetzt bei den Zweihandwaffen statt in einer eigenen Werkzeug-Kategorie – im Spiel sind sie eine Zweihandwaffe.",
+        "Relics, Tablets und Waystones sind auf der Startseite unter einer gemeinsamen Kategorie „Endgame\" zusammengefasst."
+      ]
+    },
+    {
       "version": "0.17.1",
       "date": "2026-07-08",
       "changes": [
