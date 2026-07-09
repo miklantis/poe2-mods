@@ -1,6 +1,13 @@
 {
-  "current": "0.17.4",
+  "current": "0.17.5",
   "entries": [
+    {
+      "version": "0.17.5",
+      "date": "2026-07-09",
+      "changes": [
+        "Fenstertitel der installierten App aufgeräumt: Statt des doppelten App-Namens steht jetzt „poe2-mods – Modifier-Browser - v0.17.5“."
+      ]
+    },
     {
       "version": "0.17.4",
       "date": "2026-07-09",

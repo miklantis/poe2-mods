@@ -57,6 +57,11 @@ Detail in den ADRs (`docs/adr/`) und den Commits.
 Nur die jüngsten Einträge (Datum, Version, was, ein Satz warum); Detail steht im
 Commit. Ältere Einträge im Archiv: `docs/archive/PLAN-Log-Archiv.md`.
 
+- 2026-07-09, 0.17.5 – Fenstertitel-Dopplung behoben: Als Chrome-PWA stellt
+  die App den Manifest-Namen („poe2-mods – Modifier-Browser") dem
+  `document.title` voran. Dieser trägt jetzt nur noch die Version (`v0.17.5`)
+  statt den ganzen Namen zu wiederholen. Nur `__root.tsx`.
+
 - 2026-07-09, 0.17.4 – Relic-Corrupted-Mod sichtbar + App-Version im
   Fenstertitel. Import: in den isolierten Nicht-Item-Welten (sanctum_relic,
   tablet, area) bekommt eine domänenweite Familie (nur `default`) statt nur des
